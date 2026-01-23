@@ -1,0 +1,92 @@
+{course_name.upper()} SUBCHAPTER WRITING GUIDE
+
+📖 SUBCHAPTER {subchapter_code}: {subchapter_title}
+🔑 KEY CONCEPTS: {key_concepts}
+💡 CORE INSIGHT: {core_insight}
+
+MISSION
+Write a coherent, flowing chapter section in academic Chinese prose (zh-CN) for the course "{course_name}". Use this section as a pedagogical lens to reveal the profound logic and beauty of {field_name}. Create content that reads like a well-crafted standard textbook, naturally integrating with the book's overall narrative.
+Please summarize the relevant problems you have searched for this topic and provide the specific content of the problems if applicable.
+
+BOOK CONTEXT
+This subchapter belongs to a comprehensive text on {field_name}:
+{structure_summary}
+
+WRITING STYLE REQUIREMENTS
+Academic Prose Structure:
+- Craft elegant paragraphs that flow smoothly from one concept to the next.
+- Use sophisticated sentence structures appropriate for advanced education (Graduate/Undergraduate level).
+- Employ thoughtful transitions that guide readers through complex theoretical arguments.
+- Structure sections with clear narrative arcs: introduction → development → synthesis.
+- **Strictly avoid** using bullet point formats for the main body; prefer continuous formal writing.
+
+Language and Presentation:
+- Generate **authentic Chinese academic prose** that reads naturally for {field_name} scholars/students.
+- Integrate vivid metaphorical language seamlessly into technical explanations where helpful.
+- Maintain a formal academic tone while remaining intellectually engaging.
+- Use precise terminology with Chinese-English equivalents at first mention (e.g., "卷积神经网络 (Convolutional Neural Networks, CNN)").
+- Weave philosophical or methodological insights naturally into the exposition.
+
+Content Development:
+- Begin each major section with engaging introductory paragraphs.
+- Present theoretical developments through narrative storytelling rather than dry listing.
+- Build complexity gradually through well-connected explanations.
+- Conclude sections with synthesis that reinforces key insights.
+
+THEORETICAL & TECHNICAL WRITING APPROACH
+Formal/Technical Presentation:
+- Introduce each technical concept/formula through logical motivations.
+- Present equations or code snippets (if applicable) as natural conclusions to conceptual arguments.
+- Integrate intuitive explanations immediately following formal results.
+- Use concrete examples to illustrate generalized principles.
+
+Insight Development:
+- Connect every theoretical result to practical applications or observable phenomena.
+- Create intuitive pictures that students can mentally visualize.
+- Show how the structural beauty of the theory emerges from necessity.
+- Present the historical or logical context that gave rise to these innovations.
+
+Conceptual Layering:
+- Introduce complex ideas through multiple perspectives.
+- Build from familiar examples toward general principles.
+- Synthesize diverse viewpoints into coherent understanding.
+- Anticipate and address common student confusions organizationally.
+
+PEDAGOGICAL CONTENT STRUCTURE
+Example Integration:
+- Weave examples naturally into the main narrative flow.
+- Select representative cases that illuminate core principles.
+- Progress from simple illustrations to sophisticated applications.
+- Demonstrate universal applicability through diverse implementations.
+
+Exercise Philosophy (Embedded):
+- Embed thought-provoking questions or practice opportunities within the text structure.
+- Create scenarios that reinforce fundamental principles.
+- Encourage analytical thinking rather than rote memorization.
+
+CHINESE ACADEMIC CONVENTIONS
+Writing Flow:
+- Employ paragraph structures that feel natural in Chinese academic writing (起承转合).
+- Use transitional devices common in Chinese scholarly prose.
+- Maintain the balance between traditional descriptive style and modern organizational patterns.
+- Consider the cognitive expectations of advanced students.
+
+Rigorous Style:
+- Present derivations/arguments with clear logical continuity.
+- Explain the significance of each step.
+- Balance rigorous proofs with accessible explanations.
+- Demonstrate how theoretical structures embody the truth of the discipline.
+
+CONTENT SPECIFICATIONS
+Focus Requirements:
+- Center the discussion around {subchapter_title}.
+- Maintain conceptual coherence throughout the entire section.
+- Build each paragraph as a natural continuation of the previous content.
+- Create unified themes that connect divergent technical details.
+
+CONCLUDING INTEGRATION
+Craft a conclusion that:
+- Synthesizes the section's central theoretical insights.
+- Connects specific results to broader {course_name} themes.
+- Provides reflection on the nature of the insights learned.
+- Establishes intellectual foundations for subsequent chapters.

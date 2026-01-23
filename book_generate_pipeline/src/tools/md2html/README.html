@@ -1,0 +1,2890 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Readme</title>
+    
+    <!-- MathJax Configuration and Loading - NOTE: Requires internet for LaTeX rendering -->
+    <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        processEnvironments: true,
+        processClass: "math"
+      },
+      "HTML-CSS": { 
+        linebreaks: { automatic: true },
+        scale: 90
+      }
+    });
+    </script>
+    <script type="text/javascript" async
+      src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+
+    <!-- Mermaid.js for Diagram Rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            securityLevel: 'loose'
+        });
+        
+        // Initialize diagrams after page load
+        document.addEventListener('DOMContentLoaded', function() {
+            mermaid.init(undefined, '.mermaid-diagram');
+        });
+    </script>
+
+    <!-- Prism.js for Code Highlighting - 100% offline with embedded theme -->
+    <!-- Modern CSS frameworks for cross-platform support -->
+    <style>
+/* Normalize.css for consistent cross-browser rendering */
+/*! normalize.css v8.0.1 | MIT License | github.com/necolas/normalize.css */html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}[type=button],[type=reset],[type=submit],button{-webkit-appearance:button}[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner,button::-moz-focus-inner{border-style:none;padding:0}[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring,button:-moz-focusring{outline:1px dotted ButtonText}fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}
+/*# sourceMappingURL=normalize.min.css.map */
+
+/* Modern base styles with CSS variables and accessibility */
+/* Modern CSS Base - Enhanced Typography and Cross-Platform Support */
+
+/* CSS Variables for theming */
+:root {
+    --primary-bg: #ffffff;
+    --secondary-bg: #f6f8fa;
+    --text-primary: #24292e;
+    --text-secondary: #586069;
+    --border-color: #e1e4e8;
+    --link-color: #0366d6;
+    --code-bg: #f6f8fa;
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+/* Dark mode variables - only apply if explicitly using dark theme, not system preference */
+body.dark-theme {
+    --primary-bg: #0d1117;
+    --secondary-bg: #161b22;
+    --text-primary: #c9d1d9;
+    --text-secondary: #8b949e;
+    --border-color: #30363d;
+    --link-color: #58a6ff;
+    --code-bg: #161b22;
+    --shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Modern font stack */
+.markdown-body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    color: var(--text-primary);
+    background-color: var(--primary-bg);
+}
+
+/* Enhanced headings with better spacing */
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    font-weight: 600;
+    line-height: 1.25;
+    margin-top: 24px;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.markdown-body h1 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.markdown-body h2 {
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Better code styling */
+.markdown-body code {
+    background-color: var(--code-bg);
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 6px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+}
+
+.markdown-body pre {
+    background-color: var(--code-bg);
+    border-radius: 6px;
+    font-size: 85%;
+    line-height: 1.45;
+    overflow: auto;
+    padding: 16px;
+    margin: 16px 0;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-body pre code {
+    background: transparent;
+    border: 0;
+    font-size: 100%;
+    margin: 0;
+    padding: 0;
+    white-space: pre;
+    word-break: normal;
+}
+
+/* Enhanced links */
+.markdown-body a {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.markdown-body a:hover {
+    text-decoration: underline;
+}
+
+.markdown-body a:focus {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Better tables */
+.markdown-body table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    margin: 16px 0;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-body table th {
+    background-color: var(--secondary-bg);
+    font-weight: 600;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+    padding: 6px 13px;
+    border: 1px solid var(--border-color);
+}
+
+.markdown-body table tr {
+    background-color: var(--primary-bg);
+    border-top: 1px solid var(--border-color);
+}
+
+.markdown-body table tr:nth-child(2n) {
+    background-color: var(--secondary-bg);
+}
+
+/* Enhanced blockquotes */
+.markdown-body blockquote {
+    padding: 0 1em;
+    color: var(--text-secondary);
+    border-left: 0.25em solid var(--border-color);
+    margin: 16px 0;
+    background-color: var(--secondary-bg);
+    border-radius: 0 6px 6px 0;
+}
+
+.markdown-body blockquote > :first-child {
+    margin-top: 0;
+}
+
+.markdown-body blockquote > :last-child {
+    margin-bottom: 0;
+}
+
+/* Better list styling */
+.markdown-body ul,
+.markdown-body ol {
+    margin: 16px 0;
+    padding-left: 2em;
+}
+
+.markdown-body li {
+    margin: 0.25em 0;
+    word-wrap: break-all;
+}
+
+.markdown-body li > p {
+    margin: 16px 0;
+}
+
+/* Horizontal rules */
+.markdown-body hr {
+    height: 0.25em;
+    padding: 0;
+    margin: 24px 0;
+    background-color: var(--border-color);
+    border: 0;
+    border-radius: 2px;
+}
+
+/* Enhanced focus styles for accessibility */
+.markdown-body *:focus {
+    outline: 2px solid var(--link-color);
+    outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+    background-color: rgba(3, 102, 214, 0.3);
+}
+
+::-moz-selection {
+    background-color: rgba(3, 102, 214, 0.3);
+}
+
+/* Custom scrollbar for webkit browsers */
+::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--secondary-bg);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    :root {
+        --border-color: #000000;
+        --text-primary: #000000;
+        --link-color: #0000ff;
+    }
+    
+    body.dark-theme {
+        --border-color: #ffffff;
+        --text-primary: #ffffff;
+        --link-color: #00ffff;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    html {
+        scroll-behavior: auto;
+    }
+}
+
+/* Mobile-responsive styles */
+/* Hybrid CSS: Fixed-width for PC, Responsive for Mobile */
+
+/* Reset and normalize - applies to all devices */
+* {
+    box-sizing: border-box;
+}
+
+/* PC First: Preserve existing fixed-width layout for desktop */
+/* Your existing layout is preserved by default */
+
+/* MOBILE ONLY: Apply responsive design only on mobile screens */
+@media screen and (max-width: 767px) {
+    /* Mobile base styles */
+    body {
+        font-size: 16px;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+    }
+
+    /* Container responsive design */
+    #__next {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 !important;
+        padding: 0 16px !important;
+        background-color: #d8d8d8;
+        min-height: 100vh;
+    }
+
+    #page-ctn {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 auto !important;
+        padding: 16px !important;
+        background-color: white;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        border-radius: 0;
+        min-height: auto !important;
+        margin-bottom: 0 !important;
+    }
+
+    /* Hide header on mobile */
+    #page-header {
+        display: none !important;
+    }
+
+    .markdown-body {
+        width: 100% !important;
+        padding: 0 !important;
+        font-size: 16px !important;
+        line-height: 1.6 !important;
+        margin: 0 !important;
+    }
+
+    /* Mobile typography */
+    .markdown-body h1 {
+        font-size: 1.8em !important;
+        margin: 0.8em 0 0.5em 0 !important;
+        text-align: left !important;
+        padding-top: 0.5em !important;
+        padding-bottom: 0.3em !important;
+    }
+
+    .markdown-body h2 {
+        font-size: 1.5em !important;
+        margin: 0.7em 0 0.4em 0 !important;
+    }
+
+    .markdown-body h3 {
+        font-size: 1.3em !important;
+        margin: 0.6em 0 0.3em 0 !important;
+    }
+
+    .markdown-body h4 {
+        font-size: 1.1em !important;
+        margin: 0.5em 0 0.3em 0 !important;
+    }
+
+    .markdown-body h5 {
+        font-size: 1em !important;
+        margin: 0.5em 0 0.2em 0 !important;
+    }
+
+    .markdown-body h6 {
+        font-size: 0.9em !important;
+        margin: 0.4em 0 0.2em 0 !important;
+    }
+
+    /* Mobile-friendly code blocks */
+    .markdown-body pre {
+        font-size: 14px !important;
+        padding: 12px !important;
+        margin: 16px 0 !important;
+        border-radius: 6px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .markdown-body code {
+        font-size: 0.9em !important;
+        padding: 2px 4px !important;
+        border-radius: 3px;
+        word-break: break-word;
+    }
+
+    /* Mobile tables - force horizontal scroll */
+    .markdown-body table {
+        display: block !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+        margin: 16px auto !important;
+    }
+
+    .markdown-body table th,
+    .markdown-body table td {
+        padding: 6px 8px !important;
+        font-size: 12px !important;
+        white-space: nowrap;
+        min-width: 80px;
+    }
+
+    /* Mobile-friendly lists */
+    .markdown-body ul,
+    .markdown-body ol {
+        padding-left: 20px !important;
+        margin: 12px 0 !important;
+    }
+
+    .markdown-body li {
+        margin: 4px 0 !important;
+        word-wrap: break-word;
+    }
+
+    /* Mobile collapsible sections */
+    .wrap-collabsible,
+    .wrap-content-collapsible {
+        margin: 16px 0 !important;
+        padding: 0;
+    }
+
+    .lbl-toggle {
+        font-size: 12px !important;
+        padding: 8px 12px !important;
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    }
+
+    .toggle:checked+.lbl-toggle+.collapsible-content,
+    .toggle:checked+.lbl-toggle+.content-collapsible-content {
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .collapsible-content .content-inner,
+    .content-collapsible-content .content-inner {
+        padding: 8px 12px !important;
+        margin-top: 0 !important;
+    }
+
+    /* Math rendering mobile optimization */
+    .MathJax {
+        font-size: 0.9em !important;
+    }
+
+    /* Touch-friendly links */
+    .markdown-body a {
+        -webkit-tap-highlight-color: rgba(64, 115, 221, 0.3);
+        word-break: break-word;
+    }
+
+    /* Images responsive */
+    .markdown-body img {
+        max-width: 100% !important;
+        height: auto !important;
+        margin: 8px 0 !important;
+    }
+
+    /* Admonition mobile */
+    .admonition-wrapper {
+        padding: 12px 0 !important;
+    }
+
+    .admonition.orange {
+        margin: 8px !important;
+        padding: 4px 8px !important;
+    }
+
+    .admonition-orange {
+        margin: -8px !important;
+        padding: 1px 8px !important;
+        font-size: 0.9em !important;
+    }
+}
+
+/* TABLET: Medium screens */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    #page-ctn {
+        margin: 16px auto !important;
+        border-radius: 8px;
+    }
+    
+    #__next {
+        padding: 0 24px !important;
+    }
+    
+    .markdown-body h1 {
+        text-align: center !important;
+    }
+}
+
+/* DESKTOP: Large screens - preserve your fixed-width design */
+@media screen and (min-width: 1024px) {
+    /* Your existing CSS rules take precedence here */
+    /* No overrides needed - keep your 700px/800px layout */
+    
+    /* Ensure header is visible on desktop */
+    #page-header {
+        display: block !important;
+    }
+}
+
+/* High DPI displays */
+@media screen and (-webkit-min-device-pixel-ratio: 2), 
+       screen and (min-resolution: 192dpi) {
+    .markdown-body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+}
+
+/* Print styles */
+@media print {
+    #__next {
+        background: white !important;
+        padding: 0 !important;
+    }
+    
+    #page-ctn {
+        box-shadow: none !important;
+        border: 1px solid #ccc;
+        margin: 0;
+        max-width: none;
+        width: 100%;
+    }
+    
+    .wrap-collabsible,
+    .wrap-content-collapsible {
+        display: none !important;
+    }
+    
+    .markdown-body pre {
+        white-space: pre-wrap;
+        page-break-inside: avoid;
+    }
+}
+
+/* Prism prism theme - embedded for offline use */
+code[class*=language-],pre[class*=language-]{color:#000;background:0 0;text-shadow:0 1px #fff;font-family:Consolas,Monaco,'Andale Mono','Ubuntu Mono',monospace;font-size:1em;text-align:left;white-space:pre;word-spacing:normal;word-break:normal;word-wrap:normal;line-height:1.5;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-hyphens:none;-moz-hyphens:none;-ms-hyphens:none;hyphens:none}code[class*=language-] ::-moz-selection,code[class*=language-]::-moz-selection,pre[class*=language-] ::-moz-selection,pre[class*=language-]::-moz-selection{text-shadow:none;background:#b3d4fc}code[class*=language-] ::selection,code[class*=language-]::selection,pre[class*=language-] ::selection,pre[class*=language-]::selection{text-shadow:none;background:#b3d4fc}@media print{code[class*=language-],pre[class*=language-]{text-shadow:none}}pre[class*=language-]{padding:1em;margin:.5em 0;overflow:auto}:not(pre)>code[class*=language-],pre[class*=language-]{background:#f5f2f0}:not(pre)>code[class*=language-]{padding:.1em;border-radius:.3em;white-space:normal}.token.cdata,.token.comment,.token.doctype,.token.prolog{color:#708090}.token.punctuation{color:#999}.token.namespace{opacity:.7}.token.boolean,.token.constant,.token.deleted,.token.number,.token.property,.token.symbol,.token.tag{color:#905}.token.attr-name,.token.builtin,.token.char,.token.inserted,.token.selector,.token.string{color:#690}.language-css .token.string,.style .token.string,.token.entity,.token.operator,.token.url{color:#9a6e3a;background:hsla(0,0%,100%,.5)}.token.atrule,.token.attr-value,.token.keyword{color:#07a}.token.class-name,.token.function{color:#dd4a68}.token.important,.token.regex,.token.variable{color:#e90}.token.bold,.token.important{font-weight:700}.token.italic{font-style:italic}.token.entity{cursor:help}
+
+/* Block error styling */
+.block-error {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 6px;
+    padding: 15px;
+    margin: 20px 0;
+    color: #856404;
+}
+
+.block-error h3 {
+    margin-top: 0;
+    color: #dc3545;
+}
+
+.block-error pre {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 0.9em;
+}
+    </style>
+    
+    <!-- Copy the exact prism.js that demo.html uses -->
+    <script>
+/* PrismJS 1.19.0
+https://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript+bash+c+cpp+css-extras+diff+docker+fortran+git+go+java+julia+latex+lua+makefile+markdown+matlab+python+r+regex+ruby+rust+shell-session+swift+vim&plugins=line-highlight+line-numbers+file-highlight+highlight-keywords+inline-color+command-line+toolbar+copy-to-clipboard+diff-highlight */
+var _self="undefined"!=typeof window?window:"undefined"!=typeof WorkerGlobalScope&&self instanceof WorkerGlobalScope?self:{},Prism=function(u){var c=/\blang(?:uage)?-([\w-]+)\b/i,n=0,C={manual:u.Prism&&u.Prism.manual,disableWorkerMessageHandler:u.Prism&&u.Prism.disableWorkerMessageHandler,util:{encode:function(e){return e instanceof _?new _(e.type,C.util.encode(e.content),e.alias):Array.isArray(e)?e.map(C.util.encode):e.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/\u00a0/g," ")},type:function(e){return Object.prototype.toString.call(e).slice(8,-1)},objId:function(e){return e.__id||Object.defineProperty(e,"__id",{value:++n}),e.__id},clone:function r(e,t){var a,n,i=C.util.type(e);switch(t=t||{},i){case"Object":if(n=C.util.objId(e),t[n])return t[n];for(var o in a={},t[n]=a,e)e.hasOwnProperty(o)&&(a[o]=r(e[o],t));return a;case"Array":return n=C.util.objId(e),t[n]?t[n]:(a=[],t[n]=a,e.forEach(function(e,n){a[n]=r(e,t)}),a);default:return e}},getLanguage:function(e){for(;e&&!c.test(e.className);)e=e.parentElement;return e?(e.className.match(c)||[,"none"])[1].toLowerCase():"none"},currentScript:function(){if("undefined"==typeof document)return null;if("currentScript"in document)return document.currentScript;try{throw new Error}catch(e){var n=(/at [^(\r\n]*\((.*):.+:.+\)$/i.exec(e.stack)||[])[1];if(n){var r=document.getElementsByTagName("script");for(var t in r)if(r[t].src==n)return r[t]}return null}}},languages:{extend:function(e,n){var r=C.util.clone(C.languages[e]);for(var t in n)r[t]=n[t];return r},insertBefore:function(r,e,n,t){var a=(t=t||C.languages)[r],i={};for(var o in a)if(a.hasOwnProperty(o)){if(o==e)for(var l in n)n.hasOwnProperty(l)&&(i[l]=n[l]);n.hasOwnProperty(o)||(i[o]=a[o])}var s=t[r];return t[r]=i,C.languages.DFS(C.languages,function(e,n){n===s&&e!=r&&(this[e]=i)}),i},DFS:function e(n,r,t,a){a=a||{};var i=C.util.objId;for(var o in n)if(n.hasOwnProperty(o)){r.call(n,o,n[o],t||o);var l=n[o],s=C.util.type(l);"Object"!==s||a[i(l)]?"Array"!==s||a[i(l)]||(a[i(l)]=!0,e(l,r,o,a)):(a[i(l)]=!0,e(l,r,null,a))}}},plugins:{},highlightAll:function(e,n){C.highlightAllUnder(document,e,n)},highlightAllUnder:function(e,n,r){var t={callback:r,container:e,selector:'code[class*="language-"], [class*="language-"] code, code[class*="lang-"], [class*="lang-"] code'};C.hooks.run("before-highlightall",t),t.elements=Array.prototype.slice.apply(t.container.querySelectorAll(t.selector)),C.hooks.run("before-all-elements-highlight",t);for(var a,i=0;a=t.elements[i++];)C.highlightElement(a,!0===n,t.callback)},highlightElement:function(e,n,r){var t=C.util.getLanguage(e),a=C.languages[t];e.className=e.className.replace(c,"").replace(/\s+/g," ")+" language-"+t;var i=e.parentNode;i&&"pre"===i.nodeName.toLowerCase()&&(i.className=i.className.replace(c,"").replace(/\s+/g," ")+" language-"+t);var o={element:e,language:t,grammar:a,code:e.textContent};function l(e){o.highlightedCode=e,C.hooks.run("before-insert",o),o.element.innerHTML=o.highlightedCode,C.hooks.run("after-highlight",o),C.hooks.run("complete",o),r&&r.call(o.element)}if(C.hooks.run("before-sanity-check",o),!o.code)return C.hooks.run("complete",o),void(r&&r.call(o.element));if(C.hooks.run("before-highlight",o),o.grammar)if(n&&u.Worker){var s=new Worker(C.filename);s.onmessage=function(e){l(e.data)},s.postMessage(JSON.stringify({language:o.language,code:o.code,immediateClose:!0}))}else l(C.highlight(o.code,o.grammar,o.language));else l(C.util.encode(o.code))},highlight:function(e,n,r){var t={code:e,grammar:n,language:r};return C.hooks.run("before-tokenize",t),t.tokens=C.tokenize(t.code,t.grammar),C.hooks.run("after-tokenize",t),_.stringify(C.util.encode(t.tokens),t.language)},matchGrammar:function(e,n,r,t,a,i,o){for(var l in r)if(r.hasOwnProperty(l)&&r[l]){var s=r[l];s=Array.isArray(s)?s:[s];for(var u=0;u<s.length;++u){if(o&&o==l+","+u)return;var c=s[u],g=c.inside,f=!!c.lookbehind,h=!!c.greedy,d=0,m=c.alias;if(h&&!c.pattern.global){var p=c.pattern.toString().match(/[imsuy]*$/)[0];c.pattern=RegExp(c.pattern.source,p+"g")}c=c.pattern||c;for(var y=t,v=a;y<n.length;v+=n[y].length,++y){var k=n[y];if(n.length>e.length)return;if(!(k instanceof _)){if(h&&y!=n.length-1){if(c.lastIndex=v,!(O=c.exec(e)))break;for(var b=O.index+(f&&O[1]?O[1].length:0),w=O.index+O[0].length,A=y,P=v,x=n.length;A<x&&(P<w||!n[A].type&&!n[A-1].greedy);++A)(P+=n[A].length)<=b&&(++y,v=P);if(n[y]instanceof _)continue;S=A-y,k=e.slice(v,P),O.index-=v}else{c.lastIndex=0;var O=c.exec(k),S=1}if(O){f&&(d=O[1]?O[1].length:0);w=(b=O.index+d)+(O=O[0].slice(d)).length;var j=k.slice(0,b),N=k.slice(w),E=[y,S];j&&(++y,v+=j.length,E.push(j));var L=new _(l,g?C.tokenize(O,g):O,m,O,h);if(E.push(L),N&&E.push(N),Array.prototype.splice.apply(n,E),1!=S&&C.matchGrammar(e,n,r,y,v,!0,l+","+u),i)break}else if(i)break}}}}},tokenize:function(e,n){var r=[e],t=n.rest;if(t){for(var a in t)n[a]=t[a];delete n.rest}return C.matchGrammar(e,r,n,0,0,!1),r},hooks:{all:{},add:function(e,n){var r=C.hooks.all;r[e]=r[e]||[],r[e].push(n)},run:function(e,n){var r=C.hooks.all[e];if(r&&r.length)for(var t,a=0;t=r[a++];)t(n)}},Token:_};function _(e,n,r,t,a){this.type=e,this.content=n,this.alias=r,this.length=0|(t||"").length,this.greedy=!!a}if(u.Prism=C,_.stringify=function(e,n){if("string"==typeof e)return e;if(Array.isArray(e))return e.map(function(e){return _.stringify(e,n)}).join("");var r={type:e.type,content:_.stringify(e.content,n),tag:"span",classes:["token",e.type],attributes:{},language:n};if(e.alias){var t=Array.isArray(e.alias)?e.alias:[e.alias];Array.prototype.push.apply(r.classes,t)}C.hooks.run("wrap",r);var a=Object.keys(r.attributes).map(function(e){return e+'="'+(r.attributes[e]||"").replace(/"/g,"&quot;")+'"'}).join(" ");return"<"+r.tag+' class="'+r.classes.join(" ")+'"'+(a?" "+a:"")+">"+r.content+"</"+r.tag+">"},!u.document)return u.addEventListener&&(C.disableWorkerMessageHandler||u.addEventListener("message",function(e){var n=JSON.parse(e.data),r=n.language,t=n.code,a=n.immediateClose;u.postMessage(C.highlight(t,C.languages[r],r)),a&&u.close()},!1)),C;var e=C.util.currentScript();function r(){C.manual||C.highlightAll()}if(e&&(C.filename=e.src,e.hasAttribute("data-manual")&&(C.manual=!0)),!C.manual){var t=document.readyState;"loading"===t||"interactive"===t&&e&&e.defer?document.addEventListener("DOMContentLoaded",r):window.requestAnimationFrame?window.requestAnimationFrame(r):window.setTimeout(r,16)}return C}(_self);"undefined"!=typeof module&&module.exports&&(module.exports=Prism),"undefined"!=typeof global&&(global.Prism=Prism);
+Prism.languages.markup={comment:/<!--[\s\S]*?-->/,prolog:/<\?[\s\S]+?\?>/,doctype:{pattern:/<!DOCTYPE(?:[^>"'[\]]|"[^"]*"|'[^']*')+(?:\[(?:(?!<!--)[^"'\]]|"[^"]*"|'[^']*'|<!--[\s\S]*?-->)*\]\s*)?>/i,greedy:!0},cdata:/<!\[CDATA\[[\s\S]*?]]>/i,tag:{pattern:/<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/i,greedy:!0,inside:{tag:{pattern:/^<\/?[^\s>\/]+/i,inside:{punctuation:/^<\/?/,namespace:/^[^\s>\/:]+:/}},"attr-value":{pattern:/=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+)/i,inside:{punctuation:[/^=/,{pattern:/^(\s*)["']|["']$/,lookbehind:!0}]}},punctuation:/\/?>/,"attr-name":{pattern:/[^\s>\/]+/,inside:{namespace:/^[^\s>\/:]+:/}}}},entity:/&#?[\da-z]{1,8};/i},Prism.languages.markup.tag.inside["attr-value"].inside.entity=Prism.languages.markup.entity,Prism.hooks.add("wrap",function(a){"entity"===a.type&&(a.attributes.title=a.content.replace(/&amp;/,"&"))}),Object.defineProperty(Prism.languages.markup.tag,"addInlined",{value:function(a,e){var s={};s["language-"+e]={pattern:/(^<!\[CDATA\[)[\s\S]+?(?=\]\]>$)/i,lookbehind:!0,inside:Prism.languages[e]},s.cdata=/^<!\[CDATA\[|\]\]>$/i;var n={"included-cdata":{pattern:/<!\[CDATA\[[\s\S]*?\]\]>/i,inside:s}};n["language-"+e]={pattern:/[\s\S]+/,inside:Prism.languages[e]};var t={};t[a]={pattern:RegExp("(<__[\\s\\S]*?>)(?:<!\\[CDATA\\[[\\s\\S]*?\\]\\]>\\s*|[\\s\\S])*?(?=<\\/__>)".replace(/__/g,a),"i"),lookbehind:!0,greedy:!0,inside:n},Prism.languages.insertBefore("markup","cdata",t)}}),Prism.languages.xml=Prism.languages.extend("markup",{}),Prism.languages.html=Prism.languages.markup,Prism.languages.mathml=Prism.languages.markup,Prism.languages.svg=Prism.languages.markup;
+!function(s){var e=/("|')(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/;s.languages.css={comment:/\/\*[\s\S]*?\*\//,atrule:{pattern:/@[\w-]+[\s\S]*?(?:;|(?=\s*\{))/,inside:{rule:/^@[\w-]+/,"selector-function-argument":{pattern:/(\bselector\s*\((?!\s*\))\s*)(?:[^()]|\((?:[^()]|\([^()]*\))*\))+?(?=\s*\))/,lookbehind:!0,alias:"selector"}}},url:{pattern:RegExp("url\\((?:"+e.source+"|[^\n\r()]*)\\)","i"),inside:{function:/^url/i,punctuation:/^\(|\)$/}},selector:RegExp("[^{}\\s](?:[^{};\"']|"+e.source+")*?(?=\\s*\\{)"),string:{pattern:e,greedy:!0},property:/[-_a-z\xA0-\uFFFF][-\w\xA0-\uFFFF]*(?=\s*:)/i,important:/!important\b/i,function:/[-a-z0-9]+(?=\()/i,punctuation:/[(){};:,]/},s.languages.css.atrule.inside.rest=s.languages.css;var t=s.languages.markup;t&&(t.tag.addInlined("style","css"),s.languages.insertBefore("inside","attr-value",{"style-attr":{pattern:/\s*style=("|')(?:\\[\s\S]|(?!\1)[^\\])*\1/i,inside:{"attr-name":{pattern:/^\s*style/i,inside:t.tag.inside},punctuation:/^\s*=\s*['"]|['"]\s*$/,"attr-value":{pattern:/.+/i,inside:s.languages.css}},alias:"language-css"}},t.tag))}(Prism);
+Prism.languages.clike={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?(?:\*\/|$)/,lookbehind:!0},{pattern:/(^|[^\\:])\/\/.*/,lookbehind:!0,greedy:!0}],string:{pattern:/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0},"class-name":{pattern:/(\b(?:class|interface|extends|implements|trait|instanceof|new)\s+|\bcatch\s+\()[\w.\\]+/i,lookbehind:!0,inside:{punctuation:/[.\\]/}},keyword:/\b(?:if|else|while|do|for|return|in|instanceof|function|new|try|throw|catch|finally|null|break|continue)\b/,boolean:/\b(?:true|false)\b/,function:/\w+(?=\()/,number:/\b0x[\da-f]+\b|(?:\b\d+\.?\d*|\B\.\d+)(?:e[+-]?\d+)?/i,operator:/[<>]=?|[!=]=?=?|--?|\+\+?|&&?|\|\|?|[?*/~^%]/,punctuation:/[{}[\];(),.:]/};
+Prism.languages.javascript=Prism.languages.extend("clike",{"class-name":[Prism.languages.clike["class-name"],{pattern:/(^|[^$\w\xA0-\uFFFF])[_$A-Z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\.(?:prototype|constructor))/,lookbehind:!0}],keyword:[{pattern:/((?:^|})\s*)(?:catch|finally)\b/,lookbehind:!0},{pattern:/(^|[^.]|\.\.\.\s*)\b(?:as|async(?=\s*(?:function\b|\(|[$\w\xA0-\uFFFF]|$))|await|break|case|class|const|continue|debugger|default|delete|do|else|enum|export|extends|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)\b/,lookbehind:!0}],number:/\b(?:(?:0[xX](?:[\dA-Fa-f](?:_[\dA-Fa-f])?)+|0[bB](?:[01](?:_[01])?)+|0[oO](?:[0-7](?:_[0-7])?)+)n?|(?:\d(?:_\d)?)+n|NaN|Infinity)\b|(?:\b(?:\d(?:_\d)?)+\.?(?:\d(?:_\d)?)*|\B\.(?:\d(?:_\d)?)+)(?:[Ee][+-]?(?:\d(?:_\d)?)+)?/,function:/#?[_$a-zA-Z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\s*(?:\.\s*(?:apply|bind|call)\s*)?\()/,operator:/--|\+\+|\*\*=?|=>|&&|\|\||[!=]==|<<=?|>>>?=?|[-+*/%&|^!=<>]=?|\.{3}|\?[.?]?|[~:]/}),Prism.languages.javascript["class-name"][0].pattern=/(\b(?:class|interface|extends|implements|instanceof|new)\s+)[\w.\\]+/,Prism.languages.insertBefore("javascript","keyword",{regex:{pattern:/((?:^|[^$\w\xA0-\uFFFF."'\])\s])\s*)\/(?:\[(?:[^\]\\\r\n]|\\.)*]|\\.|[^/\\\[\r\n])+\/[gimyus]{0,6}(?=(?:\s|\/\*[\s\S]*?\*\/)*(?:$|[\r\n,.;:})\]]|\/\/))/,lookbehind:!0,greedy:!0},"function-variable":{pattern:/#?[_$a-zA-Z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\s*[=:]\s*(?:async\s*)?(?:\bfunction\b|(?:\((?:[^()]|\([^()]*\))*\)|[_$a-zA-Z\xA0-\uFFFF][$\w\xA0-\uFFFF]*)\s*=>))/,alias:"function"},parameter:[{pattern:/(function(?:\s+[_$A-Za-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*)?\s*\(\s*)(?!\s)(?:[^()]|\([^()]*\))+?(?=\s*\))/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/[_$a-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*(?=\s*=>)/i,inside:Prism.languages.javascript},{pattern:/(\(\s*)(?!\s)(?:[^()]|\([^()]*\))+?(?=\s*\)\s*=>)/,lookbehind:!0,inside:Prism.languages.javascript},{pattern:/((?:\b|\s|^)(?!(?:as|async|await|break|case|catch|class|const|continue|debugger|default|delete|do|else|enum|export|extends|finally|for|from|function|get|if|implements|import|in|instanceof|interface|let|new|null|of|package|private|protected|public|return|set|static|super|switch|this|throw|try|typeof|undefined|var|void|while|with|yield)(?![$\w\xA0-\uFFFF]))(?:[_$A-Za-z\xA0-\uFFFF][$\w\xA0-\uFFFF]*\s*)\(\s*)(?!\s)(?:[^()]|\([^()]*\))+?(?=\s*\)\s*\{)/,lookbehind:!0,inside:Prism.languages.javascript}],constant:/\b[A-Z](?:[A-Z_]|\dx?)*\b/}),Prism.languages.insertBefore("javascript","string",{"template-string":{pattern:/`(?:\\[\s\S]|\${(?:[^{}]|{(?:[^{}]|{[^}]*})*})+}|(?!\${)[^\\`])*`/,greedy:!0,inside:{"template-punctuation":{pattern:/^`|`$/,alias:"string"},interpolation:{pattern:/((?:^|[^\\])(?:\\{2})*)\${(?:[^{}]|{(?:[^{}]|{[^}]*})*})+}/,lookbehind:!0,inside:{"interpolation-punctuation":{pattern:/^\${|}$/,alias:"punctuation"},rest:Prism.languages.javascript}},string:/[\s\S]+/}}}),Prism.languages.markup&&Prism.languages.markup.tag.addInlined("script","javascript"),Prism.languages.js=Prism.languages.javascript;
+!function(e){var t="\\b(?:BASH|BASHOPTS|BASH_ALIASES|BASH_ARGC|BASH_ARGV|BASH_CMDS|BASH_COMPLETION_COMPAT_DIR|BASH_LINENO|BASH_REMATCH|BASH_SOURCE|BASH_VERSINFO|BASH_VERSION|COLORTERM|COLUMNS|COMP_WORDBREAKS|DBUS_SESSION_BUS_ADDRESS|DEFAULTS_PATH|DESKTOP_SESSION|DIRSTACK|DISPLAY|EUID|GDMSESSION|GDM_LANG|GNOME_KEYRING_CONTROL|GNOME_KEYRING_PID|GPG_AGENT_INFO|GROUPS|HISTCONTROL|HISTFILE|HISTFILESIZE|HISTSIZE|HOME|HOSTNAME|HOSTTYPE|IFS|INSTANCE|JOB|LANG|LANGUAGE|LC_ADDRESS|LC_ALL|LC_IDENTIFICATION|LC_MEASUREMENT|LC_MONETARY|LC_NAME|LC_NUMERIC|LC_PAPER|LC_TELEPHONE|LC_TIME|LESSCLOSE|LESSOPEN|LINES|LOGNAME|LS_COLORS|MACHTYPE|MAILCHECK|MANDATORY_PATH|NO_AT_BRIDGE|OLDPWD|OPTERR|OPTIND|ORBIT_SOCKETDIR|OSTYPE|PAPERSIZE|PATH|PIPESTATUS|PPID|PS1|PS2|PS3|PS4|PWD|RANDOM|REPLY|SECONDS|SELINUX_INIT|SESSION|SESSIONTYPE|SESSION_MANAGER|SHELL|SHELLOPTS|SHLVL|SSH_AUTH_SOCK|TERM|UID|UPSTART_EVENTS|UPSTART_INSTANCE|UPSTART_JOB|UPSTART_SESSION|USER|WINDOWID|XAUTHORITY|XDG_CONFIG_DIRS|XDG_CURRENT_DESKTOP|XDG_DATA_DIRS|XDG_GREETER_DATA_DIR|XDG_MENU_PREFIX|XDG_RUNTIME_DIR|XDG_SEAT|XDG_SEAT_PATH|XDG_SESSION_DESKTOP|XDG_SESSION_ID|XDG_SESSION_PATH|XDG_SESSION_TYPE|XDG_VTNR|XMODIFIERS)\\b",n={environment:{pattern:RegExp("\\$"+t),alias:"constant"},variable:[{pattern:/\$?\(\([\s\S]+?\)\)/,greedy:!0,inside:{variable:[{pattern:/(^\$\(\([\s\S]+)\)\)/,lookbehind:!0},/^\$\(\(/],number:/\b0x[\dA-Fa-f]+\b|(?:\b\d+\.?\d*|\B\.\d+)(?:[Ee]-?\d+)?/,operator:/--?|-=|\+\+?|\+=|!=?|~|\*\*?|\*=|\/=?|%=?|<<=?|>>=?|<=?|>=?|==?|&&?|&=|\^=?|\|\|?|\|=|\?|:/,punctuation:/\(\(?|\)\)?|,|;/}},{pattern:/\$\((?:\([^)]+\)|[^()])+\)|`[^`]+`/,greedy:!0,inside:{variable:/^\$\(|^`|\)$|`$/}},{pattern:/\$\{[^}]+\}/,greedy:!0,inside:{operator:/:[-=?+]?|[!\/]|##?|%%?|\^\^?|,,?/,punctuation:/[\[\]]/,environment:{pattern:RegExp("(\\{)"+t),lookbehind:!0,alias:"constant"}}},/\$(?:\w+|[#?*!@$])/],entity:/\\(?:[abceEfnrtv\\"]|O?[0-7]{1,3}|x[0-9a-fA-F]{1,2}|u[0-9a-fA-F]{4}|U[0-9a-fA-F]{8})/};e.languages.bash={shebang:{pattern:/^#!\s*\/.*/,alias:"important"},comment:{pattern:/(^|[^"{\\$])#.*/,lookbehind:!0},"function-name":[{pattern:/(\bfunction\s+)\w+(?=(?:\s*\(?:\s*\))?\s*\{)/,lookbehind:!0,alias:"function"},{pattern:/\b\w+(?=\s*\(\s*\)\s*\{)/,alias:"function"}],"for-or-select":{pattern:/(\b(?:for|select)\s+)\w+(?=\s+in\s)/,alias:"variable",lookbehind:!0},"assign-left":{pattern:/(^|[\s;|&]|[<>]\()\w+(?=\+?=)/,inside:{environment:{pattern:RegExp("(^|[\\s;|&]|[<>]\\()"+t),lookbehind:!0,alias:"constant"}},alias:"variable",lookbehind:!0},string:[{pattern:/((?:^|[^<])<<-?\s*)(\w+?)\s*(?:\r?\n|\r)[\s\S]*?(?:\r?\n|\r)\2/,lookbehind:!0,greedy:!0,inside:n},{pattern:/((?:^|[^<])<<-?\s*)(["'])(\w+)\2\s*(?:\r?\n|\r)[\s\S]*?(?:\r?\n|\r)\3/,lookbehind:!0,greedy:!0},{pattern:/(["'])(?:\\[\s\S]|\$\([^)]+\)|`[^`]+`|(?!\1)[^\\])*\1/,greedy:!0,inside:n}],environment:{pattern:RegExp("\\$?"+t),alias:"constant"},variable:n.variable,function:{pattern:/(^|[\s;|&]|[<>]\()(?:add|apropos|apt|aptitude|apt-cache|apt-get|aspell|automysqlbackup|awk|basename|bash|bc|bconsole|bg|bzip2|cal|cat|cfdisk|chgrp|chkconfig|chmod|chown|chroot|cksum|clear|cmp|column|comm|cp|cron|crontab|csplit|curl|cut|date|dc|dd|ddrescue|debootstrap|df|diff|diff3|dig|dir|dircolors|dirname|dirs|dmesg|du|egrep|eject|env|ethtool|expand|expect|expr|fdformat|fdisk|fg|fgrep|file|find|fmt|fold|format|free|fsck|ftp|fuser|gawk|git|gparted|grep|groupadd|groupdel|groupmod|groups|grub-mkconfig|gzip|halt|head|hg|history|host|hostname|htop|iconv|id|ifconfig|ifdown|ifup|import|install|ip|jobs|join|kill|killall|less|link|ln|locate|logname|logrotate|look|lpc|lpr|lprint|lprintd|lprintq|lprm|ls|lsof|lynx|make|man|mc|mdadm|mkconfig|mkdir|mke2fs|mkfifo|mkfs|mkisofs|mknod|mkswap|mmv|more|most|mount|mtools|mtr|mutt|mv|nano|nc|netstat|nice|nl|nohup|notify-send|npm|nslookup|op|open|parted|passwd|paste|pathchk|ping|pkill|pnpm|popd|pr|printcap|printenv|ps|pushd|pv|quota|quotacheck|quotactl|ram|rar|rcp|reboot|remsync|rename|renice|rev|rm|rmdir|rpm|rsync|scp|screen|sdiff|sed|sendmail|seq|service|sftp|sh|shellcheck|shuf|shutdown|sleep|slocate|sort|split|ssh|stat|strace|su|sudo|sum|suspend|swapon|sync|tac|tail|tar|tee|time|timeout|top|touch|tr|traceroute|tsort|tty|umount|uname|unexpand|uniq|units|unrar|unshar|unzip|update-grub|uptime|useradd|userdel|usermod|users|uudecode|uuencode|v|vdir|vi|vim|virsh|vmstat|wait|watch|wc|wget|whereis|which|who|whoami|write|xargs|xdg-open|yarn|yes|zenity|zip|zsh|zypper)(?=$|[)\s;|&])/,lookbehind:!0},keyword:{pattern:/(^|[\s;|&]|[<>]\()(?:if|then|else|elif|fi|for|while|in|case|esac|function|select|do|done|until)(?=$|[)\s;|&])/,lookbehind:!0},builtin:{pattern:/(^|[\s;|&]|[<>]\()(?:\.|:|break|cd|continue|eval|exec|exit|export|getopts|hash|pwd|readonly|return|shift|test|times|trap|umask|unset|alias|bind|builtin|caller|command|declare|echo|enable|help|let|local|logout|mapfile|printf|read|readarray|source|type|typeset|ulimit|unalias|set|shopt)(?=$|[)\s;|&])/,lookbehind:!0,alias:"class-name"},boolean:{pattern:/(^|[\s;|&]|[<>]\()(?:true|false)(?=$|[)\s;|&])/,lookbehind:!0},"file-descriptor":{pattern:/\B&\d\b/,alias:"important"},operator:{pattern:/\d?<>|>\||\+=|==?|!=?|=~|<<[<-]?|[&\d]?>>|\d?[<>]&?|&[>&]?|\|[&|]?|<=?|>=?/,inside:{"file-descriptor":{pattern:/^\d/,alias:"important"}}},punctuation:/\$?\(\(?|\)\)?|\.\.|[{}[\];\\]/,number:{pattern:/(^|\s)(?:[1-9]\d*|0)(?:[.,]\d+)?\b/,lookbehind:!0}};for(var a=["comment","function-name","for-or-select","assign-left","string","environment","function","keyword","builtin","boolean","file-descriptor","operator","punctuation","number"],r=n.variable[1].inside,s=0;s<a.length;s++)r[a[s]]=e.languages.bash[a[s]];e.languages.shell=e.languages.bash}(Prism);
+Prism.languages.c=Prism.languages.extend("clike",{"class-name":{pattern:/(\b(?:enum|struct)\s+)\w+/,lookbehind:!0},keyword:/\b(?:_Alignas|_Alignof|_Atomic|_Bool|_Complex|_Generic|_Imaginary|_Noreturn|_Static_assert|_Thread_local|asm|typeof|inline|auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while)\b/,operator:/>>=?|<<=?|->|([-+&|:])\1|[?:~]|[-+*/%&|^!=<>]=?/,number:/(?:\b0x(?:[\da-f]+\.?[\da-f]*|\.[\da-f]+)(?:p[+-]?\d+)?|(?:\b\d+\.?\d*|\B\.\d+)(?:e[+-]?\d+)?)[ful]*/i}),Prism.languages.insertBefore("c","string",{macro:{pattern:/(^\s*)#\s*[a-z]+(?:[^\r\n\\]|\\(?:\r\n|[\s\S]))*/im,lookbehind:!0,alias:"property",inside:{string:{pattern:/(#\s*include\s*)(?:<.+?>|("|')(?:\\?.)+?\2)/,lookbehind:!0},directive:{pattern:/(#\s*)\b(?:define|defined|elif|else|endif|error|ifdef|ifndef|if|import|include|line|pragma|undef|using)\b/,lookbehind:!0,alias:"keyword"}}},constant:/\b(?:__FILE__|__LINE__|__DATE__|__TIME__|__TIMESTAMP__|__func__|EOF|NULL|SEEK_CUR|SEEK_END|SEEK_SET|stdin|stdout|stderr)\b/}),delete Prism.languages.c.boolean;
+Prism.languages.cpp=Prism.languages.extend("c",{"class-name":{pattern:/(\b(?:class|enum|struct)\s+)\w+/,lookbehind:!0},keyword:/\b(?:alignas|alignof|asm|auto|bool|break|case|catch|char|char16_t|char32_t|class|compl|const|constexpr|const_cast|continue|decltype|default|delete|do|double|dynamic_cast|else|enum|explicit|export|extern|float|for|friend|goto|if|inline|int|int8_t|int16_t|int32_t|int64_t|uint8_t|uint16_t|uint32_t|uint64_t|long|mutable|namespace|new|noexcept|nullptr|operator|private|protected|public|register|reinterpret_cast|return|short|signed|sizeof|static|static_assert|static_cast|struct|switch|template|this|thread_local|throw|try|typedef|typeid|typename|union|unsigned|using|virtual|void|volatile|wchar_t|while)\b/,number:{pattern:/(?:\b0b[01']+|\b0x(?:[\da-f']+\.?[\da-f']*|\.[\da-f']+)(?:p[+-]?[\d']+)?|(?:\b[\d']+\.?[\d']*|\B\.[\d']+)(?:e[+-]?[\d']+)?)[ful]*/i,greedy:!0},operator:/>>=?|<<=?|->|([-+&|:])\1|[?:~]|[-+*/%&|^!=<>]=?|\b(?:and|and_eq|bitand|bitor|not|not_eq|or|or_eq|xor|xor_eq)\b/,boolean:/\b(?:true|false)\b/}),Prism.languages.insertBefore("cpp","string",{"raw-string":{pattern:/R"([^()\\ ]{0,16})\([\s\S]*?\)\1"/,alias:"string",greedy:!0}});
+!function(e){var a,n=/("|')(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/;e.languages.css.selector={pattern:e.languages.css.selector,inside:a={"pseudo-element":/:(?:after|before|first-letter|first-line|selection)|::[-\w]+/,"pseudo-class":/:[-\w]+/,class:/\.[-:.\w]+/,id:/#[-:.\w]+/,attribute:{pattern:RegExp("\\[(?:[^[\\]\"']|"+n.source+")*\\]"),greedy:!0,inside:{punctuation:/^\[|\]$/,"case-sensitivity":{pattern:/(\s)[si]$/i,lookbehind:!0,alias:"keyword"},namespace:{pattern:/^(\s*)[-*\w\xA0-\uFFFF]*\|(?!=)/,lookbehind:!0,inside:{punctuation:/\|$/}},attribute:{pattern:/^(\s*)[-\w\xA0-\uFFFF]+/,lookbehind:!0},value:[n,{pattern:/(=\s*)[-\w\xA0-\uFFFF]+(?=\s*$)/,lookbehind:!0}],operator:/[|~*^$]?=/}},"n-th":[{pattern:/(\(\s*)[+-]?\d*[\dn](?:\s*[+-]\s*\d+)?(?=\s*\))/,lookbehind:!0,inside:{number:/[\dn]+/,operator:/[+-]/}},{pattern:/(\(\s*)(?:even|odd)(?=\s*\))/i,lookbehind:!0}],punctuation:/[()]/}},e.languages.css.atrule.inside["selector-function-argument"].inside=a,e.languages.insertBefore("css","property",{variable:{pattern:/(^|[^-\w\xA0-\uFFFF])--[-_a-z\xA0-\uFFFF][-\w\xA0-\uFFFF]*/i,lookbehind:!0}});var r={pattern:/(\d)(?:%|[a-z]+)/,lookbehind:!0},i={pattern:/(^|[^\w.-])-?\d*\.?\d+/,lookbehind:!0};e.languages.insertBefore("css","function",{operator:{pattern:/(\s)[+\-*\/](?=\s)/,lookbehind:!0},hexcode:{pattern:/\B#(?:[\da-f]{1,2}){3,4}\b/i,alias:"color"},color:[/\b(?:AliceBlue|AntiqueWhite|Aqua|Aquamarine|Azure|Beige|Bisque|Black|BlanchedAlmond|Blue|BlueViolet|Brown|BurlyWood|CadetBlue|Chartreuse|Chocolate|Coral|CornflowerBlue|Cornsilk|Crimson|Cyan|DarkBlue|DarkCyan|DarkGoldenRod|DarkGr[ae]y|DarkGreen|DarkKhaki|DarkMagenta|DarkOliveGreen|DarkOrange|DarkOrchid|DarkRed|DarkSalmon|DarkSeaGreen|DarkSlateBlue|DarkSlateGr[ae]y|DarkTurquoise|DarkViolet|DeepPink|DeepSkyBlue|DimGr[ae]y|DodgerBlue|FireBrick|FloralWhite|ForestGreen|Fuchsia|Gainsboro|GhostWhite|Gold|GoldenRod|Gr[ae]y|Green|GreenYellow|HoneyDew|HotPink|IndianRed|Indigo|Ivory|Khaki|Lavender|LavenderBlush|LawnGreen|LemonChiffon|LightBlue|LightCoral|LightCyan|LightGoldenRodYellow|LightGr[ae]y|LightGreen|LightPink|LightSalmon|LightSeaGreen|LightSkyBlue|LightSlateGr[ae]y|LightSteelBlue|LightYellow|Lime|LimeGreen|Linen|Magenta|Maroon|MediumAquaMarine|MediumBlue|MediumOrchid|MediumPurple|MediumSeaGreen|MediumSlateBlue|MediumSpringGreen|MediumTurquoise|MediumVioletRed|MidnightBlue|MintCream|MistyRose|Moccasin|NavajoWhite|Navy|OldLace|Olive|OliveDrab|Orange|OrangeRed|Orchid|PaleGoldenRod|PaleGreen|PaleTurquoise|PaleVioletRed|PapayaWhip|PeachPuff|Peru|Pink|Plum|PowderBlue|Purple|Red|RosyBrown|RoyalBlue|SaddleBrown|Salmon|SandyBrown|SeaGreen|SeaShell|Sienna|Silver|SkyBlue|SlateBlue|SlateGr[ae]y|Snow|SpringGreen|SteelBlue|Tan|Teal|Thistle|Tomato|Turquoise|Violet|Wheat|White|WhiteSmoke|Yellow|YellowGreen)\b/i,{pattern:/\b(?:rgb|hsl)\(\s*\d{1,3}\s*,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*\)\B|\b(?:rgb|hsl)a\(\s*\d{1,3}\s*,\s*\d{1,3}%?\s*,\s*\d{1,3}%?\s*,\s*(?:0|0?\.\d+|1)\s*\)\B/i,inside:{unit:r,number:i,function:/[\w-]+(?=\()/,punctuation:/[(),]/}}],entity:/\\[\da-f]{1,8}/i,unit:r,number:i})}(Prism);
+!function(d){d.languages.diff={coord:[/^(?:\*{3}|-{3}|\+{3}).*$/m,/^@@.*@@$/m,/^\d+.*$/m]};var r={"deleted-sign":"-","deleted-arrow":"<","inserted-sign":"+","inserted-arrow":">",unchanged:" ",diff:"!"};Object.keys(r).forEach(function(e){var n=r[e],a=[];/^\w+$/.test(e)||a.push(/\w+/.exec(e)[0]),"diff"===e&&a.push("bold"),d.languages.diff[e]={pattern:RegExp("^(?:["+n+"].*(?:\r\n?|\n|(?![\\s\\S])))+","m"),alias:a}}),Object.defineProperty(d.languages.diff,"PREFIXES",{value:r})}(Prism);
+Prism.languages.docker={keyword:{pattern:/(^\s*)(?:ADD|ARG|CMD|COPY|ENTRYPOINT|ENV|EXPOSE|FROM|HEALTHCHECK|LABEL|MAINTAINER|ONBUILD|RUN|SHELL|STOPSIGNAL|USER|VOLUME|WORKDIR)(?=\s)/im,lookbehind:!0},string:/("|')(?:(?!\1)[^\\\r\n]|\\(?:\r\n|[\s\S]))*\1/,comment:/#.*/,punctuation:/---|\.\.\.|[:[\]{}\-,|>?]/},Prism.languages.dockerfile=Prism.languages.docker;
+Prism.languages.fortran={"quoted-number":{pattern:/[BOZ](['"])[A-F0-9]+\1/i,alias:"number"},string:{pattern:/(?:\w+_)?(['"])(?:\1\1|&(?:\r\n?|\n)(?:\s*!.+(?:\r\n?|\n))?|(?!\1).)*(?:\1|&)/,inside:{comment:{pattern:/(&(?:\r\n?|\n)\s*)!.*/,lookbehind:!0}}},comment:{pattern:/!.*/,greedy:!0},boolean:/\.(?:TRUE|FALSE)\.(?:_\w+)?/i,number:/(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:[ED][+-]?\d+)?(?:_\w+)?/i,keyword:[/\b(?:INTEGER|REAL|DOUBLE ?PRECISION|COMPLEX|CHARACTER|LOGICAL)\b/i,/\b(?:END ?)?(?:BLOCK ?DATA|DO|FILE|FORALL|FUNCTION|IF|INTERFACE|MODULE(?! PROCEDURE)|PROGRAM|SELECT|SUBROUTINE|TYPE|WHERE)\b/i,/\b(?:ALLOCATABLE|ALLOCATE|BACKSPACE|CALL|CASE|CLOSE|COMMON|CONTAINS|CONTINUE|CYCLE|DATA|DEALLOCATE|DIMENSION|DO|END|EQUIVALENCE|EXIT|EXTERNAL|FORMAT|GO ?TO|IMPLICIT(?: NONE)?|INQUIRE|INTENT|INTRINSIC|MODULE PROCEDURE|NAMELIST|NULLIFY|OPEN|OPTIONAL|PARAMETER|POINTER|PRINT|PRIVATE|PUBLIC|READ|RETURN|REWIND|SAVE|SELECT|STOP|TARGET|WHILE|WRITE)\b/i,/\b(?:ASSIGNMENT|DEFAULT|ELEMENTAL|ELSE|ELSEWHERE|ELSEIF|ENTRY|IN|INCLUDE|INOUT|KIND|NULL|ONLY|OPERATOR|OUT|PURE|RECURSIVE|RESULT|SEQUENCE|STAT|THEN|USE)\b/i],operator:[/\*\*|\/\/|=>|[=\/]=|[<>]=?|::|[+\-*=%]|\.(?:EQ|NE|LT|LE|GT|GE|NOT|AND|OR|EQV|NEQV)\.|\.[A-Z]+\./i,{pattern:/(^|(?!\().)\/(?!\))/,lookbehind:!0}],punctuation:/\(\/|\/\)|[(),;:&]/};
+Prism.languages.git={comment:/^#.*/m,deleted:/^[-–].*/m,inserted:/^\+.*/m,string:/("|')(?:\\.|(?!\1)[^\\\r\n])*\1/m,command:{pattern:/^.*\$ git .*$/m,inside:{parameter:/\s--?\w+/m}},coord:/^@@.*@@$/m,commit_sha1:/^commit \w{40}$/m};
+Prism.languages.go=Prism.languages.extend("clike",{keyword:/\b(?:break|case|chan|const|continue|default|defer|else|fallthrough|for|func|go(?:to)?|if|import|interface|map|package|range|return|select|struct|switch|type|var)\b/,builtin:/\b(?:bool|byte|complex(?:64|128)|error|float(?:32|64)|rune|string|u?int(?:8|16|32|64)?|uintptr|append|cap|close|complex|copy|delete|imag|len|make|new|panic|print(?:ln)?|real|recover)\b/,boolean:/\b(?:_|iota|nil|true|false)\b/,operator:/[*\/%^!=]=?|\+[=+]?|-[=-]?|\|[=|]?|&(?:=|&|\^=?)?|>(?:>=?|=)?|<(?:<=?|=|-)?|:=|\.\.\./,number:/(?:\b0x[a-f\d]+|(?:\b\d+\.?\d*|\B\.\d+)(?:e[-+]?\d+)?)i?/i,string:{pattern:/(["'`])(?:\\[\s\S]|(?!\1)[^\\])*\1/,greedy:!0}}),delete Prism.languages.go["class-name"];
+!function(e){var t=/\b(?:abstract|assert|boolean|break|byte|case|catch|char|class|const|continue|default|do|double|else|enum|exports|extends|final|finally|float|for|goto|if|implements|import|instanceof|int|interface|long|module|native|new|null|open|opens|package|private|protected|provides|public|requires|return|short|static|strictfp|super|switch|synchronized|this|throw|throws|to|transient|transitive|try|uses|var|void|volatile|while|with|yield)\b/,a=/\b[A-Z](?:\w*[a-z]\w*)?\b/;e.languages.java=e.languages.extend("clike",{"class-name":[a,/\b[A-Z]\w*(?=\s+\w+\s*[;,=())])/],keyword:t,function:[e.languages.clike.function,{pattern:/(\:\:)[a-z_]\w*/,lookbehind:!0}],number:/\b0b[01][01_]*L?\b|\b0x[\da-f_]*\.?[\da-f_p+-]+\b|(?:\b\d[\d_]*\.?[\d_]*|\B\.\d[\d_]*)(?:e[+-]?\d[\d_]*)?[dfl]?/i,operator:{pattern:/(^|[^.])(?:<<=?|>>>?=?|->|--|\+\+|&&|\|\||::|[?:~]|[-+*/%&|^!=<>]=?)/m,lookbehind:!0}}),e.languages.insertBefore("java","string",{"triple-quoted-string":{pattern:/"""[ \t]*[\r\n](?:(?:"|"")?(?:\\.|[^"\\]))*"""/,greedy:!0,alias:"string"}}),e.languages.insertBefore("java","class-name",{annotation:{alias:"punctuation",pattern:/(^|[^.])@\w+/,lookbehind:!0},namespace:{pattern:/(\b(?:exports|import(?:\s+static)?|module|open|opens|package|provides|requires|to|transitive|uses|with)\s+)[a-z]\w*(?:\.[a-z]\w*)+/,lookbehind:!0,inside:{punctuation:/\./}},generics:{pattern:/<(?:[\w\s,.&?]|<(?:[\w\s,.&?]|<(?:[\w\s,.&?]|<[\w\s,.&?]*>)*>)*>)*>/,inside:{"class-name":a,keyword:t,punctuation:/[<>(),.:]/,operator:/[?&|]/}}})}(Prism);
+Prism.languages.julia={comment:{pattern:/(^|[^\\])#.*/,lookbehind:!0},string:/("""|''')[\s\S]+?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2/,keyword:/\b(?:abstract|baremodule|begin|bitstype|break|catch|ccall|const|continue|do|else|elseif|end|export|finally|for|function|global|if|immutable|import|importall|in|let|local|macro|module|print|println|quote|return|struct|try|type|typealias|using|while)\b/,boolean:/\b(?:true|false)\b/,number:/(?:\b(?=\d)|\B(?=\.))(?:0[box])?(?:[\da-f]+\.?\d*|\.\d+)(?:[efp][+-]?\d+)?j?/i,operator:/[-+*^%÷&$\\]=?|\/[\/=]?|!=?=?|\|[=>]?|<(?:<=?|[=:])?|>(?:=|>>?=?)?|==?=?|[~≠≤≥]/,punctuation:/[{}[\];(),.:]/,constant:/\b(?:(?:NaN|Inf)(?:16|32|64)?)\b/};
+!function(a){var e=/\\(?:[^a-z()[\]]|[a-z*]+)/i,n={"equation-command":{pattern:e,alias:"regex"}};a.languages.latex={comment:/%.*/m,cdata:{pattern:/(\\begin\{((?:verbatim|lstlisting)\*?)\})[\s\S]*?(?=\\end\{\2\})/,lookbehind:!0},equation:[{pattern:/\$\$(?:\\[\s\S]|[^\\$])+\$\$|\$(?:\\[\s\S]|[^\\$])+\$|\\\([\s\S]*?\\\)|\\\[[\s\S]*?\\\]/,inside:n,alias:"string"},{pattern:/(\\begin\{((?:equation|math|eqnarray|align|multline|gather)\*?)\})[\s\S]*?(?=\\end\{\2\})/,lookbehind:!0,inside:n,alias:"string"}],keyword:{pattern:/(\\(?:begin|end|ref|cite|label|usepackage|documentclass)(?:\[[^\]]+\])?\{)[^}]+(?=\})/,lookbehind:!0},url:{pattern:/(\\url\{)[^}]+(?=\})/,lookbehind:!0},headline:{pattern:/(\\(?:part|chapter|section|subsection|frametitle|subsubsection|paragraph|subparagraph|subsubparagraph|subsubsubparagraph)\*?(?:\[[^\]]+\])?\{)[^}]+(?=\}(?:\[[^\]]+\])?)/,lookbehind:!0,alias:"class-name"},function:{pattern:e,alias:"selector"},punctuation:/[[\]{}&]/},a.languages.tex=a.languages.latex,a.languages.context=a.languages.latex}(Prism);
+Prism.languages.lua={comment:/^#!.+|--(?:\[(=*)\[[\s\S]*?\]\1\]|.*)/m,string:{pattern:/(["'])(?:(?!\1)[^\\\r\n]|\\z(?:\r\n|\s)|\\(?:\r\n|[\s\S]))*\1|\[(=*)\[[\s\S]*?\]\2\]/,greedy:!0},number:/\b0x[a-f\d]+\.?[a-f\d]*(?:p[+-]?\d+)?\b|\b\d+(?:\.\B|\.?\d*(?:e[+-]?\d+)?\b)|\B\.\d+(?:e[+-]?\d+)?\b/i,keyword:/\b(?:and|break|do|else|elseif|end|false|for|function|goto|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/,function:/(?!\d)\w+(?=\s*(?:[({]))/,operator:[/[-+*%^&|#]|\/\/?|<[<=]?|>[>=]?|[=~]=?/,{pattern:/(^|[^.])\.\.(?!\.)/,lookbehind:!0}],punctuation:/[\[\](){},;]|\.+|:+/};
+Prism.languages.makefile={comment:{pattern:/(^|[^\\])#(?:\\(?:\r\n|[\s\S])|[^\\\r\n])*/,lookbehind:!0},string:{pattern:/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0},builtin:/\.[A-Z][^:#=\s]+(?=\s*:(?!=))/,symbol:{pattern:/^[^:=\r\n]+(?=\s*:(?!=))/m,inside:{variable:/\$+(?:[^(){}:#=\s]+|(?=[({]))/}},variable:/\$+(?:[^(){}:#=\s]+|\([@*%<^+?][DF]\)|(?=[({]))/,keyword:[/-include\b|\b(?:define|else|endef|endif|export|ifn?def|ifn?eq|include|override|private|sinclude|undefine|unexport|vpath)\b/,{pattern:/(\()(?:addsuffix|abspath|and|basename|call|dir|error|eval|file|filter(?:-out)?|findstring|firstword|flavor|foreach|guile|if|info|join|lastword|load|notdir|or|origin|patsubst|realpath|shell|sort|strip|subst|suffix|value|warning|wildcard|word(?:s|list)?)(?=[ \t])/,lookbehind:!0}],operator:/(?:::|[?:+!])?=|[|@]/,punctuation:/[:;(){}]/};
+!function(d){function n(n,e){return n=n.replace(/<inner>/g,"(?:\\\\.|[^\\\\\\n\r]|(?:\r?\n|\r)(?!\r?\n|\r))"),e&&(n=n+"|"+n.replace(/_/g,"\\*")),RegExp("((?:^|[^\\\\])(?:\\\\{2})*)(?:"+n+")")}var e="(?:\\\\.|``.+?``|`[^`\r\\n]+`|[^\\\\|\r\\n`])+",t="\\|?__(?:\\|__)+\\|?(?:(?:\r?\n|\r)|$)".replace(/__/g,e),a="\\|?[ \t]*:?-{3,}:?[ \t]*(?:\\|[ \t]*:?-{3,}:?[ \t]*)+\\|?(?:\r?\n|\r)";d.languages.markdown=d.languages.extend("markup",{}),d.languages.insertBefore("markdown","prolog",{blockquote:{pattern:/^>(?:[\t ]*>)*/m,alias:"punctuation"},table:{pattern:RegExp("^"+t+a+"(?:"+t+")*","m"),inside:{"table-data-rows":{pattern:RegExp("^("+t+a+")(?:"+t+")*$"),lookbehind:!0,inside:{"table-data":{pattern:RegExp(e),inside:d.languages.markdown},punctuation:/\|/}},"table-line":{pattern:RegExp("^("+t+")"+a+"$"),lookbehind:!0,inside:{punctuation:/\||:?-{3,}:?/}},"table-header-row":{pattern:RegExp("^"+t+"$"),inside:{"table-header":{pattern:RegExp(e),alias:"important",inside:d.languages.markdown},punctuation:/\|/}}}},code:[{pattern:/(^[ \t]*(?:\r?\n|\r))(?: {4}|\t).+(?:(?:\r?\n|\r)(?: {4}|\t).+)*/m,lookbehind:!0,alias:"keyword"},{pattern:/``.+?``|`[^`\r\n]+`/,alias:"keyword"},{pattern:/^```[\s\S]*?^```$/m,greedy:!0,inside:{"code-block":{pattern:/^(```.*(?:\r?\n|\r))[\s\S]+?(?=(?:\r?\n|\r)^```$)/m,lookbehind:!0},"code-language":{pattern:/^(```).+/,lookbehind:!0},punctuation:/```/}}],title:[{pattern:/\S.*(?:\r?\n|\r)(?:==+|--+)(?=[ \t]*$)/m,alias:"important",inside:{punctuation:/==+$|--+$/}},{pattern:/(^\s*)#+.+/m,lookbehind:!0,alias:"important",inside:{punctuation:/^#+|#+$/}}],hr:{pattern:/(^\s*)([*-])(?:[\t ]*\2){2,}(?=\s*$)/m,lookbehind:!0,alias:"punctuation"},list:{pattern:/(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,lookbehind:!0,alias:"punctuation"},"url-reference":{pattern:/!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,inside:{variable:{pattern:/^(!?\[)[^\]]+/,lookbehind:!0},string:/(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,punctuation:/^[\[\]!:]|[<>]/},alias:"url"},bold:{pattern:n("__(?:(?!_)<inner>|_(?:(?!_)<inner>)+_)+__",!0),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^..)[\s\S]+(?=..$)/,lookbehind:!0,inside:{}},punctuation:/\*\*|__/}},italic:{pattern:n("_(?:(?!_)<inner>|__(?:(?!_)<inner>)+__)+_",!0),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^.)[\s\S]+(?=.$)/,lookbehind:!0,inside:{}},punctuation:/[*_]/}},strike:{pattern:n("(~~?)(?:(?!~)<inner>)+?\\2",!1),lookbehind:!0,greedy:!0,inside:{content:{pattern:/(^~~?)[\s\S]+(?=\1$)/,lookbehind:!0,inside:{}},punctuation:/~~?/}},url:{pattern:n('!?\\[(?:(?!\\])<inner>)+\\](?:\\([^\\s)]+(?:[\t ]+"(?:\\\\.|[^"\\\\])*")?\\)| ?\\[(?:(?!\\])<inner>)+\\])',!1),lookbehind:!0,greedy:!0,inside:{variable:{pattern:/(\[)[^\]]+(?=\]$)/,lookbehind:!0},content:{pattern:/(^!?\[)[^\]]+(?=\])/,lookbehind:!0,inside:{}},string:{pattern:/"(?:\\.|[^"\\])*"(?=\)$)/}}}}),["url","bold","italic","strike"].forEach(function(e){["url","bold","italic","strike"].forEach(function(n){e!==n&&(d.languages.markdown[e].inside.content.inside[n]=d.languages.markdown[n])})}),d.hooks.add("after-tokenize",function(n){"markdown"!==n.language&&"md"!==n.language||!function n(e){if(e&&"string"!=typeof e)for(var t=0,a=e.length;t<a;t++){var i=e[t];if("code"===i.type){var r=i.content[1],o=i.content[3];if(r&&o&&"code-language"===r.type&&"code-block"===o.type&&"string"==typeof r.content){var l=r.content.replace(/\b#/g,"sharp").replace(/\b\+\+/g,"pp"),s="language-"+(l=(/[a-z][\w-]*/i.exec(l)||[""])[0].toLowerCase());o.alias?"string"==typeof o.alias?o.alias=[o.alias,s]:o.alias.push(s):o.alias=[s]}}else n(i.content)}}(n.tokens)}),d.hooks.add("wrap",function(n){if("code-block"===n.type){for(var e="",t=0,a=n.classes.length;t<a;t++){var i=n.classes[t],r=/language-(.+)/.exec(i);if(r){e=r[1];break}}var o=d.languages[e];if(o){var l=n.content.replace(/&lt;/g,"<").replace(/&amp;/g,"&");n.content=d.highlight(l,o,e)}else if(e&&"none"!==e&&d.plugins.autoloader){var s="md-"+(new Date).valueOf()+"-"+Math.floor(1e16*Math.random());n.attributes.id=s,d.plugins.autoloader.loadLanguages(e,function(){var n=document.getElementById(s);n&&(n.innerHTML=d.highlight(n.textContent,d.languages[e],e))})}}}),d.languages.md=d.languages.markdown}(Prism);
+Prism.languages.matlab={comment:[/%\{[\s\S]*?\}%/,/%.+/],string:{pattern:/\B'(?:''|[^'\r\n])*'/,greedy:!0},number:/(?:\b\d+\.?\d*|\B\.\d+)(?:[eE][+-]?\d+)?(?:[ij])?|\b[ij]\b/,keyword:/\b(?:break|case|catch|continue|else|elseif|end|for|function|if|inf|NaN|otherwise|parfor|pause|pi|return|switch|try|while)\b/,function:/(?!\d)\w+(?=\s*\()/,operator:/\.?[*^\/\\']|[+\-:@]|[<>=~]=?|&&?|\|\|?/,punctuation:/\.{3}|[.,;\[\](){}!]/};
+Prism.languages.python={comment:{pattern:/(^|[^\\])#.*/,lookbehind:!0},"string-interpolation":{pattern:/(?:f|rf|fr)(?:("""|''')[\s\S]+?\1|("|')(?:\\.|(?!\2)[^\\\r\n])*\2)/i,greedy:!0,inside:{interpolation:{pattern:/((?:^|[^{])(?:{{)*){(?!{)(?:[^{}]|{(?!{)(?:[^{}]|{(?!{)(?:[^{}])+})+})+}/,lookbehind:!0,inside:{"format-spec":{pattern:/(:)[^:(){}]+(?=}$)/,lookbehind:!0},"conversion-option":{pattern:/![sra](?=[:}]$)/,alias:"punctuation"},rest:null}},string:/[\s\S]+/}},"triple-quoted-string":{pattern:/(?:[rub]|rb|br)?("""|''')[\s\S]+?\1/i,greedy:!0,alias:"string"},string:{pattern:/(?:[rub]|rb|br)?("|')(?:\\.|(?!\1)[^\\\r\n])*\1/i,greedy:!0},function:{pattern:/((?:^|\s)def[ \t]+)[a-zA-Z_]\w*(?=\s*\()/g,lookbehind:!0},"class-name":{pattern:/(\bclass\s+)\w+/i,lookbehind:!0},decorator:{pattern:/(^\s*)@\w+(?:\.\w+)*/im,lookbehind:!0,alias:["annotation","punctuation"],inside:{punctuation:/\./}},keyword:/\b(?:and|as|assert|async|await|break|class|continue|def|del|elif|else|except|exec|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|print|raise|return|try|while|with|yield)\b/,builtin:/\b(?:__import__|abs|all|any|apply|ascii|basestring|bin|bool|buffer|bytearray|bytes|callable|chr|classmethod|cmp|coerce|compile|complex|delattr|dict|dir|divmod|enumerate|eval|execfile|file|filter|float|format|frozenset|getattr|globals|hasattr|hash|help|hex|id|input|int|intern|isinstance|issubclass|iter|len|list|locals|long|map|max|memoryview|min|next|object|oct|open|ord|pow|property|range|raw_input|reduce|reload|repr|reversed|round|set|setattr|slice|sorted|staticmethod|str|sum|super|tuple|type|unichr|unicode|vars|xrange|zip)\b/,boolean:/\b(?:True|False|None)\b/,number:/(?:\b(?=\d)|\B(?=\.))(?:0[bo])?(?:(?:\d|0x[\da-f])[\da-f]*\.?\d*|\.\d+)(?:e[+-]?\d+)?j?\b/i,operator:/[-+%=]=?|!=|\*\*?=?|\/\/?=?|<[<=>]?|>[=>]?|[&|^~]/,punctuation:/[{}[\];(),.:]/},Prism.languages.python["string-interpolation"].inside.interpolation.inside.rest=Prism.languages.python,Prism.languages.py=Prism.languages.python;
+Prism.languages.r={comment:/#.*/,string:{pattern:/(['"])(?:\\.|(?!\1)[^\\\r\n])*\1/,greedy:!0},"percent-operator":{pattern:/%[^%\s]*%/,alias:"operator"},boolean:/\b(?:TRUE|FALSE)\b/,ellipsis:/\.\.(?:\.|\d+)/,number:[/\b(?:NaN|Inf)\b/,/(?:\b0x[\dA-Fa-f]+(?:\.\d*)?|\b\d+\.?\d*|\B\.\d+)(?:[EePp][+-]?\d+)?[iL]?/],keyword:/\b(?:if|else|repeat|while|function|for|in|next|break|NULL|NA|NA_integer_|NA_real_|NA_complex_|NA_character_)\b/,operator:/->?>?|<(?:=|<?-)?|[>=!]=?|::?|&&?|\|\|?|[+*\/^$@~]/,punctuation:/[(){}\[\],;]/};
+!function(n){var e={pattern:/\\[\\(){}[\]^$+*?|.]/,alias:"escape"},a=/\\(?:x[\da-fA-F]{2}|u[\da-fA-F]{4}|u\{[\da-fA-F]+\}|c[a-zA-Z]|0[0-7]{0,2}|[123][0-7]{2}|.)/,r=/\\[wsd]|\.|\\p{[^{}]+}/i,i="(?:[^\\\\-]|"+a.source+")",s=RegExp(i+"-"+i),t={pattern:/(<|')[^<>']+(?=[>']$)/,lookbehind:!0,alias:"variable"},c=[/\\(?![123][0-7]{2})[1-9]/,{pattern:/\\k<[^<>']+>/,inside:{"group-name":t}}];n.languages.regex={charset:{pattern:/((?:^|[^\\])(?:\\\\)*)\[(?:[^\\\]]|\\[\s\S])*\]/,lookbehind:!0,inside:{"charset-negation":{pattern:/(^\[)\^/,lookbehind:!0},"charset-punctuation":/^\[|\]$/,range:{pattern:s,inside:{escape:a,"range-punctuation":/-/}},"special-escape":e,charclass:r,backreference:c,escape:a}},"special-escape":e,charclass:r,backreference:c,anchor:/[$^]|\\[ABbGZz]/,escape:a,group:[{pattern:/\((?:\?(?:<[^<>']+>|'[^<>']+'|[>:]|<?[=!]|[idmnsuxU]+(?:-[idmnsuxU]+)?:?))?/,inside:{"group-name":t}},/\)/],quantifier:/[+*?]|\{(?:\d+,?\d*)\}/,alternation:/\|/},["actionscript","coffescript","flow","javascript","typescript","vala"].forEach(function(e){var a=n.languages[e];a&&(a.regex.inside={"regex-flags":/[a-z]+$/,"regex-delimiter":/^\/|\/$/,"language-regex":{pattern:/[\s\S]+/,inside:n.languages.regex}})})}(Prism);
+!function(e){e.languages.ruby=e.languages.extend("clike",{comment:[/#.*/,{pattern:/^=begin\s[\s\S]*?^=end/m,greedy:!0}],"class-name":{pattern:/(\b(?:class)\s+|\bcatch\s+\()[\w.\\]+/i,lookbehind:!0,inside:{punctuation:/[.\\]/}},keyword:/\b(?:alias|and|BEGIN|begin|break|case|class|def|define_method|defined|do|each|else|elsif|END|end|ensure|extend|for|if|in|include|module|new|next|nil|not|or|prepend|protected|private|public|raise|redo|require|rescue|retry|return|self|super|then|throw|undef|unless|until|when|while|yield)\b/});var n={pattern:/#\{[^}]+\}/,inside:{delimiter:{pattern:/^#\{|\}$/,alias:"tag"},rest:e.languages.ruby}};delete e.languages.ruby.function,e.languages.insertBefore("ruby","keyword",{regex:[{pattern:/%r([^a-zA-Z0-9\s{(\[<])(?:(?!\1)[^\\]|\\[\s\S])*\1[gim]{0,3}/,greedy:!0,inside:{interpolation:n}},{pattern:/%r\((?:[^()\\]|\\[\s\S])*\)[gim]{0,3}/,greedy:!0,inside:{interpolation:n}},{pattern:/%r\{(?:[^#{}\\]|#(?:\{[^}]+\})?|\\[\s\S])*\}[gim]{0,3}/,greedy:!0,inside:{interpolation:n}},{pattern:/%r\[(?:[^\[\]\\]|\\[\s\S])*\][gim]{0,3}/,greedy:!0,inside:{interpolation:n}},{pattern:/%r<(?:[^<>\\]|\\[\s\S])*>[gim]{0,3}/,greedy:!0,inside:{interpolation:n}},{pattern:/(^|[^/])\/(?!\/)(?:\[.+?]|\\.|[^/\\\r\n])+\/[gim]{0,3}(?=\s*(?:$|[\r\n,.;})]))/,lookbehind:!0,greedy:!0}],variable:/[@$]+[a-zA-Z_]\w*(?:[?!]|\b)/,symbol:{pattern:/(^|[^:]):[a-zA-Z_]\w*(?:[?!]|\b)/,lookbehind:!0},"method-definition":{pattern:/(\bdef\s+)[\w.]+/,lookbehind:!0,inside:{function:/\w+$/,rest:e.languages.ruby}}}),e.languages.insertBefore("ruby","number",{builtin:/\b(?:Array|Bignum|Binding|Class|Continuation|Dir|Exception|FalseClass|File|Stat|Fixnum|Float|Hash|Integer|IO|MatchData|Method|Module|NilClass|Numeric|Object|Proc|Range|Regexp|String|Struct|TMS|Symbol|ThreadGroup|Thread|Time|TrueClass)\b/,constant:/\b[A-Z]\w*(?:[?!]|\b)/}),e.languages.ruby.string=[{pattern:/%[qQiIwWxs]?([^a-zA-Z0-9\s{(\[<])(?:(?!\1)[^\\]|\\[\s\S])*\1/,greedy:!0,inside:{interpolation:n}},{pattern:/%[qQiIwWxs]?\((?:[^()\\]|\\[\s\S])*\)/,greedy:!0,inside:{interpolation:n}},{pattern:/%[qQiIwWxs]?\{(?:[^#{}\\]|#(?:\{[^}]+\})?|\\[\s\S])*\}/,greedy:!0,inside:{interpolation:n}},{pattern:/%[qQiIwWxs]?\[(?:[^\[\]\\]|\\[\s\S])*\]/,greedy:!0,inside:{interpolation:n}},{pattern:/%[qQiIwWxs]?<(?:[^<>\\]|\\[\s\S])*>/,greedy:!0,inside:{interpolation:n}},{pattern:/("|')(?:#\{[^}]+\}|\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0,inside:{interpolation:n}}],e.languages.rb=e.languages.ruby}(Prism);
+Prism.languages.rust={comment:[{pattern:/(^|[^\\])\/\*[\s\S]*?\*\//,lookbehind:!0},{pattern:/(^|[^\\:])\/\/.*/,lookbehind:!0}],string:[{pattern:/b?r(#*)"(?:\\.|(?!"\1)[^\\\r\n])*"\1/,greedy:!0},{pattern:/b?"(?:\\.|[^\\\r\n"])*"/,greedy:!0}],char:{pattern:/b?'(?:\\(?:x[0-7][\da-fA-F]|u{(?:[\da-fA-F]_*){1,6}|.)|[^\\\r\n\t'])'/,alias:"string"},"lifetime-annotation":{pattern:/'[^\s>']+/,alias:"symbol"},keyword:/\b(?:abstract|alignof|as|async|await|be|box|break|const|continue|crate|do|dyn|else|enum|extern|false|final|fn|for|if|impl|in|let|loop|match|mod|move|mut|offsetof|once|override|priv|pub|pure|ref|return|sizeof|static|self|Self|struct|super|true|trait|type|typeof|union|unsafe|unsized|use|virtual|where|while|yield)\b/,attribute:{pattern:/#!?\[.+?\]/,greedy:!0,alias:"attr-name"},function:[/\w+(?=\s*\()/,/\w+!(?=\s*\(|\[)/],"macro-rules":{pattern:/\w+!/,alias:"function"},number:/\b(?:0x[\dA-Fa-f](?:_?[\dA-Fa-f])*|0o[0-7](?:_?[0-7])*|0b[01](?:_?[01])*|(?:\d(?:_?\d)*)?\.?\d(?:_?\d)*(?:[Ee][+-]?\d+)?)(?:_?(?:[iu](?:8|16|32|64)?|f32|f64))?\b/,"closure-params":{pattern:/\|[^|]*\|(?=\s*[{-])/,inside:{punctuation:/[|:,]/,operator:/[&*]/}},punctuation:/->|\.\.=|\.{1,3}|::|[{}[\];(),:]/,operator:/[-+*\/%!^]=?|=[=>]?|&[&=]?|\|[|=]?|<<?=?|>>?=?|[@?]/};
+!function(s){var n=["([\"'])(?:\\\\[\\s\\S]|\\$\\([^)]+\\)|`[^`]+`|(?!\\1)[^\\\\])*\\1","<<-?\\s*(\\w+?)\\s*(?:\r?\n|\r)[\\s\\S]*?(?:\r?\n|\r)\\2","<<-?\\s*([\"'])(\\w+)\\3\\s*(?:\r?\n|\r)[\\s\\S]*?(?:\r?\n|\r)\\4"].join("|");s.languages["shell-session"]={command:{pattern:RegExp("\\$(?:[^\r\\n'\"<]|<<str>>)+".replace(/<<str>>/g,n)),inside:{bash:{pattern:/(\$\s*)[\s\S]+/,lookbehind:!0,alias:"language-bash",inside:s.languages.bash},sh:{pattern:/^\$/,alias:"important"}}},output:{pattern:/.(?:.*(?:\r\n?|\n|.$))*/}}}(Prism);
+Prism.languages.swift=Prism.languages.extend("clike",{string:{pattern:/("|')(?:\\(?:\((?:[^()]|\([^)]+\))+\)|\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,greedy:!0,inside:{interpolation:{pattern:/\\\((?:[^()]|\([^)]+\))+\)/,inside:{delimiter:{pattern:/^\\\(|\)$/,alias:"variable"}}}}},keyword:/\b(?:as|associativity|break|case|catch|class|continue|convenience|default|defer|deinit|didSet|do|dynamic(?:Type)?|else|enum|extension|fallthrough|final|for|func|get|guard|if|import|in|infix|init|inout|internal|is|lazy|left|let|mutating|new|none|nonmutating|operator|optional|override|postfix|precedence|prefix|private|protocol|public|repeat|required|rethrows|return|right|safe|self|Self|set|static|struct|subscript|super|switch|throws?|try|Type|typealias|unowned|unsafe|var|weak|where|while|willSet|__(?:COLUMN__|FILE__|FUNCTION__|LINE__))\b/,number:/\b(?:[\d_]+(?:\.[\de_]+)?|0x[a-f0-9_]+(?:\.[a-f0-9p_]+)?|0b[01_]+|0o[0-7_]+)\b/i,constant:/\b(?:nil|[A-Z_]{2,}|k[A-Z][A-Za-z_]+)\b/,atrule:/@\b(?:IB(?:Outlet|Designable|Action|Inspectable)|class_protocol|exported|noreturn|NS(?:Copying|Managed)|objc|UIApplicationMain|auto_closure)\b/,builtin:/\b(?:[A-Z]\S+|abs|advance|alignof(?:Value)?|assert|contains|count(?:Elements)?|debugPrint(?:ln)?|distance|drop(?:First|Last)|dump|enumerate|equal|filter|find|first|getVaList|indices|isEmpty|join|last|lexicographicalCompare|map|max(?:Element)?|min(?:Element)?|numericCast|overlaps|partition|print(?:ln)?|reduce|reflect|reverse|sizeof(?:Value)?|sort(?:ed)?|split|startsWith|stride(?:of(?:Value)?)?|suffix|swap|toDebugString|toString|transcode|underestimateCount|unsafeBitCast|with(?:ExtendedLifetime|Unsafe(?:MutablePointers?|Pointers?)|VaList))\b/}),Prism.languages.swift.string.inside.interpolation.inside.rest=Prism.languages.swift;
+Prism.languages.vim={string:/"(?:[^"\\\r\n]|\\.)*"|'(?:[^'\r\n]|'')*'/,comment:/".*/,function:/\w+(?=\()/,keyword:/\b(?:ab|abbreviate|abc|abclear|abo|aboveleft|al|all|arga|argadd|argd|argdelete|argdo|arge|argedit|argg|argglobal|argl|arglocal|ar|args|argu|argument|as|ascii|bad|badd|ba|ball|bd|bdelete|be|bel|belowright|bf|bfirst|bl|blast|bm|bmodified|bn|bnext|bN|bNext|bo|botright|bp|bprevious|brea|break|breaka|breakadd|breakd|breakdel|breakl|breaklist|br|brewind|bro|browse|bufdo|b|buffer|buffers|bun|bunload|bw|bwipeout|ca|cabbrev|cabc|cabclear|caddb|caddbuffer|cad|caddexpr|caddf|caddfile|cal|call|cat|catch|cb|cbuffer|cc|ccl|cclose|cd|ce|center|cex|cexpr|cf|cfile|cfir|cfirst|cgetb|cgetbuffer|cgete|cgetexpr|cg|cgetfile|c|change|changes|chd|chdir|che|checkpath|checkt|checktime|cla|clast|cl|clist|clo|close|cmapc|cmapclear|cnew|cnewer|cn|cnext|cN|cNext|cnf|cnfile|cNfcNfile|cnorea|cnoreabbrev|col|colder|colo|colorscheme|comc|comclear|comp|compiler|conf|confirm|con|continue|cope|copen|co|copy|cpf|cpfile|cp|cprevious|cq|cquit|cr|crewind|cuna|cunabbrev|cu|cunmap|cw|cwindow|debugg|debuggreedy|delc|delcommand|d|delete|delf|delfunction|delm|delmarks|diffg|diffget|diffoff|diffpatch|diffpu|diffput|diffsplit|diffthis|diffu|diffupdate|dig|digraphs|di|display|dj|djump|dl|dlist|dr|drop|ds|dsearch|dsp|dsplit|earlier|echoe|echoerr|echom|echomsg|echon|e|edit|el|else|elsei|elseif|em|emenu|endfo|endfor|endf|endfunction|endfun|en|endif|endt|endtry|endw|endwhile|ene|enew|ex|exi|exit|exu|exusage|f|file|files|filetype|fina|finally|fin|find|fini|finish|fir|first|fix|fixdel|fo|fold|foldc|foldclose|folddoc|folddoclosed|foldd|folddoopen|foldo|foldopen|for|fu|fun|function|go|goto|gr|grep|grepa|grepadd|ha|hardcopy|h|help|helpf|helpfind|helpg|helpgrep|helpt|helptags|hid|hide|his|history|ia|iabbrev|iabc|iabclear|if|ij|ijump|il|ilist|imapc|imapclear|in|inorea|inoreabbrev|isearch|isp|isplit|iuna|iunabbrev|iu|iunmap|j|join|ju|jumps|k|keepalt|keepj|keepjumps|kee|keepmarks|laddb|laddbuffer|lad|laddexpr|laddf|laddfile|lan|language|la|last|later|lb|lbuffer|lc|lcd|lch|lchdir|lcl|lclose|let|left|lefta|leftabove|lex|lexpr|lf|lfile|lfir|lfirst|lgetb|lgetbuffer|lgete|lgetexpr|lg|lgetfile|lgr|lgrep|lgrepa|lgrepadd|lh|lhelpgrep|l|list|ll|lla|llast|lli|llist|lmak|lmake|lm|lmap|lmapc|lmapclear|lnew|lnewer|lne|lnext|lN|lNext|lnf|lnfile|lNf|lNfile|ln|lnoremap|lo|loadview|loc|lockmarks|lockv|lockvar|lol|lolder|lop|lopen|lpf|lpfile|lp|lprevious|lr|lrewind|ls|lt|ltag|lu|lunmap|lv|lvimgrep|lvimgrepa|lvimgrepadd|lw|lwindow|mak|make|ma|mark|marks|mat|match|menut|menutranslate|mk|mkexrc|mks|mksession|mksp|mkspell|mkvie|mkview|mkv|mkvimrc|mod|mode|m|move|mzf|mzfile|mz|mzscheme|nbkey|new|n|next|N|Next|nmapc|nmapclear|noh|nohlsearch|norea|noreabbrev|nu|number|nun|nunmap|omapc|omapclear|on|only|o|open|opt|options|ou|ounmap|pc|pclose|ped|pedit|pe|perl|perld|perldo|po|pop|popu|popup|pp|ppop|pre|preserve|prev|previous|p|print|P|Print|profd|profdel|prof|profile|promptf|promptfind|promptr|promptrepl|ps|psearch|pta|ptag|ptf|ptfirst|ptj|ptjump|ptl|ptlast|ptn|ptnext|ptN|ptNext|ptp|ptprevious|ptr|ptrewind|pts|ptselect|pu|put|pw|pwd|pyf|pyfile|py|python|qa|qall|q|quit|quita|quitall|r|read|rec|recover|redi|redir|red|redo|redr|redraw|redraws|redrawstatus|reg|registers|res|resize|ret|retab|retu|return|rew|rewind|ri|right|rightb|rightbelow|rub|ruby|rubyd|rubydo|rubyf|rubyfile|ru|runtime|rv|rviminfo|sal|sall|san|sandbox|sa|sargument|sav|saveas|sba|sball|sbf|sbfirst|sbl|sblast|sbm|sbmodified|sbn|sbnext|sbN|sbNext|sbp|sbprevious|sbr|sbrewind|sb|sbuffer|scripte|scriptencoding|scrip|scriptnames|se|set|setf|setfiletype|setg|setglobal|setl|setlocal|sf|sfind|sfir|sfirst|sh|shell|sign|sil|silent|sim|simalt|sla|slast|sl|sleep|sm|smagic|sm|smap|smapc|smapclear|sme|smenu|sn|snext|sN|sNext|sni|sniff|sno|snomagic|snor|snoremap|snoreme|snoremenu|sor|sort|so|source|spelld|spelldump|spe|spellgood|spelli|spellinfo|spellr|spellrepall|spellu|spellundo|spellw|spellwrong|sp|split|spr|sprevious|sre|srewind|sta|stag|startg|startgreplace|star|startinsert|startr|startreplace|stj|stjump|st|stop|stopi|stopinsert|sts|stselect|sun|sunhide|sunm|sunmap|sus|suspend|sv|sview|syncbind|t|tab|tabc|tabclose|tabd|tabdo|tabe|tabedit|tabf|tabfind|tabfir|tabfirst|tabl|tablast|tabm|tabmove|tabnew|tabn|tabnext|tabN|tabNext|tabo|tabonly|tabp|tabprevious|tabr|tabrewind|tabs|ta|tag|tags|tc|tcl|tcld|tcldo|tclf|tclfile|te|tearoff|tf|tfirst|th|throw|tj|tjump|tl|tlast|tm|tm|tmenu|tn|tnext|tN|tNext|to|topleft|tp|tprevious|tr|trewind|try|ts|tselect|tu|tu|tunmenu|una|unabbreviate|u|undo|undoj|undojoin|undol|undolist|unh|unhide|unlet|unlo|unlockvar|unm|unmap|up|update|verb|verbose|ve|version|vert|vertical|vie|view|vim|vimgrep|vimgrepa|vimgrepadd|vi|visual|viu|viusage|vmapc|vmapclear|vne|vnew|vs|vsplit|vu|vunmap|wa|wall|wh|while|winc|wincmd|windo|winp|winpos|win|winsize|wn|wnext|wN|wNext|wp|wprevious|wq|wqa|wqall|w|write|ws|wsverb|wv|wviminfo|X|xa|xall|x|xit|xm|xmap|xmapc|xmapclear|xme|xmenu|XMLent|XMLns|xn|xnoremap|xnoreme|xnoremenu|xu|xunmap|y|yank)\b/,builtin:/\b(?:autocmd|acd|ai|akm|aleph|allowrevins|altkeymap|ambiwidth|ambw|anti|antialias|arab|arabic|arabicshape|ari|arshape|autochdir|autoindent|autoread|autowrite|autowriteall|aw|awa|background|backspace|backup|backupcopy|backupdir|backupext|backupskip|balloondelay|ballooneval|balloonexpr|bdir|bdlay|beval|bex|bexpr|bg|bh|bin|binary|biosk|bioskey|bk|bkc|bomb|breakat|brk|browsedir|bs|bsdir|bsk|bt|bufhidden|buflisted|buftype|casemap|ccv|cdpath|cedit|cfu|ch|charconvert|ci|cin|cindent|cink|cinkeys|cino|cinoptions|cinw|cinwords|clipboard|cmdheight|cmdwinheight|cmp|cms|columns|com|comments|commentstring|compatible|complete|completefunc|completeopt|consk|conskey|copyindent|cot|cpo|cpoptions|cpt|cscopepathcomp|cscopeprg|cscopequickfix|cscopetag|cscopetagorder|cscopeverbose|cspc|csprg|csqf|cst|csto|csverb|cuc|cul|cursorcolumn|cursorline|cwh|debug|deco|def|define|delcombine|dex|dg|dict|dictionary|diff|diffexpr|diffopt|digraph|dip|dir|directory|dy|ea|ead|eadirection|eb|ed|edcompatible|ef|efm|ei|ek|enc|encoding|endofline|eol|ep|equalalways|equalprg|errorbells|errorfile|errorformat|esckeys|et|eventignore|expandtab|exrc|fcl|fcs|fdc|fde|fdi|fdl|fdls|fdm|fdn|fdo|fdt|fen|fenc|fencs|fex|ff|ffs|fileencoding|fileencodings|fileformat|fileformats|fillchars|fk|fkmap|flp|fml|fmr|foldcolumn|foldenable|foldexpr|foldignore|foldlevel|foldlevelstart|foldmarker|foldmethod|foldminlines|foldnestmax|foldtext|formatexpr|formatlistpat|formatoptions|formatprg|fp|fs|fsync|ft|gcr|gd|gdefault|gfm|gfn|gfs|gfw|ghr|gp|grepformat|grepprg|gtl|gtt|guicursor|guifont|guifontset|guifontwide|guiheadroom|guioptions|guipty|guitablabel|guitabtooltip|helpfile|helpheight|helplang|hf|hh|hi|hidden|highlight|hk|hkmap|hkmapp|hkp|hl|hlg|hls|hlsearch|ic|icon|iconstring|ignorecase|im|imactivatekey|imak|imc|imcmdline|imd|imdisable|imi|iminsert|ims|imsearch|inc|include|includeexpr|incsearch|inde|indentexpr|indentkeys|indk|inex|inf|infercase|insertmode|isf|isfname|isi|isident|isk|iskeyword|isprint|joinspaces|js|key|keymap|keymodel|keywordprg|km|kmp|kp|langmap|langmenu|laststatus|lazyredraw|lbr|lcs|linebreak|lines|linespace|lisp|lispwords|listchars|loadplugins|lpl|lsp|lz|macatsui|magic|makeef|makeprg|matchpairs|matchtime|maxcombine|maxfuncdepth|maxmapdepth|maxmem|maxmempattern|maxmemtot|mco|mef|menuitems|mfd|mh|mis|mkspellmem|ml|mls|mm|mmd|mmp|mmt|modeline|modelines|modifiable|modified|more|mouse|mousef|mousefocus|mousehide|mousem|mousemodel|mouses|mouseshape|mouset|mousetime|mp|mps|msm|mzq|mzquantum|nf|nrformats|numberwidth|nuw|odev|oft|ofu|omnifunc|opendevice|operatorfunc|opfunc|osfiletype|pa|para|paragraphs|paste|pastetoggle|patchexpr|patchmode|path|pdev|penc|pex|pexpr|pfn|ph|pheader|pi|pm|pmbcs|pmbfn|popt|preserveindent|previewheight|previewwindow|printdevice|printencoding|printexpr|printfont|printheader|printmbcharset|printmbfont|printoptions|prompt|pt|pumheight|pvh|pvw|qe|quoteescape|readonly|remap|report|restorescreen|revins|rightleft|rightleftcmd|rl|rlc|ro|rs|rtp|ruf|ruler|rulerformat|runtimepath|sbo|sc|scb|scr|scroll|scrollbind|scrolljump|scrolloff|scrollopt|scs|sect|sections|secure|sel|selection|selectmode|sessionoptions|sft|shcf|shellcmdflag|shellpipe|shellquote|shellredir|shellslash|shelltemp|shelltype|shellxquote|shiftround|shiftwidth|shm|shortmess|shortname|showbreak|showcmd|showfulltag|showmatch|showmode|showtabline|shq|si|sidescroll|sidescrolloff|siso|sj|slm|smartcase|smartindent|smarttab|smc|smd|softtabstop|sol|spc|spell|spellcapcheck|spellfile|spelllang|spellsuggest|spf|spl|splitbelow|splitright|sps|sr|srr|ss|ssl|ssop|stal|startofline|statusline|stl|stmp|su|sua|suffixes|suffixesadd|sw|swapfile|swapsync|swb|swf|switchbuf|sws|sxq|syn|synmaxcol|syntax|tabline|tabpagemax|tabstop|tagbsearch|taglength|tagrelative|tagstack|tal|tb|tbi|tbidi|tbis|tbs|tenc|term|termbidi|termencoding|terse|textauto|textmode|textwidth|tgst|thesaurus|tildeop|timeout|timeoutlen|title|titlelen|titleold|titlestring|toolbar|toolbariconsize|top|tpm|tsl|tsr|ttimeout|ttimeoutlen|ttm|tty|ttybuiltin|ttyfast|ttym|ttymouse|ttyscroll|ttytype|tw|tx|uc|ul|undolevels|updatecount|updatetime|ut|vb|vbs|vdir|verbosefile|vfile|viewdir|viewoptions|viminfo|virtualedit|visualbell|vop|wak|warn|wb|wc|wcm|wd|weirdinvert|wfh|wfw|whichwrap|wi|wig|wildchar|wildcharm|wildignore|wildmenu|wildmode|wildoptions|wim|winaltkeys|window|winfixheight|winfixwidth|winheight|winminheight|winminwidth|winwidth|wiv|wiw|wm|wmh|wmnu|wmw|wop|wrap|wrapmargin|wrapscan|writeany|writebackup|writedelay|ww|noacd|noai|noakm|noallowrevins|noaltkeymap|noanti|noantialias|noar|noarab|noarabic|noarabicshape|noari|noarshape|noautochdir|noautoindent|noautoread|noautowrite|noautowriteall|noaw|noawa|nobackup|noballooneval|nobeval|nobin|nobinary|nobiosk|nobioskey|nobk|nobl|nobomb|nobuflisted|nocf|noci|nocin|nocindent|nocompatible|noconfirm|noconsk|noconskey|nocopyindent|nocp|nocscopetag|nocscopeverbose|nocst|nocsverb|nocuc|nocul|nocursorcolumn|nocursorline|nodeco|nodelcombine|nodg|nodiff|nodigraph|nodisable|noea|noeb|noed|noedcompatible|noek|noendofline|noeol|noequalalways|noerrorbells|noesckeys|noet|noex|noexpandtab|noexrc|nofen|nofk|nofkmap|nofoldenable|nogd|nogdefault|noguipty|nohid|nohidden|nohk|nohkmap|nohkmapp|nohkp|nohls|noic|noicon|noignorecase|noim|noimc|noimcmdline|noimd|noincsearch|noinf|noinfercase|noinsertmode|nois|nojoinspaces|nojs|nolazyredraw|nolbr|nolinebreak|nolisp|nolist|noloadplugins|nolpl|nolz|noma|nomacatsui|nomagic|nomh|noml|nomod|nomodeline|nomodifiable|nomodified|nomore|nomousef|nomousefocus|nomousehide|nonu|nonumber|noodev|noopendevice|nopaste|nopi|nopreserveindent|nopreviewwindow|noprompt|nopvw|noreadonly|noremap|norestorescreen|norevins|nori|norightleft|norightleftcmd|norl|norlc|noro|nors|noru|noruler|nosb|nosc|noscb|noscrollbind|noscs|nosecure|nosft|noshellslash|noshelltemp|noshiftround|noshortname|noshowcmd|noshowfulltag|noshowmatch|noshowmode|nosi|nosm|nosmartcase|nosmartindent|nosmarttab|nosmd|nosn|nosol|nospell|nosplitbelow|nosplitright|nospr|nosr|nossl|nosta|nostartofline|nostmp|noswapfile|noswf|nota|notagbsearch|notagrelative|notagstack|notbi|notbidi|notbs|notermbidi|noterse|notextauto|notextmode|notf|notgst|notildeop|notimeout|notitle|noto|notop|notr|nottimeout|nottybuiltin|nottyfast|notx|novb|novisualbell|nowa|nowarn|nowb|noweirdinvert|nowfh|nowfw|nowildmenu|nowinfixheight|nowinfixwidth|nowiv|nowmnu|nowrap|nowrapscan|nowrite|nowriteany|nowritebackup|nows|invacd|invai|invakm|invallowrevins|invaltkeymap|invanti|invantialias|invar|invarab|invarabic|invarabicshape|invari|invarshape|invautochdir|invautoindent|invautoread|invautowrite|invautowriteall|invaw|invawa|invbackup|invballooneval|invbeval|invbin|invbinary|invbiosk|invbioskey|invbk|invbl|invbomb|invbuflisted|invcf|invci|invcin|invcindent|invcompatible|invconfirm|invconsk|invconskey|invcopyindent|invcp|invcscopetag|invcscopeverbose|invcst|invcsverb|invcuc|invcul|invcursorcolumn|invcursorline|invdeco|invdelcombine|invdg|invdiff|invdigraph|invdisable|invea|inveb|inved|invedcompatible|invek|invendofline|inveol|invequalalways|inverrorbells|invesckeys|invet|invex|invexpandtab|invexrc|invfen|invfk|invfkmap|invfoldenable|invgd|invgdefault|invguipty|invhid|invhidden|invhk|invhkmap|invhkmapp|invhkp|invhls|invhlsearch|invic|invicon|invignorecase|invim|invimc|invimcmdline|invimd|invincsearch|invinf|invinfercase|invinsertmode|invis|invjoinspaces|invjs|invlazyredraw|invlbr|invlinebreak|invlisp|invlist|invloadplugins|invlpl|invlz|invma|invmacatsui|invmagic|invmh|invml|invmod|invmodeline|invmodifiable|invmodified|invmore|invmousef|invmousefocus|invmousehide|invnu|invnumber|invodev|invopendevice|invpaste|invpi|invpreserveindent|invpreviewwindow|invprompt|invpvw|invreadonly|invremap|invrestorescreen|invrevins|invri|invrightleft|invrightleftcmd|invrl|invrlc|invro|invrs|invru|invruler|invsb|invsc|invscb|invscrollbind|invscs|invsecure|invsft|invshellslash|invshelltemp|invshiftround|invshortname|invshowcmd|invshowfulltag|invshowmatch|invshowmode|invsi|invsm|invsmartcase|invsmartindent|invsmarttab|invsmd|invsn|invsol|invspell|invsplitbelow|invsplitright|invspr|invsr|invssl|invsta|invstartofline|invstmp|invswapfile|invswf|invta|invtagbsearch|invtagrelative|invtagstack|invtbi|invtbidi|invtbs|invtermbidi|invterse|invtextauto|invtextmode|invtf|invtgst|invtildeop|invtimeout|invtitle|invto|invtop|invtr|invttimeout|invttybuiltin|invttyfast|invtx|invvb|invvisualbell|invwa|invwarn|invwb|invweirdinvert|invwfh|invwfw|invwildmenu|invwinfixheight|invwinfixwidth|invwiv|invwmnu|invwrap|invwrapscan|invwrite|invwriteany|invwritebackup|invws|t_AB|t_AF|t_al|t_AL|t_bc|t_cd|t_ce|t_Ce|t_cl|t_cm|t_Co|t_cs|t_Cs|t_CS|t_CV|t_da|t_db|t_dl|t_DL|t_EI|t_F1|t_F2|t_F3|t_F4|t_F5|t_F6|t_F7|t_F8|t_F9|t_fs|t_IE|t_IS|t_k1|t_K1|t_k2|t_k3|t_K3|t_k4|t_K4|t_k5|t_K5|t_k6|t_K6|t_k7|t_K7|t_k8|t_K8|t_k9|t_K9|t_KA|t_kb|t_kB|t_KB|t_KC|t_kd|t_kD|t_KD|t_ke|t_KE|t_KF|t_KG|t_kh|t_KH|t_kI|t_KI|t_KJ|t_KK|t_kl|t_KL|t_kN|t_kP|t_kr|t_ks|t_ku|t_le|t_mb|t_md|t_me|t_mr|t_ms|t_nd|t_op|t_RI|t_RV|t_Sb|t_se|t_Sf|t_SI|t_so|t_sr|t_te|t_ti|t_ts|t_ue|t_us|t_ut|t_vb|t_ve|t_vi|t_vs|t_WP|t_WS|t_xs|t_ZH|t_ZR)\b/,number:/\b(?:0x[\da-f]+|\d+(?:\.\d+)?)\b/i,operator:/\|\||&&|[-+.]=?|[=!](?:[=~][#?]?)?|[<>]=?[#?]?|[*\/%?]|\b(?:is(?:not)?)\b/,punctuation:/[{}[\](),;:]/};
+!function(){if("undefined"!=typeof self&&self.Prism&&self.document&&document.querySelector){var t,n=function(){if(void 0===t){var e=document.createElement("div");e.style.fontSize="13px",e.style.lineHeight="1.5",e.style.padding=0,e.style.border=0,e.innerHTML="&nbsp;<br />&nbsp;",document.body.appendChild(e),t=38===e.offsetHeight,document.body.removeChild(e)}return t},a=0;Prism.hooks.add("before-sanity-check",function(e){var t=e.element.parentNode,n=t&&t.getAttribute("data-line");if(t&&n&&/pre/i.test(t.nodeName)){var i=0;r(".line-highlight",t).forEach(function(e){i+=e.textContent.length,e.parentNode.removeChild(e)}),i&&/^( \n)+$/.test(e.code.slice(-i))&&(e.code=e.code.slice(0,-i))}}),Prism.hooks.add("complete",function e(t){var n=t.element.parentNode,i=n&&n.getAttribute("data-line");if(n&&i&&/pre/i.test(n.nodeName)){clearTimeout(a);var r=Prism.plugins.lineNumbers,o=t.plugins&&t.plugins.lineNumbers;if(l(n,"line-numbers")&&r&&!o)Prism.hooks.add("line-numbers",e);else s(n,i)(),a=setTimeout(u,1)}}),window.addEventListener("hashchange",u),window.addEventListener("resize",function(){var t=[];r("pre[data-line]").forEach(function(e){t.push(s(e))}),t.forEach(i)})}function r(e,t){return Array.prototype.slice.call((t||document).querySelectorAll(e))}function l(e,t){return t=" "+t+" ",-1<(" "+e.className+" ").replace(/[\n\t]/g," ").indexOf(t)}function i(e){e()}function s(u,e,d){var t=(e="string"==typeof e?e:u.getAttribute("data-line")).replace(/\s+/g,"").split(","),c=+u.getAttribute("data-line-offset")||0,f=(n()?parseInt:parseFloat)(getComputedStyle(u).lineHeight),h=l(u,"line-numbers"),p=h?u:u.querySelector("code")||u,m=[];return t.forEach(function(e){var t=e.split("-"),n=+t[0],i=+t[1]||n,r=u.querySelector('.line-highlight[data-range="'+e+'"]')||document.createElement("div");if(m.push(function(){r.setAttribute("aria-hidden","true"),r.setAttribute("data-range",e),r.className=(d||"")+" line-highlight"}),h&&Prism.plugins.lineNumbers){var o=Prism.plugins.lineNumbers.getLine(u,n),a=Prism.plugins.lineNumbers.getLine(u,i);if(o){var l=o.offsetTop+"px";m.push(function(){r.style.top=l})}if(a){var s=a.offsetTop-o.offsetTop+a.offsetHeight+"px";m.push(function(){r.style.height=s})}}else m.push(function(){r.setAttribute("data-start",n),n<i&&r.setAttribute("data-end",i),r.style.top=(n-c-1)*f+"px",r.textContent=new Array(i-n+2).join(" \n")});m.push(function(){p.appendChild(r)})}),function(){m.forEach(i)}}function u(){var e=location.hash.slice(1);r(".temporary.line-highlight").forEach(function(e){e.parentNode.removeChild(e)});var t=(e.match(/\.([\d,-]+)$/)||[,""])[1];if(t&&!document.getElementById(e)){var n=e.slice(0,e.lastIndexOf(".")),i=document.getElementById(n);if(i)i.hasAttribute("data-line")||i.setAttribute("data-line",""),s(i,t,"temporary ")(),document.querySelector(".temporary.line-highlight").scrollIntoView()}}}();
+!function(){if("undefined"!=typeof self&&self.Prism&&self.document){var l="line-numbers",c=/\n(?!$)/g,m=function(e){var t=a(e)["white-space"];if("pre-wrap"===t||"pre-line"===t){var n=e.querySelector("code"),r=e.querySelector(".line-numbers-rows"),s=e.querySelector(".line-numbers-sizer"),i=n.textContent.split(c);s||((s=document.createElement("span")).className="line-numbers-sizer",n.appendChild(s)),s.style.display="block",i.forEach(function(e,t){s.textContent=e||"\n";var n=s.getBoundingClientRect().height;r.children[t].style.height=n+"px"}),s.textContent="",s.style.display="none"}},a=function(e){return e?window.getComputedStyle?getComputedStyle(e):e.currentStyle||null:null};window.addEventListener("resize",function(){Array.prototype.forEach.call(document.querySelectorAll("pre."+l),m)}),Prism.hooks.add("complete",function(e){if(e.code){var t=e.element,n=t.parentNode;if(n&&/pre/i.test(n.nodeName)&&!t.querySelector(".line-numbers-rows")){for(var r=!1,s=/(?:^|\s)line-numbers(?:\s|$)/,i=t;i;i=i.parentNode)if(s.test(i.className)){r=!0;break}if(r){t.className=t.className.replace(s," "),s.test(n.className)||(n.className+=" line-numbers");var l,a=e.code.match(c),o=a?a.length+1:1,u=new Array(o+1).join("<span></span>");(l=document.createElement("span")).setAttribute("aria-hidden","true"),l.className="line-numbers-rows",l.innerHTML=u,n.hasAttribute("data-start")&&(n.style.counterReset="linenumber "+(parseInt(n.getAttribute("data-start"),10)-1)),e.element.appendChild(l),m(n),Prism.hooks.run("line-numbers",e)}}}}),Prism.hooks.add("line-numbers",function(e){e.plugins=e.plugins||{},e.plugins.lineNumbers=!0}),Prism.plugins.lineNumbers={getLine:function(e,t){if("PRE"===e.tagName&&e.classList.contains(l)){var n=e.querySelector(".line-numbers-rows"),r=parseInt(e.getAttribute("data-start"),10)||1,s=r+(n.children.length-1);t<r&&(t=r),s<t&&(t=s);var i=t-r;return n.children[i]}}}}}();
+"undefined"!=typeof self&&self.Prism&&self.document&&document.querySelector&&(self.Prism.fileHighlight=function(e){e=e||document;var i={js:"javascript",py:"python",rb:"ruby",ps1:"powershell",psm1:"powershell",sh:"bash",bat:"batch",h:"c",tex:"latex"};Array.prototype.slice.call(e.querySelectorAll("pre[data-src]")).forEach(function(e){if(!e.hasAttribute("data-src-loaded")){for(var t,a=e.getAttribute("data-src"),s=e,n=/\blang(?:uage)?-([\w-]+)\b/i;s&&!n.test(s.className);)s=s.parentNode;if(s&&(t=(e.className.match(n)||[,""])[1]),!t){var r=(a.match(/\.(\w+)$/)||[,""])[1];t=i[r]||r}var o=document.createElement("code");o.className="language-"+t,e.textContent="",o.textContent="Loading…",e.appendChild(o);var l=new XMLHttpRequest;l.open("GET",a,!0),l.onreadystatechange=function(){4==l.readyState&&(l.status<400&&l.responseText?(o.textContent=l.responseText,Prism.highlightElement(o),e.setAttribute("data-src-loaded","")):400<=l.status?o.textContent="✖ Error "+l.status+" while fetching file: "+l.statusText:o.textContent="✖ Error: File does not exist or is empty")},l.send(null)}})},document.addEventListener("DOMContentLoaded",function(){self.Prism.fileHighlight()}));
+"undefined"!=typeof self&&!self.Prism||"undefined"!=typeof global&&!global.Prism||Prism.hooks.add("wrap",function(e){"keyword"===e.type&&e.classes.push("keyword-"+e.content)});
+!function(){if("undefined"!=typeof self&&"undefined"!=typeof Prism&&"undefined"!=typeof document){var i=/<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g,t=/^#?(?=(?:[\da-f]{1,2}){3,4}$)([\da-f][\da-f]?)([\da-f][\da-f]?)([\da-f][\da-f]?)([\da-f][\da-f]?)?$/i,d=[function(n){var e=t.exec(n);if(e){var o=n.length<=4?1/15:1/255;return"rgba("+e.slice(1,4).map(function(n){return String(Math.round(parseInt(n,16)*o*255))}).join(",")+","+(void 0===e[4]?"1":(parseInt(e[4],16)*o).toFixed(3))+")"}},function(n){var e=(new Option).style;return e.color=n,e.color?n:void 0}];Prism.hooks.add("wrap",function(n){if("color"===n.type||"hexcode"===n.type){for(var e,o=n.content,t=o.split(i).join(""),r=0,a=d.length;r<a&&!e;r++)e=d[r](t);if(!e)return;var f='<span class="inline-color" style="background-color:'+e+';"></span>';n.content=f+o}})}}();
+!function(){if("undefined"!=typeof self&&self.Prism&&self.document){var u=/(?:^|\s)command-line(?:\s|$)/;Prism.hooks.add("before-highlight",function(e){var t=e.vars=e.vars||{},a=t["command-line"]=t["command-line"]||{};if(!a.complete&&e.code){var n=e.element.parentNode;if(n&&/pre/i.test(n.nodeName)&&(u.test(n.className)||u.test(e.element.className)))if(e.element.querySelector(".command-line-prompt"))a.complete=!0;else{var r=e.code.split("\n");a.numberOfLines=r.length;var s=a.outputLines=[],o=n.getAttribute("data-output"),i=n.getAttribute("data-filter-output");if(o||""===o){o=o.split(",");for(var l=0;l<o.length;l++){var m=o[l].split("-"),p=parseInt(m[0],10),d=2===m.length?parseInt(m[1],10):p;if(!isNaN(p)&&!isNaN(d)){p<1&&(p=1),d>r.length&&(d=r.length),d--;for(var c=--p;c<=d;c++)s[c]=r[c],r[c]=""}}}else if(i)for(l=0;l<r.length;l++)0===r[l].indexOf(i)&&(s[l]=r[l].slice(i.length),r[l]="");e.code=r.join("\n")}else a.complete=!0}else a.complete=!0}),Prism.hooks.add("before-insert",function(e){var t=e.vars=e.vars||{},a=t["command-line"]=t["command-line"]||{};if(!a.complete){for(var n=e.highlightedCode.split("\n"),r=0,s=(a.outputLines||[]).length;r<s;r++)a.outputLines.hasOwnProperty(r)&&(n[r]=a.outputLines[r]);e.highlightedCode=n.join("\n")}}),Prism.hooks.add("complete",function(e){var t=e.vars=e.vars||{},a=t["command-line"]=t["command-line"]||{};if(!a.complete){var n=e.element.parentNode;u.test(e.element.className)&&(e.element.className=e.element.className.replace(u," ")),u.test(n.className)||(n.className+=" command-line");var r=function(e,t){return(n.getAttribute(e)||t).replace(/"/g,"&quot")},s=new Array((a.numberOfLines||0)+1),o=r("data-prompt","");if(""!==o)s=s.join('<span data-prompt="'+o+'"></span>');else{var i=r("data-user","user"),l=r("data-host","localhost");s=s.join('<span data-user="'+i+'" data-host="'+l+'"></span>')}var m=document.createElement("span");m.className="command-line-prompt",m.innerHTML=s;for(var p=0,d=(a.outputLines||[]).length;p<d;p++)if(a.outputLines.hasOwnProperty(p)){var c=m.children[p];c.removeAttribute("data-user"),c.removeAttribute("data-host"),c.removeAttribute("data-prompt")}e.element.insertBefore(m,e.element.firstChild),a.complete=!0}})}}();
+!function(){if("undefined"!=typeof self&&self.Prism&&self.document){var i=[],l={},c=function(){};Prism.plugins.toolbar={};var e=Prism.plugins.toolbar.registerButton=function(e,n){var t;t="function"==typeof n?n:function(e){var t;return"function"==typeof n.onClick?((t=document.createElement("button")).type="button",t.addEventListener("click",function(){n.onClick.call(this,e)})):"string"==typeof n.url?(t=document.createElement("a")).href=n.url:t=document.createElement("span"),n.className&&t.classList.add(n.className),t.textContent=n.text,t},e in l?console.warn('There is a button with the key "'+e+'" registered already.'):i.push(l[e]=t)},t=Prism.plugins.toolbar.hook=function(a){var e=a.element.parentNode;if(e&&/pre/i.test(e.nodeName)&&!e.parentNode.classList.contains("code-toolbar")){var t=document.createElement("div");t.classList.add("code-toolbar"),e.parentNode.insertBefore(t,e),t.appendChild(e);var r=document.createElement("div");r.classList.add("toolbar");var n=i,o=function(e){for(;e;){var t=e.getAttribute("data-toolbar-order");if(null!=t)return(t=t.trim()).length?t.split(/\s*,\s*/g):[];e=e.parentElement}}(a.element);o&&(n=o.map(function(e){return l[e]||c})),n.forEach(function(e){var t=e(a);if(t){var n=document.createElement("div");n.classList.add("toolbar-item"),n.appendChild(t),r.appendChild(n)}}),t.appendChild(r)}};e("label",function(e){var t=e.element.parentNode;if(t&&/pre/i.test(t.nodeName)&&t.hasAttribute("data-label")){var n,a,r=t.getAttribute("data-label");try{a=document.querySelector("template#"+r)}catch(e){}return a?n=a.content:(t.hasAttribute("data-url")?(n=document.createElement("a")).href=t.getAttribute("data-url"):n=document.createElement("span"),n.textContent=r),n}}),Prism.hooks.add("complete",t)}}();
+!function(){if("undefined"!=typeof self&&self.Prism&&self.document)if(Prism.plugins.toolbar){var r=window.ClipboardJS||void 0;r||"function"!=typeof require||(r=require("clipboard"));var i=[];if(!r){var o=document.createElement("script"),e=document.querySelector("head");o.onload=function(){if(r=window.ClipboardJS)for(;i.length;)i.pop()()},o.src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.0/clipboard.min.js",e.appendChild(o)}Prism.plugins.toolbar.registerButton("copy-to-clipboard",function(e){var t=document.createElement("button");return t.textContent="Copy",r?o():i.push(o),t;function o(){var o=new r(t,{text:function(){return e.code}});o.on("success",function(){t.textContent="Copied!",n()}),o.on("error",function(){t.textContent="Press Ctrl+C to copy",n()})}function n(){setTimeout(function(){t.textContent="Copy"},5e3)}})}else console.warn("Copy to Clipboard plugin loaded before Toolbar plugin.")}();
+!function(){if("undefined"!=typeof Prism&&Prism.languages.diff){var o=/diff-([\w-]+)/i,m=/<\/?(?!\d)[^\s>\/=$<%]+(?:\s(?:\s*[^\s>\/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/gi,c=RegExp("(?:__|[^\r\\n<])*(?:\r\\n?|\n|(?:__|[^\r\\n<])(?![^\r\\n]))".replace(/__/g,m.source),"gi"),d=Prism.languages.diff.PREFIXES;Prism.hooks.add("before-sanity-check",function(e){var a=e.language;o.test(a)&&!e.grammar&&(e.grammar=Prism.languages[a]=Prism.languages.diff)}),Prism.hooks.add("before-tokenize",function(e){var a=e.language;o.test(a)&&!Prism.languages[a]&&(Prism.languages[a]=Prism.languages.diff)}),Prism.hooks.add("wrap",function(e){var a,s;if("diff"!==e.language){var r=o.exec(e.language);if(!r)return;a=r[1],s=Prism.languages[a]}if(e.type in d){var n,i=e.content.replace(m,"").replace(/&lt;/g,"<").replace(/&amp;/g,"&"),g=i.replace(/(^|[\r\n])./g,"$1");n=s?Prism.highlight(g,s,a):Prism.util.encode(g);var f,t=new Prism.Token("prefix",d[e.type],[/\w+/.exec(e.type)[0]]),u=Prism.Token.stringify(t,e.language),l=[];for(c.lastIndex=0;f=c.exec(n);)l.push(u+f[0]);/(?:^|[\r\n]).$/.test(i)&&l.push(u),e.content=l.join(""),s&&e.classes.push("language-"+a)}})}}();
+
+    </script>
+    <script>
+        // Ensure Prism highlights all code blocks when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            Prism.highlightAll();
+        });
+    </script>
+    
+    <!-- Callouts functionality -->
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const callouts = document.querySelectorAll('.callout');
+
+    callouts.forEach(callout => {
+        const title = callout.querySelector('.callout-title');
+        if (title) {
+            title.addEventListener('click', () => {
+                callout.classList.toggle('is-open');
+            });
+        }
+    });
+});
+
+    </script>
+
+    <style>
+/*when save the web file into html we realize the bookmark in set in tag
+ * <header id="page-header">, therefore set display:none option to hide.
+ *-----------------------------------------------------------------------
+ * <body>
+ *     <div id="__next">
+ *         <div id="page-ctn">
+ *             <header id="page-header">
+ *                <h3><svg viewBox="0 0 16 16" ...>
+ *                        <path fill-rule="evenodd" ...></path>
+ *                    </svg></h3>
+ *             </header>
+ *             <section class="markdown-body"></section>
+ *         </div>
+ *     </div>
+ * </div>
+ *-----------------------------------------------------------------------
+ * note that the content of markdown-body is absent when saving.
+ *---------------------------------------------------------------------*/
+html {
+    /* the background-color should be set as white, otherwise iMac print gray bottom */
+    /* background-color: #d8d8d8; */
+    background-color: white;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove default margins and padding */
+body {
+    background-color: #d8d8d8;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Override scrollbar height for pre code blocks */
+::-webkit-scrollbar {
+    height: 7px !important;
+}
+
+/* Remove top margin from first element to eliminate white space at top */
+body > *:first-child,
+.markdown-body > *:first-child {
+    margin-top: 0 !important;
+}
+
+#__next {
+    /* width: 100%; */
+    padding: 0 !important;
+    margin: 0 !important;
+    /*SOMETIMES need to set margin to offset the html background-color margin*/
+    /* margin: -2em; */
+    background-color: #d8d8d8;
+    /* background-color: white; */
+}
+
+#page-ctn {
+    /* the width of the white area, need to set 700px and up to print correctly */
+    width: 800px;
+    /* fine-tuned for Safari */
+    min-height: 840px;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 0 !important; /* Force zero top margin */
+    padding-top: 0 !important; /* Force zero top padding */
+    /* margin-top:0px; */
+    margin-bottom: -4em;
+    border: none;
+    /* background-color: lightgray; */
+    background-color: white;
+}
+
+#page-header {
+    /* set width same as that of body to center content */
+    max-width: 700px;
+    /* these are important only if display: none is removed */
+    margin-left: 1em;
+    margin-right: 1em;
+    padding: 4px 1em 4px 1em;
+    /* padding to the left and the right boarders*/
+    /* hide the block but keep the space */
+    /* visibility:hidden; */
+    display: none;
+}
+
+.markdown-body {
+    color: #24292e;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, "Noto Sans", "Noto Sans Symbols", Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol;
+    font-size: 13px;
+    line-height: 1.5;
+    word-wrap: break-word;
+    /* set it below 640px to print correctly with the 700px setting in page-ctn */
+    width: 700px;
+    text-align: left;
+    padding: 0 2em 2em 2em; /* Remove top padding: was 1em 2em 2em 2em */
+    /* padding to the left and the right boarders*/
+    /*center content in the middle of page-ctn */
+    margin: auto;
+    background-color: white;
+}
+
+/* alignment of the markdown header */
+.markdown-body .anchor {
+    float: left;
+    line-height: 1;
+    margin-left: -20px;
+    padding-right: 4px;
+}
+
+.markdown-body .anchor:focus {
+    outline: none;
+}
+
+.markdown-body h1 .octicon-link,
+.markdown-body h2 .octicon-link,
+.markdown-body h3 .octicon-link,
+.markdown-body h4 .octicon-link,
+.markdown-body h5 .octicon-link,
+.markdown-body h6 .octicon-link {
+    color: #1b1f23;
+    vertical-align: middle;
+    visibility: hidden;
+}
+
+.markdown-body h1:hover .anchor .octicon-link,
+.markdown-body h2:hover .anchor .octicon-link,
+.markdown-body h3:hover .anchor .octicon-link,
+.markdown-body h4:hover .anchor .octicon-link,
+.markdown-body h5:hover .anchor .octicon-link,
+.markdown-body h6:hover .anchor .octicon-link {
+    visibility: visible;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4,
+.markdown-body h5,
+.markdown-body h6 {
+    font-weight: 600;
+    line-height: 1.25;
+    margin-bottom: 0px;
+    margin-top: 24px;
+    padding-bottom: 0px;
+}
+
+.markdown-body h1 {
+    font-size: 2.25em;
+    text-align: center;
+    padding-top: 1em;
+    padding-bottom: 0.5em;
+    color: #000000 !important; /* Force h1 to be black */
+    border-bottom: none !important; /* Remove any border below h1 */
+    /* background-color: #eee; */
+}
+
+/* DISABLED body.dark-theme .markdown-body h1 {
+    color: #FFFFFF !important; /* White in dark theme */
+} */
+
+.markdown-body h2 {
+    border-bottom: 1px solid rgba(239, 73, 73, 0.5);
+    padding-bottom: 2px;
+}
+
+.markdown-body h2 {
+    color: #ef4949;
+    font-size: 1.75em;
+}
+
+.markdown-body h3 {
+    color: #149963;
+    font-size: 1.5em;
+    padding-bottom: 2px;
+}
+
+.markdown-body h4 {
+    color: #248be5;
+    font-size: 1.25em;
+    padding-bottom: 0px;
+    margin-bottom: 8px;
+    margin-top: 12px;
+}
+
+/* Reduce spacing between h4 and following content */
+.markdown-body h4 + p,
+.markdown-body h4 + ul,
+.markdown-body h4 + ol {
+    margin-top: 0px;
+}
+
+/* Reduce top margin of <ul> elements that follows a paragraphs */
+.markdown-body p + ul,
+.markdown-body p + ol {
+    margin-top: 4px !important;
+}
+
+/* Reduce bottom margin from paragraphs that precede lists */
+.markdown-body p:has(+ ul),
+.markdown-body p:has(+ ol) {
+    margin-bottom: 4px !important;
+}
+
+/* Fallback for browsers that don't support :has() */
+.markdown-body p {
+    margin-bottom: 8px;
+}
+
+.markdown-body h5 {
+    color: #111;
+    font-size: 1.15em;
+}
+
+.markdown-body h6 {
+    color: #ef9500;
+    font-size: 1em;
+}
+
+.markdown-body a {
+    color: #4073dd;
+    /*a href color*/
+    text-decoration: none;
+}
+
+.markdown-body blockquote>:first-child {
+    margin-top: 0;
+}
+
+.markdown-body blockquote>:last-child {
+    margin-bottom: 0;
+}
+
+.markdown-body blockquote {
+    font-size: 100%;
+    line-height: 1.5;
+    position: relative;
+    color: rgba(52, 73, 94, 0.8);
+    background-color: rgba(0, 71, 171, 0.05);
+    border-left: .25em solid #5097ba;
+    box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.125);
+    margin: 0;
+    padding: 4px 4px 4px 0.5em;
+}
+
+/* Inline code styling - only for non-pre code (inline code snippets) */
+.markdown-body code:not(pre code) {
+    background-color: rgba(27, 31, 35, .05);
+    border-radius: 3px;
+    font-size: 90%;
+    margin: 0;
+    padding: 1px 3px;
+    color: #333;
+}
+
+
+.markdown-body kbd {
+    background-color: #fafbfc;
+    border: 1px solid #d1d5da;
+    border-bottom-color: #c6cbd1;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #c6cbd1;
+    color: #444d56;
+    display: inline-block;
+    font: 11px SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+    line-height: 10px;
+    font-size: 9px;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+
+/* font-size : 11px */
+.markdown-body kbd1 {
+    background-color: #fafbfc;
+    border: 1px solid #d1d5da;
+    border-bottom-color: #c6cbd1;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #c6cbd1;
+    color: #444d56;
+    display: inline-block;
+    font: 11px SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+    line-height: 11px;
+    font-size: 11px;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+
+/* font-size : 12px */
+.markdown-body kbd2 {
+    background-color: #fafbfc;
+    border: 1px solid #d1d5da;
+    border-bottom-color: #c6cbd1;
+    border-radius: 3px;
+    box-shadow: inset 0 -1px 0 #c6cbd1;
+    color: #444d56;
+    display: inline-block;
+    font: 12px SFMono-Regular, Consolas, Liberation Mono, Menlo, Courier, monospace;
+    line-height: 12px;
+    font-size: 12px;
+    padding: 2px 3px;
+    vertical-align: middle;
+}
+
+.markdown-body img {
+    background-color: #fff;
+    box-sizing: content-box;
+    max-width: 100%;
+    /* max-width: 450px; */
+}
+
+.markdown-body img[align=right] {
+    padding-left: 20px;
+}
+
+.markdown-body img[align=left] {
+    padding-right: 20px;
+}
+
+/* Light Modern Table Design */
+.markdown-body table {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 24px auto;
+    border-radius: 8px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    width: auto;
+    overflow: hidden;
+}
+
+.markdown-body table thead {
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border-bottom: 1px solid #d1d5db;
+}
+
+.markdown-body table th {
+    padding: 6px 24px;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9em;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border: none;
+}
+
+.markdown-body table td {
+    padding: 5px 24px;
+    border-bottom: 1px solid #f3f4f6;
+    color: #4b5563;
+    background: #ffffff;
+    border-left: none;
+    border-right: none;
+    font-size: 0.95em;
+}
+
+/* Reduce padding when table approaches 70% of content width (490px of 700px) */
+/* Use container-based breakpoints that consider the actual content constraints */
+@media (max-width: 1000px) {
+    /* When viewport allows content + some margin, but table might be getting wide */
+    .markdown-body table {
+        font-size: 0.9em; /* Slightly smaller text to help fit */
+    }
+}
+
+@media (max-width: 800px) {
+    /* Content area becoming constrained, reduce table padding */
+    .markdown-body table th {
+        padding: 6px 16px !important;
+        background: red !important;
+    }
+    .markdown-body table td {
+        padding: 5px 16px !important;
+        background: yellow !important;
+    }
+}
+
+@media (max-width: 750px) {
+    /* Approaching 70% threshold for 700px content */
+    .markdown-body table th {
+        padding: 6px 12px !important;
+        background: blue !important;
+    }
+    .markdown-body table td {
+        padding: 5px 12px !important;
+        background: green !important;
+    }
+}
+
+@media (max-width: 700px) {
+    /* At content width limit, minimal padding */
+    .markdown-body table th {
+        padding: 6px 8px !important;
+        background: purple !important;
+    }
+    .markdown-body table td {
+        padding: 5px 8px !important;
+        background: orange !important;
+    }
+}
+
+.markdown-body table tr {
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    background-color: #ffffff;
+    border-top: none;
+}
+
+.markdown-body table tbody tr:hover {
+    background: #f0fdf4 !important;
+    color: #166534 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 
+        inset 3px 0 0 #22c55e,
+        0 4px 20px rgba(34, 197, 94, 0.12) !important;
+}
+
+.markdown-body table tbody tr:hover td {
+    background: #f0fdf4 !important;
+    color: #166534 !important;
+}
+
+.markdown-body table tr:nth-child(2n) {
+    background-color: #ffffff;
+}
+
+.markdown-body table tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+.markdown-body table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Light modern table hover effect */
+.markdown-body table:hover {
+    border-color: #3b82f6;
+    box-shadow: 
+        0 10px 25px rgba(0, 0, 0, 0.12),
+        0 0 20px rgba(59, 130, 246, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+}
+
+.markdown-body .highlight {
+    margin-bottom: 16px;
+}
+
+.markdown-body .highlight pre {
+    margin-bottom: 0;
+    word-break: break-all;
+}
+
+/* pre is the indented code block without ```lang ...``` specification   */
+.markdown-body .highlight pre,
+.markdown-body pre {
+    border-radius: 3px;
+    font-size: 90%;
+    line-height: 1.5;
+    overflow: auto;
+    padding: 0.5em 1em;
+    white-space: pre-wrap;
+}
+
+/* Light themes get the light gray background */
+.markdown-body pre:not(.dark-theme),
+.collapsible-content pre:not(.dark-theme) {
+    background-color: #f0f2f5 !important;
+}
+
+/* Ensure all code tokens (including operators, punctuation) use the light background */
+body:not(.dark-theme) .markdown-body pre code .token {
+    background-color: transparent !important;
+}
+
+/* Specifically target common operators and punctuation tokens */
+body:not(.dark-theme) .markdown-body pre code .token.operator,
+body:not(.dark-theme) .markdown-body pre code .token.punctuation,
+body:not(.dark-theme) .markdown-body pre code .token.property,
+body:not(.dark-theme) .markdown-body pre code .token.number,
+body:not(.dark-theme) .markdown-body pre code .token.string {
+    background-color: transparent !important;
+}
+
+.markdown-body pre code {
+    background-color: transparent;
+    border: 0;
+    display: inline;
+    line-height: inherit;
+    margin: 0;
+    max-width: auto;
+    overflow: visible;
+    padding: 0;
+    word-wrap: break-word;
+}
+
+.markdown-body ol,
+.markdown-body ul {
+    padding-left: 2em;
+}
+
+.markdown-body ol ol,
+.markdown-body ol ul,
+.markdown-body ul ol,
+.markdown-body ul ul {
+    margin-bottom: 0;
+    margin-top: 0;
+}
+
+.markdown-body li {
+    word-wrap: break-all;
+}
+
+.markdown-body li>p {
+    margin-top: 6px;
+}
+
+.markdown-body li+li {
+    margin-top: .25em;
+}
+
+.markdown-body ol li {
+    font-size: 12px;
+}
+
+.markdown-body ul li {
+    font-size: 1em;
+}
+
+/* Legacy collapsible system - keeping for code block collapsing only */
+.wrap-content-collapsible {
+    margin-bottom: 1.2rem 0;
+    padding: 0em 0em 0.5em 0em; /* Reduced top padding from 1em to 0.2em */
+}
+
+input[type='checkbox'] {
+    display: none;
+}
+
+/* Task list checkbox styling - override the generic hidden checkbox rule */
+.task-list-item-checkbox {
+    display: inline-block !important;
+    margin-right: 0.5em;
+    vertical-align: middle;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+/* Task list item styling */
+.task-list-item {
+    list-style-type: none !important;
+    margin-left: -1.5em;
+    position: relative;
+}
+
+/* Styling for completed tasks */
+.task-list-item input[type="checkbox"]:checked + * {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+body:not(.dark-theme) .lbl-toggle {
+    display: block;
+    font-weight: 500;
+    font-size: 13px;
+    text-align: left;
+    padding: 4px 0.4rem 4px 0.4rem;
+    color: white;
+    background: #6AB0DE;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.25s ease-out;
+}
+
+body.dark-theme .lbl-toggle {
+    display: block;
+    font-weight: 500;
+    font-size: 13px;
+    text-align: left;
+    padding: 4px 0.4rem 4px 0.4rem;
+    color: white;
+    background: #6AB0DE;
+    cursor: pointer;
+    border-radius: 7px;
+    transition: all 0.25s ease-out;
+}
+
+body:not(.dark-theme) .lbl-toggle:hover {
+    color: #faf500;
+    background: #5a9bd4;
+}
+
+body.dark-theme .lbl-toggle:hover {
+    color: #faf500;
+    background: #5a9bd4;
+}
+
+.lbl-toggle::before {
+    content: ' ';
+    display: inline-block;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+    border-left: 5px solid currentColor;
+    vertical-align: middle;
+    margin-right: .7rem;
+    transform: translateY(-2px);
+    transition: transform .2s ease-out;
+}
+
+.toggle:checked+.lbl-toggle::before {
+    transform: rotate(90deg) translateX(-3px);
+}
+
+/* Legacy collapsible content rules - only for code blocks */
+.wrap-content-collapsible .content-collapsible-content {
+    max-height: 0px;
+    overflow: hidden;
+    transition: max-height .25s ease-in-out, opacity .15s ease-in-out;
+    opacity: 0;
+}
+
+/* Content area when expanded - with horizontal scrolling */
+.toggle:checked+.lbl-toggle+.content-collapsible-content {
+    max-height: 100vh !important;
+    overflow-x: auto !important;
+    overflow-y: visible !important;
+    opacity: 1 !important;
+}
+
+/* Content-inner background styling - matches zhiyuanyao.css */
+.content-collapsible-content .content-inner {
+    background: rgba(106, 176, 222, .15);
+    border-bottom: 2px solid rgba(106, 176, 222, .8);
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    margin-top: -0.8rem;
+    padding: 10px 0px 0px 0px;
+}
+
+.toggle:checked+.lbl-toggle {
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.markdown-body .toggle:checked+.lbl-toggle+.content-collapsible-content,
+body .toggle:checked+.lbl-toggle+.content-collapsible-content {
+    max-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: auto !important;
+    position: relative !important;
+}
+
+/* Fix for code shifting during collapse - keep width consistent in both states */
+.wrap-content-collapsible .content-collapsible-content pre,
+.wrap-content-collapsible .content-collapsible-content .content-inner pre {
+    display: block !important;
+    visibility: visible !important;
+    margin: 0 !important;
+    padding: 10px 0px 10px 20px !important;
+    background-color: #f0f2f5 !important;
+    max-height: none !important;
+    overflow: visible !important;
+    width: max-content !important; /* Key fix: collapsed state uses max-content (same as expanded) */
+    min-width: 100% !important;
+}
+
+/* Expanded state - inherits width: max-content from above to prevent shifting */
+.toggle:checked+.lbl-toggle+.content-collapsible-content pre,
+.toggle:checked+.lbl-toggle+.content-collapsible-content .content-inner pre {
+    /* Inherits width: max-content + min-width: 100% - no width change = no shift */
+}
+
+.toggle:checked+.lbl-toggle+.content-collapsible-content pre.dark-theme,
+.content-collapsible-content pre.dark-theme {
+    background-color: #282C34 !important;
+}
+
+/* Horizontal scrollbar styling for content-collapsible window */
+.content-collapsible-content::-webkit-scrollbar {
+    width: 8px !important;
+    height: 7px !important;
+}
+
+.content-collapsible-content::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1) !important;
+}
+
+.content-collapsible-content::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3) !important;
+    border-radius: 4px !important;
+}
+
+.content-collapsible-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5) !important;
+}
+
+/* Dark theme scrollbar colors for content-collapsible window */
+body.dark-theme .content-collapsible-content::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .content-collapsible-content::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3) !important;
+}
+
+body.dark-theme .content-collapsible-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5) !important;
+}
+
+/* Prism.js Toolbar and Copy-to-Clipboard Styles - copied from demo.html */
+div.code-toolbar {
+    position: relative;
+}
+
+div.code-toolbar>.toolbar {
+    position: absolute;
+    top: .3em;
+    right: .2em;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+div.code-toolbar:hover>.toolbar {
+    opacity: 1;
+}
+
+/* Separate line b/c rules are thrown out if selector is invalid.
+   IE11 and old Edge versions don't support :focus-within. */
+div.code-toolbar:focus-within>.toolbar {
+    opacity: 1;
+}
+
+div.code-toolbar>.toolbar .toolbar-item {
+    display: inline-block;
+}
+
+div.code-toolbar>.toolbar a {
+    cursor: pointer;
+}
+
+div.code-toolbar>.toolbar button {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: normal;
+    overflow: visible;
+    padding: 0;
+    -webkit-user-select: none;
+    /* for button */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+div.code-toolbar>.toolbar a,
+div.code-toolbar>.toolbar button,
+div.code-toolbar>.toolbar span {
+    color: #bbb;
+    font-size: 0.97em;
+    padding: 2px .5em !important; /* Force reduced vertical padding for shorter height */
+    background: #f5f2f0;
+    background: rgba(224, 224, 224, 0.2);
+    box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+    border-radius: .5em;
+    line-height: 1.2 !important; /* Override modern CSS line-height */
+    height: auto !important; /* Override any fixed heights */
+}
+
+div.code-toolbar>.toolbar a:hover,
+div.code-toolbar>.toolbar a:focus,
+div.code-toolbar>.toolbar button:hover,
+div.code-toolbar>.toolbar button:focus,
+div.code-toolbar>.toolbar span:hover,
+div.code-toolbar>.toolbar span:focus {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Ultra-specific override for copy button height - override modern CSS */
+.markdown-body div.code-toolbar>.toolbar a,
+.markdown-body div.code-toolbar>.toolbar button,
+.markdown-body div.code-toolbar>.toolbar span,
+body div.code-toolbar>.toolbar a,
+body div.code-toolbar>.toolbar button,
+body div.code-toolbar>.toolbar span {
+    padding: 2px .5em !important;
+    line-height: 1.2 !important;
+    height: auto !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+}
+
+/* Global consistent selection colors - override all theme selections */
+/* Apply to all elements for uniform selection behavior across all themes */
+*::selection {
+    background-color: #C0D4F3 !important; /* Consistent uniform selection color */
+    color: inherit !important;
+}
+
+*::-moz-selection {
+    background-color: #C0D4F3 !important;
+    color: inherit !important;
+}
+
+/* Ensure code elements specifically use the same color */
+.markdown-body code:not(pre code)::selection,
+.markdown-body pre code::selection,
+.markdown-body pre::selection {
+    background-color: #C0D4F3 !important; /* Consistent uniform selection color */
+    color: inherit !important;
+}
+
+.markdown-body code:not(pre code)::-moz-selection,
+.markdown-body pre code::-moz-selection,
+.markdown-body pre::-moz-selection {
+    background-color: #C0D4F3 !important;
+    color: inherit !important;
+}
+
+/* Override any Prism theme-specific selection colors */
+code[class*="language-"]::selection,
+pre[class*="language-"]::selection,
+code[class*="language-"] *::selection,
+pre[class*="language-"] *::selection {
+    background-color: #C0D4F3 !important;
+    color: inherit !important;
+}
+
+code[class*="language-"]::-moz-selection,
+pre[class*="language-"]::-moz-selection,
+code[class*="language-"] *::-moz-selection,
+pre[class*="language-"] *::-moz-selection {
+    background-color: #C0D4F3 !important;
+    color: inherit !important;
+}
+
+/* Force inline code to use Prism light theme display style completely - always apply */
+.markdown-body code:not(pre code),
+code:not(pre code) {
+    background-color: rgba(27, 31, 35, .05) !important; /* Prism light theme background */
+    color: #333 !important; /* Prism light theme text color */
+    border-radius: 3px !important;
+    font-size: 90% !important;
+    margin: 0 !important;
+    padding: 1px 3px !important;
+    text-shadow: none !important; /* Override any dark theme text shadow */
+    border: none !important; /* Override any dark theme borders */
+}
+
+/* Table padding adjustments now handled by JavaScript based on actual table width vs content width */
+
+body.dark-theme .markdown-body code:not(pre code)::selection,
+body.dark-theme code:not(pre code)::selection {
+    background-color: #C0D4F3 !important; /* Light theme selection color */
+    color: inherit !important;
+}
+
+body.dark-theme .markdown-body code:not(pre code)::-moz-selection,
+body.dark-theme code:not(pre code)::-moz-selection {
+    background-color: #C0D4F3 !important; /* Light theme selection color */
+    color: inherit !important;
+}
+
+/* Dark theme pre code selection - use light theme selection color to avoid weird appearance */
+body.dark-theme pre[class*="language-"]::selection,
+body.dark-theme pre[class*="language-"] *::selection,
+body.dark-theme .markdown-body pre code::selection,
+body.dark-theme .markdown-body pre::selection,
+body.dark-theme .collapsible-content pre::selection,
+body.dark-theme .collapsible-content pre code::selection {
+    background-color: #C0D4F3 !important; /* Use light theme selection color */
+    color: inherit !important; /* Keep original text colors */
+}
+
+body.dark-theme pre[class*="language-"]::-moz-selection,
+body.dark-theme pre[class*="language-"] *::-moz-selection,
+body.dark-theme .markdown-body pre code::-moz-selection,
+body.dark-theme .markdown-body pre::-moz-selection,
+body.dark-theme .collapsible-content pre::-moz-selection,
+body.dark-theme .collapsible-content pre code::-moz-selection {
+    background-color: #C0D4F3 !important; /* Use light theme selection color */
+    color: inherit !important; /* Keep original text colors */
+}
+
+/* FINAL RULE: Dark theme background for collapsible pre code - specific color that works */
+body.dark-theme .collapsible-content pre {
+    background-color: #282C34 !important; /* Specific one-dark theme background color */
+}
+
+/* Clean Universal Section/Subsection Folding System */
+.section-collapsible-header {
+    cursor: pointer !important;
+    user-select: none !important;
+    /*To have proper spacing between ## ### #### etc */
+    padding: 6px 0 !important;
+    margin: 6px 0 !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    transition: all 0.2s ease !important;
+    position: relative !important;
+    border: none !important;
+}
+
+.section-collapsible-header:hover {
+    background: rgba(0, 0, 0, 0.02) !important;
+}
+
+.section-collapsible-header.collapsed {
+    background: rgba(0, 0, 0, 0.01) !important;
+}
+
+.collapse-icon {
+    position: absolute !important;
+    right: 10px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    font-size: 12px !important;
+    color: #666 !important;
+    transition: transform 0.2s ease !important;
+}
+
+.section-collapsible-header.collapsed .collapse-icon {
+    transform: translateY(-50%) rotate(-90deg) !important;
+}
+
+.section-collapsible-content.collapsed {
+    display: none !important;
+}
+
+.section-collapsible-content.expanded {
+    display: block !important;
+    padding: 0 !important;
+    margin-top: 0px !important;
+}
+
+.section-collapsible-content.expanded > *:first-child {
+    margin-top: 0px !important;
+}
+
+.section-collapsible-header h1,
+.section-collapsible-header h2,
+.section-collapsible-header h3,
+.section-collapsible-header h4,
+.section-collapsible-header h5,
+.section-collapsible-header h6 {
+    /*spacing between section header and content*/
+    margin: 0 !important;
+    padding: 0 !important;
+    display: inline-block !important;
+    width: calc(100% - 25px) !important;
+    font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif, Apple Color Emoji, Segoe UI Emoji, Segoe UI Symbol !important;
+}
+
+/* Preserve original beautiful header colors in collapsible headers */
+.section-collapsible-header h2 {
+    color: #ef4949 !important;
+}
+
+.section-collapsible-header h3 {
+    color: #149963 !important;
+}
+
+.section-collapsible-header h4 {
+    color: #248be5 !important;
+}
+
+.section-collapsible-header h5 {
+    color: #111 !important;
+}
+
+.section-collapsible-header h6 {
+    color: #ef9500 !important;
+}
+
+/* DISABLED Dark theme overrides - only content-collapsible pre code should have dark theme
+body.dark-theme .section-collapsible-header {
+    background: transparent !important;
+    color: #e2e8f0 !important;
+}
+
+body.dark-theme .section-collapsible-header:hover {
+    background: rgba(255, 255, 255, 0.02) !important;
+}
+
+body.dark-theme .section-collapsible-header.collapsed {
+    background: rgba(255, 255, 255, 0.01) !important;
+}
+
+body.dark-theme .section-collapsible-content {
+    color: #e2e8f0 !important;
+} */
+
+/* Content-inner container styling for collapsible sections */
+body:not(.dark-theme) .collapsible-content pre {
+    background: rgba(106, 176, 222, .15) !important;
+    border-bottom: 2px solid rgba(106, 176, 222, .8);
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    padding: 10px;
+    overflow-x: visible;
+}
+
+body.dark-theme .collapsible-content pre {
+    background: rgba(40, 44, 52, .8) !important;
+    border-bottom: 2px solid rgba(255, 255, 255, .2);
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    padding: 10px;
+    overflow-x: visible;
+}
+
+/* Ensure consistent padding for collapsible pre elements */
+.collapsible-content pre:not(.dark-theme),
+.wrap-content-collapsible .content-collapsible-content pre:not(.dark-theme) {
+    overflow: auto !important;
+    overflow-x: auto !important;
+    overflow-y: auto !important;
+    background-color: #f0f2f5 !important;
+    border-radius: 3px !important;
+    padding: 10px 0px 10px 20px !important; /* Must match padding above */
+}
+
+/* Dark theme collapsible pre styling */
+body.dark-theme .collapsible-content pre,
+body.dark-theme .wrap-content-collapsible .content-collapsible-content pre {
+    background-color: #282C34 !important; /* Dark theme background */
+}
+
+/* New rules for when dark-theme class is applied directly to pre elements */
+pre.dark-theme,
+pre.dark-theme[class*="language-"],
+.markdown-body pre.dark-theme,
+.collapsible-content pre.dark-theme,
+.wrap-content-collapsible .content-collapsible-content pre.dark-theme {
+    background-color: #282C34 !important; /* Dark theme background */
+    color: #abb2bf !important; /* Light text for dark background */
+}
+
+/* Scrollbar styling for collapsible pre blocks */
+.collapsible-content pre::-webkit-scrollbar,
+.wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar {
+    width: 8px !important;
+    height: 7px !important;
+}
+
+.collapsible-content pre::-webkit-scrollbar-track,
+.wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1) !important;
+}
+
+.collapsible-content pre::-webkit-scrollbar-thumb,
+.wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.3) !important;
+    border-radius: 4px !important;
+}
+
+.collapsible-content pre::-webkit-scrollbar-thumb:hover,
+.wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(0,0,0,0.5) !important;
+}
+
+/* Dark theme scrollbar colors for collapsible pre */
+body.dark-theme .collapsible-content pre::-webkit-scrollbar-track,
+body.dark-theme .wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-track {
+    background: rgba(255,255,255,0.1) !important;
+}
+
+body.dark-theme .collapsible-content pre::-webkit-scrollbar-thumb,
+body.dark-theme .wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.3) !important;
+}
+
+body.dark-theme .collapsible-content pre::-webkit-scrollbar-thumb:hover,
+body.dark-theme .wrap-content-collapsible .content-collapsible-content pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(255,255,255,0.5) !important;
+}
+
+
+/*===============================================================================*/
+/*                 admonition wrapper and various styles                         */
+/*===============================================================================*/
+.markdown-body .admonition.header.red {
+    color: #fff;
+    font-weight: 600;
+    display: block;
+    color: #fff;
+    background: rgba(219, 93, 90, 0.9);
+    padding: 2px 12px;
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+
+.markdown-body .admonition.body.red {
+    line-height: 24px;
+    background: rgba(219, 93, 90, 0.2);
+    padding: 4px 12px;
+    margin-top: 0px;
+    margin-bottom: 24px;
+}
+
+.markdown-body .admonition.header.green {
+    color: #fff;
+    font-weight: 600;
+    display: block;
+    color: #fff;
+    background: #1abc9c;
+    padding: 2px 12px;
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+
+.markdown-body .admonition.body.green {
+    line-height: 20px;
+    background: #dbfaf4;
+    padding: 4px 12px;
+    margin-top: 0px;
+    margin-bottom: 24px;
+}
+
+.markdown-body .admonition.header.blue {
+    color: #fff;
+    font-weight: 600;
+    display: block;
+    color: #fff;
+    background: #6ab0de;
+    padding: 2px 12px;
+    margin-top: 12px;
+    margin-bottom: 0px;
+}
+
+.markdown-body .admonition.body.blue {
+    font-size: 12px;
+    line-height: 20px;
+    background: #e7f2fa;
+    padding: 4px 12px;
+    margin-top: 0px;
+    margin-bottom: 24px;
+}
+
+/* Modular admonition spacing system - using padding to avoid margin collapse */
+.admonition-wrapper {
+    padding: 8px 0 0 4px; /* Outer spacing - easy to adjust */
+}
+
+.admonition.orange {
+    padding: 6px 12px;
+    line-height: 24px;
+    margin-bottom: 0; /* Remove bottom margin - handled by wrapper */
+    background: #ffedcc;
+}
+
+.admonition-orange {
+    color: #fff;
+    /* font-weight: bold; */
+    font-weight: 500;
+    display: block;
+    color: #fff;
+    background: #f0b37e;
+    margin: -12px; /* Keep negative margin for header overlap effect */
+    padding: 2px 12px;
+    margin-bottom: 6px;
+}
+
+.note {
+    border: 1px solid #eaeaea;
+    margin: 0.5em 0 1em 0;
+    padding: 0.5em;
+    padding-left : 50px;
+    width: 100% -50px;
+    color: #111;
+    background-color: #F2E8E6;
+    line-height: 1.75em;
+    font-size: 1.0em;
+    border-radius: 6px;
+    box-shadow: 2px 2px 2px #888;
+}
+
+.note {
+    background-image: url('http://1.bp.blogspot.com/-p8LbDqH9uE8/T5tKEbdCHxI/AAAAAAAAAHg/bFwy_C8vQic/s1600/note-icon.png');
+    background-size: 25px;
+    background-repeat: no-repeat;
+    background-position: 10px center;
+}
+
+/*===============================================================================*/
+/*          Callout styles based on Obsidian's callout syntax.                   */
+/*===============================================================================*/
+.callout {
+    border-left: 5px solid;
+    border-radius: 5px;
+    padding: 15px;
+    margin: 20px 0;
+}
+
+.callout-title {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    cursor: pointer; /* Add cursor pointer to indicate it's clickable */
+}
+
+.callout.is-open .callout-title {
+    margin-bottom: 10px;
+}
+
+.callout-fold {
+    margin-left: 8px;
+    width: 8px;
+    height: 8px;
+    border-style: solid;
+    border-width: 0 2px 2px 0;
+    border-color: inherit;
+    transform: rotate(-45deg);
+    transition: transform 0.2s ease-in-out;
+}
+
+.callout.is-open .callout-fold {
+    transform: rotate(45deg);
+    margin-top: -4px;
+}
+
+.callout-content {
+    display: none;
+}
+
+.callout.is-open .callout-content {
+    display: block;
+}
+
+.callout-icon {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.callout-icon::before {
+    content: "";
+    display: block;
+    width: 20px;
+    height: 20px;
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
+    mask-size: contain;
+}
+
+/* Note */
+.callout[data-callout="note"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-pencil'%3E%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-pencil'%3E%3Cpath d='M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z'/%3E%3Cpath d='m15 5 4 4'/%3E%3C/svg%3E");
+}
+
+/* Abstract */
+.callout[data-callout="abstract"] .callout-icon::before,
+.callout[data-callout="summary"] .callout-icon::before,
+.callout[data-callout="tldr"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-clipboard-list'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='M12 11h4'/%3E%3Cpath d='M12 16h4'/%3E%3Cpath d='M8 11h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-clipboard-list'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='M12 11h4'/%3E%3Cpath d='M12 16h4'/%3E%3Cpath d='M8 11h.01'/%3E%3Cpath d='M8 16h.01'/%3E%3C/svg%3E");
+}
+
+/* Info */
+.callout[data-callout="info"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-info'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4'/%3E%3Cpath d='M12 8h.01'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-info'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M12 16v-4'/%3E%3Cpath d='M12 8h.01'/%3E%3C/svg%3E");
+}
+
+/* Todo */
+.callout[data-callout="todo"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-list-checks'%3E%3Cpath d='m3 17 2 2 4-4'/%3E%3Cpath d='m3 7 2 2 4-4'/%3E%3Cpath d='M13 6h8'/%3E%3Cpath d='M13 12h8'/%3E%3Cpath d='M13 18h8'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-list-checks'%3E%3Cpath d='m3 17 2 2 4-4'/%3E%3Cpath d='m3 7 2 2 4-4'/%3E%3Cpath d='M13 6h8'/%3E%3Cpath d='M13 12h8'/%3E%3Cpath d='M13 18h8'/%3E%3C/svg%3E");
+}
+
+/* Tip */
+.callout[data-callout="tip"] .callout-icon::before,
+.callout[data-callout="hint"] .callout-icon::before,
+.callout[data-callout="important"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-flame'%3E%3Cpath d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-flame'%3E%3Cpath d='M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z'/%3E%3C/svg%3E");
+}
+
+/* Success */
+.callout[data-callout="success"] .callout-icon::before,
+.callout[data-callout="check"] .callout-icon::before,
+.callout[data-callout="done"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-check-circle-2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-check-circle-2'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m9 12 2 2 4-4'/%3E%3C/svg%3E");
+}
+
+/* Question */
+.callout[data-callout="question"] .callout-icon::before,
+.callout[data-callout="help"] .callout-icon::before,
+.callout[data-callout="faq"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-help-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-help-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+}
+
+/* Warning */
+.callout[data-callout="warning"] .callout-icon::before,
+.callout[data-callout="caution"] .callout-icon::before,
+.callout[data-callout="attention"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-alert-triangle'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/%3E%3Cpath d='M12 9v4'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-alert-triangle'%3E%3Cpath d='m21.73 18-8-14a2 2 0 0 0-3.46 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z'/%3E%3Cpath d='M12 9v4'/%3E%3Cpath d='M12 17h.01'/%3E%3C/svg%3E");
+}
+
+/* Failure */
+.callout[data-callout="failure"] .callout-icon::before,
+.callout[data-callout="fail"] .callout-icon::before,
+.callout[data-callout="missing"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-x-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m15 9-6 6'/%3E%3Cpath d='m9 9 6 6'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-x-circle'%3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m15 9-6 6'/%3E%3Cpath d='m9 9 6 6'/%3E%3C/svg%3E");
+}
+
+/* Danger */
+.callout[data-callout="danger"] .callout-icon::before,
+.callout[data-callout="error"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-zap'%3E%3Cpath d='M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.05A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.05A1 1 0 0 0 11 14z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-zap'%3E%3Cpath d='M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.05A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.05A1 1 0 0 0 11 14z'/%3E%3C/svg%3E");
+}
+
+/* Bug */
+.callout[data-callout="bug"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-bug'%3E%3Cpath d='m8 2 1.88 1.88'/%3E%3Cpath d='M14.12 3.88 16 2'/%3E%3Cpath d='M9 7.13v-1a3.003 3.003 0 1 1 6 0v1'/%3E%3Cpath d='M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6'/%3E%3Cpath d='M12 20v-9'/%3E%3Cpath d='M6.53 9C4.6 8.8 3 7.1 3 5'/%3E%3Cpath d='M20.97 9c-.1-2.1-1.6-3.8-3.5-4'/%3E%3Cpath d='M6 13H2'/%3E%3Cpath d='M18 13h4'/%3E%3Cpath d='m10 16.5 1-3'/%3E%3Cpath d='m14 16.5-1-3'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-bug'%3E%3Cpath d='m8 2 1.88 1.88'/%3E%3Cpath d='M14.12 3.88 16 2'/%3E%3Cpath d='M9 7.13v-1a3.003 3.003 0 1 1 6 0v1'/%3E%3Cpath d='M12 20c-3.3 0-6-2.7-6-6v-3a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v3c0 3.3-2.7 6-6 6'/%3E%3Cpath d='M12 20v-9'/%3E%3Cpath d='M6.53 9C4.6 8.8 3 7.1 3 5'/%3E%3Cpath d='M20.97 9c-.1-2.1-1.6-3.8-3.5-4'/%3E%3Cpath d='M6 13H2'/%3E%3Cpath d='M18 13h4'/%3E%3Cpath d='m10 16.5 1-3'/%3E%3Cpath d='m14 16.5-1-3'/%3E%3C/svg%3E");
+}
+
+/* Example */
+.callout[data-callout="example"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-list'%3E%3Cline x1='8' x2='21' y1='6' y2='6'/%3E%3Cline x1='8' x2='21' y1='12' y2='12'/%3E%3Cline x1='8' x2='21' y1='18' y2='18'/%3E%3Cline x1='3' x2='3.01' y1='6' y2='6'/%3E%3Cline x1='3' x2='3.01' y1='12' y2='12'/%3E%3Cline x1='3' x2='3.01' y1='18' y2='18'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-list'%3E%3Cline x1='8' x2='21' y1='6' y2='6'/%3E%3Cline x1='8' x2='21' y1='12' y2='12'/%3E%3Cline x1='8' x2='21' y1='18' y2='18'/%3E%3Cline x1='3' x2='3.01' y1='6' y2='6'/%3E%3Cline x1='3' x2='3.01' y1='12' y2='12'/%3E%3Cline x1='3' x2='3.01' y1='18' y2='18'/%3E%3C/svg%3E");
+}
+
+/* Quote */
+.callout[data-callout="quote"] .callout-icon::before,
+.callout[data-callout="cite"] .callout-icon::before {
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-quote'%3E%3Cpath d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 2v6h3v2c0 3.5-2.5 4.5-5 5z'/%3E%3Cpath d='M15 21c3 0 7-1 7-8V5c0-1.25-.75-2.017-2-2h-4c-1.25 0-2 .75-2 2v6h3v2c0 3.5-2.5 4.5-5 5z'/%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' class='lucide lucide-quote'%3E%3Cpath d='M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 2v6h3v2c0 3.5-2.5 4.5-5 5z'/%3E%3Cpath d='M15 21c3 0 7-1 7-8V5c0-1.25-.75-2.017-2-2h-4c-1.25 0-2 .75-2 2v6h3v2c0 3.5-2.5 4.5-5 5z'/%3E%3C/svg%3E");
+}
+
+/* Note */
+.callout[data-callout="note"] {
+    border-color: #4a90e2;
+    background-color: #e7f3ff;
+}
+
+.callout[data-callout="note"] .callout-title {
+    color: #4a90e2;
+}
+
+.callout[data-callout="note"] .callout-icon::before {
+    background-color: #4a90e2;
+}
+
+/* Abstract */
+.callout[data-callout="abstract"],
+.callout[data-callout="summary"],
+.callout[data-callout="tldr"] {
+    border-color: #9b59b6;
+    background-color: #f4eef6;
+}
+
+.callout[data-callout="abstract"] .callout-title,
+.callout[data-callout="summary"] .callout-title,
+.callout[data-callout="tldr"] .callout-title {
+    color: #9b59b6;
+}
+
+.callout[data-callout="abstract"] .callout-icon::before,
+.callout[data-callout="summary"] .callout-icon::before,
+.callout[data-callout="tldr"] .callout-icon::before {
+    background-color: #9b59b6;
+}
+
+/* Info */
+.callout[data-callout="info"] {
+    border-color: #2ecc71;
+    background-color: #eafaf1;
+}
+
+.callout[data-callout="info"] .callout-title {
+    color: #2ecc71;
+}
+
+.callout[data-callout="info"] .callout-icon::before {
+    background-color: #2ecc71;
+}
+
+/* Todo */
+.callout[data-callout="todo"] {
+    border-color: #f39c12;
+    background-color: #fef5e7;
+}
+
+.callout[data-callout="todo"] .callout-title {
+    color: #f39c12;
+}
+
+.callout[data-callout="todo"] .callout-icon::before {
+    background-color: #f39c12;
+}
+
+/* Tip */
+.callout[data-callout="tip"],
+.callout[data-callout="hint"],
+.callout[data-callout="important"] {
+    border-color: #3498db;
+    background-color: #eaf4fb;
+}
+
+.callout[data-callout="tip"] .callout-title,
+.callout[data-callout="hint"] .callout-title,
+.callout[data-callout="important"] .callout-title {
+    color: #3498db;
+}
+
+.callout[data-callout="tip"] .callout-icon::before,
+.callout[data-callout="hint"] .callout-icon::before,
+.callout[data-callout="important"] .callout-icon::before {
+    background-color: #3498db;
+}
+
+/* Success */
+.callout[data-callout="success"],
+.callout[data-callout="check"],
+.callout[data-callout="done"] {
+    border-color: #27ae60;
+    background-color: #e9f7ef;
+}
+
+.callout[data-callout="success"] .callout-title,
+.callout[data-callout="check"] .callout-title,
+.callout[data-callout="done"] .callout-title {
+    color: #27ae60;
+}
+
+.callout[data-callout="success"] .callout-icon::before,
+.callout[data-callout="check"] .callout-icon::before,
+.callout[data-callout="done"] .callout-icon::before {
+    background-color: #27ae60;
+}
+
+/* Question */
+.callout[data-callout="question"],
+.callout[data-callout="help"],
+.callout[data-callout="faq"] {
+    border-color: #f1c40f;
+    background-color: #fef9e7;
+}
+
+.callout[data-callout="question"] .callout-title,
+.callout[data-callout="help"] .callout-title,
+.callout[data-callout="faq"] .callout-title {
+    color: #f1c40f;
+}
+
+.callout[data-callout="question"] .callout-icon::before,
+.callout[data-callout="help"] .callout-icon::before,
+.callout[data-callout="faq"] .callout-icon::before {
+    background-color: #f1c40f;
+}
+
+/* Warning */
+.callout[data-callout="warning"],
+.callout[data-callout="caution"],
+.callout[data-callout="attention"] {
+    border-color: #e67e22;
+    background-color: #fdf3e6;
+}
+
+.callout[data-callout="warning"] .callout-title,
+.callout[data-callout="caution"] .callout-title,
+.callout[data-callout="attention"] .callout-title {
+    color: #e67e22;
+}
+
+.callout[data-callout="warning"] .callout-icon::before,
+.callout[data-callout="caution"] .callout-icon::before,
+.callout[data-callout="attention"] .callout-icon::before {
+    background-color: #e67e22;
+}
+
+/* Failure */
+.callout[data-callout="failure"],
+.callout[data-callout="fail"],
+.callout[data-callout="missing"] {
+    border-color: #e74c3c;
+    background-color: #fbeee D;
+}
+
+.callout[data-callout="failure"] .callout-title,
+.callout[data-callout="fail"] .callout-title,
+.callout[data-callout="missing"] .callout-title {
+    color: #e74c3c;
+}
+
+.callout[data-callout="failure"] .callout-icon::before,
+.callout[data-callout="fail"] .callout-icon::before,
+.callout[data-callout="missing"] .callout-icon::before {
+    background-color: #e74c3c;
+}
+
+/* Danger */
+.callout[data-callout="danger"],
+.callout[data-callout="error"] {
+    border-color: #c0392b;
+    background-color: #fae5e3;
+}
+
+.callout[data-callout="danger"] .callout-title,
+.callout[data-callout="error"] .callout-title {
+    color: #c0392b;
+}
+
+.callout[data-callout="danger"] .callout-icon::before,
+.callout[data-callout="error"] .callout-icon::before {
+    background-color: #c0392b;
+}
+
+/* Bug */
+.callout[data-callout="bug"] {
+    border-color: #8e44ad;
+    background-color: #f3eef8;
+}
+
+.callout[data-callout="bug"] .callout-title {
+    color: #8e44ad;
+}
+
+.callout[data-callout="bug"] .callout-icon::before {
+    background-color: #8e44ad;
+}
+
+/* Example */
+.callout[data-callout="example"] {
+    border-color: #1abc9c;
+    background-color: #e8f8f5;
+}
+
+.callout[data-callout="example"] .callout-title {
+    color: #1abc9c;
+}
+
+.callout[data-callout="example"] .callout-icon::before {
+    background-color: #1abc9c;
+}
+
+/* Quote */
+.callout[data-callout="quote"],
+.callout[data-callout="cite"] {
+    border-color: #95a5a6;
+    background-color: #f4f6f6;
+}
+
+.callout[data-callout="quote"] .callout-title,
+.callout[data-callout="cite"] .callout-title {
+    color: #95a5a6;
+}
+
+.callout[data-callout="quote"] .callout-icon::before,
+.callout[data-callout="cite"] .callout-icon::before {
+    background-color: #95a5a6;
+}
+/* Table of Contents Styling - simple div without title */
+div.toc {
+    background-color: #f8f9fa;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 20px 0;
+    max-width: 100%;
+    width: 100%;
+}
+
+div.toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+div.toc ul ul {
+    padding-left: 20px;
+    margin: 4px 0;
+}
+
+div.toc .toc-symbol {
+    margin-right: 4px;
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: baseline;
+}
+
+div.toc .toc-symbol[data-level="2"],
+div.toc .toc-symbol[data-level="3"] {
+    font-size: 0.5em;
+    transform: translateY(-2px);
+}
+
+div.toc .toc-symbol[data-level="4"],
+div.toc .toc-symbol[data-level="5"] {
+    font-size: 1.2em;
+    transform: translateY(1px);
+}
+
+div.toc li {
+    margin: 3px 0;
+    line-height: 1.4;
+}
+
+div.toc a {
+    color: #0066cc;
+    text-decoration: none;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 1.0em;
+}
+
+div.toc a:hover {
+    background-color: #e3f2fd;
+    text-decoration: none;
+    color: #004494;
+}
+
+/* Smooth scrolling to anchors */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Style for targeted headers (when clicked from TOC) */
+h1:target, h2:target, h3:target, h4:target, h5:target, h6:target {
+    scroll-margin-top: 20px;
+    animation: highlight-flash 2s ease-out;
+}
+
+@keyframes highlight-flash {
+    0% { background-color: #fff3cd; }
+    100% { background-color: transparent; }
+}
+
+/* Choice Options Styling - Simple with padding */
+.choice-option {
+    margin: 2px 0 !important;
+    padding: 0 0 0 0.5em !important;
+    background: none !important;
+    border: none !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+}
+
+.choice-option strong {
+    font-weight: bold !important;
+    margin-right: 4px !important;
+}
+
+/* Mermaid Diagram Styling */
+.mermaid-diagram {
+    width: 100%;
+    <!-- display: flex; -->
+    justify-content: center;
+    align-items: center;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.mermaid-diagram svg {
+    max-width: 100%;
+    height: auto;
+}
+
+    </style>
+</head>
+<body>
+    <div id="__next">
+        <div id="page-ctn">
+            <header id="page-header">
+                <h3></h3>
+            </header>
+            <section class="markdown-body">
+<h1 id="toc_1">Advanced Markdown to HTML Converter</h1>
+<p>A sophisticated Python-based markdown to HTML conversion system with advanced styling, responsive tables, and intelligent list formatting. It's built with a robust block-based architecture for fault-tolerant processing of complex academic and technical documents.</p>
+<h2>Table of Contents</h2>
+<div class="toc"><ul>
+  <ul>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_2">Installation</a></li>
+    <ul>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_3">Prerequisites</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_4">Quick Setup</a></li>
+    </ul>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_5">Usage</a></li>
+    <ul>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_6">Basic Conversion</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_7">Advanced Options</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_8">Full Command Reference</a></li>
+    </ul>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_9">Core Features</a></li>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_10">Architecture</a></li>
+    <ul>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_11">Core Principles</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_12">File Structure</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_13">Conversion Pipeline</a></li>
+    </ul>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_14">Feature Dive</a></li>
+    <ul>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_15">🧩 Block-Based Processing Architecture</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_16">⚡ Smart Code Block System</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_17">🔧 Advanced LaTeX Math Integration</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_18">📚 Interactive Table of Contents System</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_19">🎨 Intelligent Table System</a></li>
+      <ul>
+        <li><span class="toc-symbol" data-level="4">▪</span><a href="#toc_21">Obsidian-Style Callouts</a></li>
+        <li><span class="toc-symbol" data-level="4">▪</span><a href="#toc_22">Admonition Boxes</a></li>
+      </ul>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_23">🎨 Interactive Mermaid Diagrams</a></li>
+      <li><span class="toc-symbol" data-level="3">○</span><a href="#toc_24">📱 Cross-Platform Responsive Design</a></li>
+    </ul>
+    <li><span class="toc-symbol" data-level="2">●</span><a href="#toc_25">License</a></li>
+  </ul>
+</ul>
+</div>
+
+<h2 id="toc_2">Installation</h2>
+
+<h3 id="toc_3">Prerequisites</h3>
+<pre><code class="language-bash"># Required Python package
+pip install mistune&gt;=3.0.0
+</code></pre>
+
+<h3 id="toc_4">Quick Setup</h3>
+<ol>
+<li><p><strong>Download the complete md2html system</strong>:</p>
+<pre><code class="language-bash">git clone &lt;repository-url&gt; md2html
+cd md2html
+</code></pre>
+</li>
+<li><p><strong>One-time asset download</strong> (recommended):</p>
+<pre><code class="language-bash">python md2html.py sample.md --download-themes
+# Downloads 40+ premium themes to .prism/ directory
+</code></pre>
+</li>
+<li><p><strong>Verify installation</strong>:</p>
+<pre><code class="language-bash">python md2html.py sample.md sample.html
+# Should generate sample.html with all features
+# (add [TOC] to sample.md to test table of contents)
+</code></pre>
+</li>
+</ol>
+
+<h2 id="toc_5">Usage</h2>
+
+<h3 id="toc_6">Basic Conversion</h3>
+<pre><code class="language-bash">python md2html.py input.md output.html
+</code></pre>
+<p><strong>Flexible Execution</strong>: The script can be run from any directory with absolute or relative paths:</p>
+<pre><code class="language-bash"># Run from any directory with absolute path
+python /path/to/md2html/md2html.py input.md output.html
+
+# Run from parent directory with relative path  
+python md2html/md2html.py README.md
+
+# Run from different directory entirely
+cd /tmp &amp;&amp; python /Users/name/md2html/md2html.py /path/to/input.md
+</code></pre>
+<p>All <code class="language-python">.prism/</code> assets are automatically resolved relative to the script location, not your current working directory.</p>
+
+<h3 id="toc_7">Advanced Options</h3>
+<div class="wrap-content-collapsible">
+    <input id="code-collapse-1" class="toggle" type="checkbox">
+    <label for="code-collapse-1" class="lbl-toggle">BASH (31 lines)</label>
+    <div class="content-collapsible-content">
+        <div class="content-inner">
+<pre><code class="language-bash"># With custom CSS
+python md2html.py input.md output.html --css custom.css
+
+# Dark theme for code blocks
+python md2html.py input.md output.html --theme dark
+
+# Line numbers in code blocks
+python md2html.py input.md output.html --line-numbers
+
+# Collapsible sections (fold sections containing specific keywords)
+python md2html.py input.md output.html --fold-sections &quot;solution&quot; &quot;answer&quot;
+
+# Collapsible long code blocks (&gt;N lines)
+python md2html.py input.md output.html --collapse 50
+
+# Table of contents (add [TOC] line in your markdown)
+# python md2html.py input.md output.html
+
+
+# Disable standalone boxed math expressions (enabled by default)
+python md2html.py input.md output.html
+python md2html.py input.md output.html --no-boxed-math
+
+# Disable choice options formatting, convert A. B. C. to single lines (eabled by default)
+python md2html.py input.md output.html
+python md2html.py input.md output.html --no-choice-options
+
+# Mermaid diagram rendering (enabled by default)
+python md2html.py input.md output.html  # Mermaid diagrams rendered
+python md2html.py input.md output.html --no-mermaid  # Disable Mermaid rendering
+</code></pre>
+        </div>
+    </div>
+</div>
+
+<h3 id="toc_8">Full Command Reference</h3>
+<pre><code class="language-bash">python md2html.py [-h] [--css CSS] [--theme THEME] [--line-numbers]
+                  [--collapse N] [--download-themes]
+                  [--inline-lang INLINE_LANG]  
+                  [--fold-sections [FOLD_SECTIONS ...]] 
+                  [--no-boxed-math] [--no-choice-options] [--no-mermaid]
+                  [input_file] [output_file]
+</code></pre>
+<p><strong>New Options:</strong></p>
+<ul>
+<li><code class="language-python">--no-boxed-math</code>: Disable standalone <code class="language-python">\boxed{...}</code> math rendering</li>
+<li><code class="language-python">--no-choice-options</code>: Disable formatting choice options (A. B. C.) as single-line styled paragraphs</li>
+<li><code class="language-python">--no-mermaid</code>: Disable Mermaid diagram rendering (Mermaid is enabled by default)</li>
+</ul>
+
+<h2 id="toc_9">Core Features</h2>
+<ul>
+<li><strong>Flexible Path Resolution</strong>: Can be executed from any directory with absolute or relative paths. All <code class="language-python">.prism/</code> assets are automatically resolved relative to the script location, ensuring consistent behavior regardless of current working directory.</li>
+<li><strong>Smart Code Blocks</strong>: Includes an intelligent algorithm to repair broken or unpaired code fences, minimizing structural damage. Invalid fences generate interactive warning callouts in the rendered HTML. Features 40+ syntax themes, collapsible long blocks, and selective dark theming.</li>
+<li><strong>Robust Fence Processing</strong>: Unified fence validation system with comprehensive edge case handling. Context-aware processing ensures fences inside code blocks are preserved literally while standalone invalid fences generate appropriate warnings.</li>
+<li><strong>Fault-Tolerant Processing</strong>: A block-based architecture parses the document in isolated sections. A syntax error in one section won't prevent the other 80-90% of the document from rendering correctly. Failed blocks are displayed in console output and highlighted in the rendered HTML.</li>
+<li><strong>Interactive TOC</strong>: Table of Contents generation triggered only when <code class="language-python">[TOC]</code> appears as a standalone line in the markdown, with TOC inserted exactly at that location.</li>
+<li><strong>Section Folding</strong>: Automatically makes sections collapsible based on keywords (e.g., &quot;Solution&quot;), allowing users to interactively hide and show content.</li>
+<li><strong>Responsive Tables &amp; Design</strong>: JavaScript-based responsive padding adjustment and hover row highlight. The entire layout is built with a PC-first hybrid design to ensure readability on all devices.</li>
+<li><strong>Advanced LaTeX Support</strong>: A protection-based pipeline isolates complex LaTeX math environments from the markdown parser, preventing corruption of backslashes, alignment operators, and line breaks for perfect rendering.</li>
+<li><strong>Standalone Boxed Math</strong>: Automatically converts standalone <code class="language-python">\boxed{...}</code> expressions to display math format. Only processes lines starting exactly with <code class="language-python">\boxed</code> to avoid conflicts with standard markdown code block syntax.</li>
+<li><strong>Enhanced Callouts</strong>: Multi-line Obsidian-style callouts with support for code blocks inside callouts. Converts <code class="language-python">&gt; [!TYPE]</code> blockquotes into rich, interactive notification boxes with proper content separation.</li>
+<li><strong>Choice Options Formatting</strong>: Automatically detects and formats multiple-choice questions into clean, single-line styled paragraphs. Supports three common formats: <code class="language-python">A.</code> (period), <code class="language-python">A)</code> (parenthesis), and <code class="language-python">(A)</code> (in parentheses). Perfect for educational content and quizzes.</li>
+<li><strong>Interactive Mermaid Diagrams</strong>: Full support for Mermaid.js diagram rendering from ```mermaid code blocks. Automatically converts flowcharts, sequence diagrams, Gantt charts, and more into interactive SVG diagrams. Enabled by default with graceful fallback to syntax-highlighted code blocks when disabled.</li>
+</ul>
+
+<h2 id="toc_10">Architecture</h2>
+
+<h3 id="toc_11">Core Principles</h3>
+<p>The converter is built on three core principles:</p>
+<ol>
+<li><p><strong>Block-Based Processing</strong>: The input markdown is parsed into hierarchical <strong>blocks</strong>. A block is a logical section of the document defined by a markdown header (e.g., <code class="language-python">## My Section</code>) and includes all content until the next header of the same or higher level. This isolates errors, allowing the rest of the document to render even if one section is corrupted.</p>
+</li>
+<li><p><strong>Sequential Pipeline</strong>: Conversion follows a strict 8-stage process. This ensures complex features like code-fence repair, LaTeX protection, and interactive callouts are applied in the correct order without interfering with each other.</p>
+</li>
+<li><p><strong>Offline-First Asset Management</strong>: The system relies on a local <code class="language-python">.prism/</code> directory for all CSS and JS assets, ensuring consistent, fast, and offline-capable rendering.</p>
+</li>
+</ol>
+
+<h3 id="toc_12">File Structure</h3>
+<p>The system relies on a clear separation between Python logic and static assets.</p>
+<div class="wrap-content-collapsible">
+    <input id="code-collapse-2" class="toggle" type="checkbox">
+    <label for="code-collapse-2" class="lbl-toggle">CODE (38 lines)</label>
+    <div class="content-collapsible-content">
+        <div class="content-inner">
+<pre><code>md2html/                              # ← Your project directory
+├── 📁  
+│   └── README.md                     # README file
+│
+├── 📁 doc
+│   ├── fence_system_guide.md         # Fence system documentation
+│   └── Documentation.md              # Comprehensive README file 
+│
+├── 📁 test 
+│   ├── fence_test_suite.md           # test fence code treament 
+│   ├── error_handling_demo.md        # block-based error isolation 
+│   ├── markdown_vs_mistune.py        # pure markdown and mistune pack for test
+│   └── ...                           # other miscellaneous tests
+│
+├── 📁 Required Python Modules
+│   ├── md2html.py                    # Main conversion script
+│   ├── pre_code_patch.py             # Pre-code fence repair 
+│   ├── parse_blocks.py               # Block-based parsing
+│   └── fence_utils.py                # Unified fence validation system
+│
+└── 📁 .prism/                        # ← Asset directory
+    ├── 🎨 Core Stylesheets 
+    │   ├── style.css                 # Main responsive stylesheet  
+    │   ├── normalize.css             # Cross-browser normalization
+    │   ├── modern-base.css           # Modern typography &amp; base styles
+    │   └── mobile-responsive.css     # Mobile-first responsive design
+    │
+    ├── 🎯 Interactive Features 
+    │   ├── callouts.js               # Callouts click-to-collapse JS
+    │   └── mistune_toc.css           # TOC styling and symbols
+    │
+    └── ✨ Syntax Highlighting 
+        ├── prism.js                  # Core Prism.js library 
+        └── theme-prism-*.css         # At least ONE theme file:
+            ├── theme-prism.css               # Default light theme 
+            └── theme-prism-one-dark.css      # Modern dark choice
+            └── ... (optional: 37+ more themes)
+</code></pre>
+        </div>
+    </div>
+</div>
+
+<h3 id="toc_13">Conversion Pipeline</h3>
+<p>The md2html converter implements a <strong>sophisticated 8-stage pipeline</strong> designed for reliability, error isolation, and complex document feature support. Each stage has a specific purpose and must occur in the correct order to prevent processing conflicts.</p>
+<div class="mermaid-diagram" id="mermaid-0aa8cfbc">
+flowchart TD
+    %%{init: { &quot;flowchart&quot;: { &quot;curve&quot;: &quot;basis&quot; } } }%%
+    %% --- Subgraphs for each row to control layout ---
+    subgraph Row 1
+        direction LR
+        A[&quot;📄 Input&quot;] --&gt; B[&quot;🔧 Stage 0:&lt;br/&gt;Pre-Code Patching&quot;]
+        B --&gt; C[&quot;📦 Stage 1:&lt;br/&gt;Resource Loading&quot;]
+        C --&gt; D[&quot;🧩 Stage 2:&lt;br/&gt;Block-Based Parsing&quot;]
+    end
+
+    subgraph Row 2
+        direction RL
+        I[&quot;📚 Stage 5:&lt;br/&gt;TOC Generation&quot;] --&gt; H[&quot;🔗 Stage 4:&lt;br/&gt;Block Assembly&quot;]
+        H --&gt; G[&quot;⚙️ Stage 3: Block Processing&lt;br/&gt;&amp; TOC ID Management&quot;]
+    end
+
+    subgraph Row 3
+        direction LR
+        J[&quot;✨ Stage 6:&lt;br/&gt;Content Enhancement&quot;] --&gt; K[&quot;🎯 Stage 7:&lt;br/&gt;Final HTML Assembly&quot;]
+        K --&gt; L[&quot;✅ Complete&lt;br/&gt;HTML Output&quot;]
+    end
+
+    %% --- Connections between rows to create the S-shape ---
+    D --&gt; |&quot;convert_block_content&lt;br/&gt;fix_toc_ids_globally&quot;| G
+    I --&gt; |&quot;process_obsidian_callouts&lt;br/&gt;add_topic_thumbnail_admonitions&lt;br/&gt;wrap_long_code_blocks&lt;br/&gt;add_universal_section_folding&quot;| J
+
+    %% --- Dotted function labels on flows ---
+    A -.-&gt; |&quot;process_pre_code_blocks&quot;| B
+    B -.-&gt; |&quot;Load CSS/JS Assets&quot;| C  
+    C -.-&gt; |&quot;parse_markdown_blocks&quot;| D
+    G -.-&gt; |&quot;generate_and_insert_toc&lt;br/&gt;has_standalone_toc_marker&quot;| H
+    H -.-&gt; |&quot;reassemble_processed_blocks&lt;br/&gt;convert_toc_ids_to_slugs&quot;| I
+    J -.-&gt; |&quot;HTML_TEMPLATE.format&quot;| K
+
+    %% --- Styling for nodes ---
+    style A fill:#e1f5fe,stroke:#01579b,stroke-width:3px
+    style L fill:#c8e6c9,stroke:#1b5e20,stroke-width:3px
+    style B fill:#fff3e0,stroke:#e65100
+    style C fill:#fff3e0,stroke:#e65100
+    style D fill:#f3e5f5,stroke:#4a148c
+    style G fill:#f3e5f5,stroke:#4a148c
+    style H fill:#e8f5e8,stroke:#1b5e20
+    style I fill:#e8f5e8,stroke:#1b5e20
+    style J fill:#fff8e1,stroke:#f57f17
+    style K fill:#ffebee,stroke:#c62828
+
+</div>
+<p><strong>Stage Breakdown with Function Calls:</strong></p>
+<ol>
+<li><p><strong>Stage 0: Pre-Code Patching</strong> → <code class="language-python">process_pre_code_blocks(md_text)</code></p>
+<ul>
+<li>Fixes broken ``` code fences before any other processing</li>
+<li>Ensures structural integrity of code blocks</li>
+</ul>
+</li>
+<li><p><strong>Stage 1: Resource Loading</strong> → CSS/JS Asset Loading</p>
+<ul>
+<li>Loads all necessary CSS and JS assets from the <code class="language-python">.prism/</code> directory</li>
+<li>Configures themes and styling options</li>
+</ul>
+</li>
+<li><p><strong>Stage 2: Block-Based Parsing</strong> → <code class="language-python">parse_markdown_blocks(md_text)</code></p>
+<ul>
+<li>Splits the markdown into isolated sections based on headers</li>
+<li>Creates hierarchical block structure for fault tolerance</li>
+</ul>
+</li>
+<li><p><strong>Stage 3: Block Processing &amp; TOC ID Management</strong> → <code class="language-python">convert_block_content()</code>, <code class="language-python">fix_toc_ids_globally()</code></p>
+<ul>
+<li>Processes each block safely in isolation with LaTeX protection</li>
+<li>Ensures that header IDs are unique across all processed blocks</li>
+</ul>
+</li>
+<li><p><strong>Stage 4: Block Assembly</strong> → <code class="language-python">reassemble_processed_blocks()</code>, <code class="language-python">convert_toc_ids_to_slugs()</code></p>
+<ul>
+<li>Reassembles the processed HTML from all blocks into a single document</li>
+<li>Converts generic TOC IDs to user-specified anchor slugs</li>
+</ul>
+</li>
+<li><p><strong>Stage 5: TOC Generation</strong> → <code class="language-python">has_standalone_toc_marker()</code>, <code class="language-python">generate_and_insert_toc()</code></p>
+<ul>
+<li>Detects [TOC] markers in markdown and inserts Table of Contents at that location</li>
+<li>Only generates TOC when explicitly requested</li>
+</ul>
+</li>
+<li><p><strong>Stage 6: Content Enhancement</strong> → <code class="language-python">process_obsidian_callouts()</code>, <code class="language-python">add_topic_thumbnail_admonitions()</code>, <code class="language-python">wrap_long_code_blocks()</code>, <code class="language-python">add_universal_section_folding()</code></p>
+<ul>
+<li>Applies post-processing features like Obsidian callouts and admonition boxes</li>
+<li>Adds collapsible code blocks and section folding functionality</li>
+</ul>
+</li>
+<li><p><strong>Stage 7: Final HTML Assembly</strong> → <code class="language-python">HTML_TEMPLATE.format()</code></p>
+<ul>
+<li>Injects the final HTML body into the main template with all assets</li>
+<li>Produces the complete, ready-to-serve HTML document</li>
+</ul>
+</li>
+</ol>
+
+<h2 id="toc_14">Feature Dive</h2>
+
+<h3 id="toc_15">🧩 Block-Based Processing Architecture</h3>
+<p><strong>The Problem: Monolithic Processing Failure</strong>
+Traditional markdown converters process entire documents as single units. One corrupted section (malformed LaTeX, broken code fences, invalid HTML) breaks the entire document.</p>
+<p><strong>The Solution: Hierarchical Block Processing</strong>
+<strong>md2html</strong> implements a <strong>2-level hierarchical block system</strong> that isolates errors and ensures maximum document recovery. Each <strong>Block</strong> represents a <strong>hierarchical document section</strong> defined by markdown headers (H1, H2, etc.).</p>
+<p><strong>Benefits</strong>:</p>
+<ul>
+<li><strong>Fault Tolerance</strong>: A broken section doesn't kill the entire document. The system gracefully degrades, showing an error for the failed block while rendering the rest.</li>
+<li><strong>Debugging &amp; Diagnostics</strong>: Errors are reported per-section with line numbers, making them easy to find and fix.</li>
+<li><strong>Scalability</strong>: Enables future enhancements like parallel processing.</li>
+</ul>
+<p><strong>Real-World Results</strong>: Academic papers with complex math and code achieve <strong>85-95% block success rates</strong> even with malformed content, compared to <strong>0% success</strong> with monolithic processing.</p>
+
+<h3 id="toc_16">⚡ Smart Code Block System</h3>
+<p><strong>The Problem</strong>: Unpaired <code class="language-python">```</code> fences corrupt the entire HTML rendering.</p>
+<p><strong>Our Solution</strong>: An intelligent pairing algorithm that minimizes structural damage. It treats language fences (e.g., <code class="language-python">```python</code>) as sacred and finds the optimal plain fence (<code class="language-python">```</code>) to treat as the &quot;culprit&quot; if an odd number exists. The goal is to minimize the number of markdown headers (<code class="language-python">##</code>) that get trapped inside a code block.</p>
+
+<h3 id="toc_17">🔧 Advanced LaTeX Math Integration</h3>
+<p><strong>The Problem</strong>: Complex LaTeX expressions are often corrupted by standard markdown processing library such as <code class="language-python">markdown</code> and <code class="language-python">mistune</code> (adopt here for better nested list suppport), which  misinterprets <code class="language-python">&amp;</code>, <code class="language-python">\</code>, and other special characters.</p>
+<p><strong>The Solution</strong>: A <strong>protection-based pipeline</strong>. Before the main markdown conversion, complex LaTeX environments (<code class="language-python">$...$</code>, <code class="language-python">\[...\]</code>, etc.) are identified and replaced with a placeholder. After the HTML is generated, these placeholders are restored with the original, untouched LaTeX content, ensuring perfect rendering by MathJax.</p>
+
+<h3 id="toc_18">📚 Interactive Table of Contents System</h3>
+<p>The system generates TOC only when <code class="language-python">[TOC]</code> appears as a standalone line in the markdown, inserting the table of contents exactly at that location.</p>
+<p><strong>Smart Header ID System</strong>:
+A key challenge with block-based processing is that each block might generate a header with <code class="language-python">id=&quot;toc_1&quot;</code>. To solve this, a global counter is used to ensure every <code class="language-python">toc_n</code> ID is unique across the entire document. The system also detects custom anchors from markdown links (e.g., <code class="language-python">[Problem 1](#problem-1)</code>) and uses them to create clean, semantic IDs.</p>
+
+<h3 id="toc_19">🎨 Intelligent Table System</h3>
+<p><strong>The Problem</strong>: Traditional responsive tables use CSS media queries based on the <em>browser window's</em> width, which doesn't work well for tables whose formatting should depend on their <em>content's</em> width.</p>
+<p><strong>The Solution</strong>: A <strong>content-aware padding algorithm</strong> implemented in JavaScript. After the page loads, the script measures the actual rendered width of each table.</p>
+<ul>
+<li><strong>Wide tables</strong> (e.g., complex physics data) that exceed a certain threshold get compact padding.</li>
+<li><strong>Narrower tables</strong> get more spacious, readable padding.</li>
+</ul>
+<p>This ensures formatting is appropriate for the content, not the viewport.</p>
+
+<h3 id="toc_20">🎯 Callouts &amp; Admonition Boxes</h3>
+<p>The system supports two types of styled boxes to highlight information: interactive Obsidian-style callouts and simpler keyword-based admonition boxes.</p>
+
+<h4 id="toc_21">Obsidian-Style Callouts</h4>
+<p>Transforms simple markdown blockquotes into interactive, styled notification boxes with click-to-collapse functionality. The currently supported types include <code class="language-python">note</code>, <code class="language-python">warning</code>, <code class="language-python">bug</code>, <code class="language-python">tip</code>, <code class="language-python">success</code>, <code class="language-python">question</code>, <code class="language-python">failure</code>, <code class="language-python">danger</code>, <code class="language-python">example</code>, <code class="language-python">quote</code> (12+ total).</p>
+<p><strong>Markdown Syntax</strong>:</p>
+<pre><code class="language-markdown">&gt; [!note] Information Callout
+&gt; Use this for general information and notes
+
+&gt; [!warning] Warning Callout  
+&gt; Important warnings and cautions
+</code></pre>
+<p><strong>Output</strong>: This generates a styled, collapsible box with a unique icon and color corresponding to the type (<code class="language-python">note</code>, <code class="language-python">warning</code>, etc.).</p>
+
+<h4 id="toc_22">Admonition Boxes</h4>
+<p>Admonition boxes are simple, non-collapsible styled containers generated from specific keywords. They are ideal for highlighting topics, key terms, or metadata directly within the document flow.</p>
+<p><strong>Markdown Syntax</strong>:
+This feature is triggered by using <code class="language-python">**Topic**:</code> and optionally <code class="language-python">**Thumbnail**:</code> at the beginning of a paragraph.</p>
+<pre><code class="language-markdown">**Topic**: Multicritical points (123)
+**Thumbnail**: This is a description of the topic.
+</code></pre>
+<p><strong>Output</strong>: This combination is automatically converted into a single, styled orange admonition box, with the &quot;Topic&quot; as the title and the &quot;Thumbnail&quot; as the body content. If <code class="language-python">**Thumbnail**:</code> is omitted, an admonition box with only a title is created.</p>
+
+<h3 id="toc_23">🎨 Interactive Mermaid Diagrams</h3>
+<p><strong>The Problem: Complex Diagram Creation</strong>
+Creating flowcharts, sequence diagrams, and other visual representations in documentation often requires external tools, breaking the markdown workflow and creating maintenance overhead.</p>
+<p><strong>The Solution: Integrated Mermaid.js Rendering</strong>
+<strong>md2html</strong> includes full Mermaid.js integration that automatically converts ```mermaid code blocks into interactive SVG diagrams. The system supports all Mermaid diagram types including flowcharts, sequence diagrams, Gantt charts, class diagrams, and more.</p>
+<p><strong>Key Features:</strong></p>
+<ul>
+<li><strong>Automatic Detection</strong>: Recognizes ```mermaid code blocks and processes them seamlessly</li>
+<li><strong>Default Enabled</strong>: Mermaid rendering is enabled by default for convenience</li>
+<li><strong>Graceful Fallback</strong>: When disabled with <code class="language-python">--no-mermaid</code>, diagrams remain as syntax-highlighted code blocks</li>
+<li><strong>Responsive Design</strong>: Generated SVG diagrams automatically scale and adapt to different screen sizes</li>
+<li><strong>Rich Diagram Support</strong>: Flowcharts, sequence diagrams, Gantt charts, class diagrams, state diagrams, and more</li>
+</ul>
+<p><strong>Example Usage:</strong></p>
+<pre><code class="language-markdown">​```mermaid
+flowchart TD
+    A[Start] --&gt; B{Decision?}
+    B --&gt;|Yes| C[Action 1]
+    B --&gt;|No| D[Action 2]
+​```
+</code></pre>
+<p><strong>Benefits:</strong></p>
+<ul>
+<li><strong>Workflow Integration</strong>: Diagrams live alongside documentation source code</li>
+<li><strong>Version Control</strong>: Diagram definitions are tracked with documentation changes</li>
+<li><strong>Maintenance</strong>: No external files or tools required for diagram updates</li>
+<li><strong>Performance</strong>: CDN-delivered Mermaid.js ensures fast loading and latest features</li>
+</ul>
+
+<h3 id="toc_24">📱 Cross-Platform Responsive Design</h3>
+<p>We adopt a <strong>PC-First Hybrid Approach</strong> to ensure a high-quality experience for the primary (desktop) use case without compromising the experience on other platforms.</p>
+<ul>
+<li><strong>PC (<code class="language-python">&gt;1023px</code>)</strong>: The default CSS is optimized for a desktop, information-dense layout (e.g., a fixed 700px width for the main content). Then, CSS media queries are used to layer on adjustments for other devices:</li>
+<li><strong>Tablet (<code class="language-python">768px-1023px</code>)</strong>: The desktop layout is refined with better spacing and modern touches.</li>
+<li><strong>Mobile (<code class="language-python">&lt;767px</code>)</strong>: A complete transformation is applied for readability on small screens (e.g., full width, larger fonts).</li>
+</ul>
+<p>This strategy ensures a high-quality experience for the primary (desktop) use case without compromising the experience on other platforms.</p>
+
+<h2 id="toc_25">License</h2>
+<p>This project is a custom markdown converter developed for advanced document generation with emphasis on beautiful table formatting, intelligent list processing, and modern web standards.</p>
+
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const collapsedSections = ["Solution"];
+        const isDarkTheme = false;
+        
+        // Apply dark theme only to pre code blocks if needed
+        if (isDarkTheme) {
+            const codeBlocks = document.querySelectorAll('pre');
+            codeBlocks.forEach(function(pre) {
+                pre.classList.add('dark-theme');
+            });
+        }
+        
+        // Check table widths and apply reduced padding if they exceed 70% of content width
+        const markdownBody = document.querySelector('.markdown-body');
+        const contentWidth = 700; // markdown-body width is 700px
+        const threshold = contentWidth * 0.7; // 70% = 490px
+        
+        const tables = document.querySelectorAll('.markdown-body table');
+        tables.forEach(function(table) {
+            // Force table layout to calculate natural width
+            table.style.width = 'auto';
+            
+            // Get the actual rendered width of the table
+            const tableWidth = table.getBoundingClientRect().width;
+            
+            if (tableWidth > threshold) {
+                // Table exceeds 70% of content width, reduce padding
+                const ths = table.querySelectorAll('th');
+                const tds = table.querySelectorAll('td');
+                
+                ths.forEach(function(th) {
+                    th.style.padding = '12px 20px';
+                });
+                
+                tds.forEach(function(td) {
+                    td.style.padding = '11px 20px';
+                });
+            }
+        });
+        
+        // Find all headers h2-h6
+        const headers = document.querySelectorAll('.markdown-body h2, .markdown-body h3, .markdown-body h4, .markdown-body h5, .markdown-body h6');
+        
+        headers.forEach(function(header, index) {
+            // Skip headers inside code blocks
+            if (header.closest('pre, code')) {
+                return;
+            }
+            
+            const level = parseInt(header.tagName.substring(1));
+            const text = header.textContent;
+            const sectionId = 'section-' + index;
+            
+            // Check if this section should be collapsed by default (exact match only)
+            const isCollapsed = collapsedSections.some(section => 
+                text.toLowerCase().trim() === section.toLowerCase().trim()
+            );
+            
+            // Create wrapper div for the header
+            const headerDiv = document.createElement('div');
+            headerDiv.className = 'section-collapsible-header ' + (isCollapsed ? 'collapsed' : 'expanded');
+            headerDiv.onclick = function() { toggleSection(sectionId); };
+            
+            // Create collapse icon
+            const icon = document.createElement('span');
+            icon.className = 'collapse-icon';
+            icon.innerHTML = '⌄';
+            
+            // Replace header with wrapped version
+            header.parentNode.insertBefore(headerDiv, header);
+            headerDiv.appendChild(header);
+            headerDiv.appendChild(icon);
+            
+            // Create content div and collect content until next same-level header
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'section-collapsible-content ' + (isCollapsed ? 'collapsed' : 'expanded');
+            contentDiv.id = sectionId;
+            
+            let nextElement = headerDiv.nextElementSibling;
+            while (nextElement) {
+                // Stop at next header of same or higher level
+                if (nextElement.tagName && nextElement.tagName.match(/^H[1-6]$/)) {
+                    const nextLevel = parseInt(nextElement.tagName.substring(1));
+                    if (nextLevel <= level) {
+                        break;
+                    }
+                }
+                
+                const elementToMove = nextElement;
+                nextElement = nextElement.nextElementSibling;
+                contentDiv.appendChild(elementToMove);
+            }
+            
+            // Insert content div after header
+            headerDiv.parentNode.insertBefore(contentDiv, headerDiv.nextElementSibling);
+        });
+    });
+    
+    function toggleSection(sectionId) {
+        const content = document.getElementById(sectionId);
+        const header = content.previousElementSibling;
+        
+        if (content.classList.contains('collapsed')) {
+            content.classList.remove('collapsed');
+            content.classList.add('expanded');
+            header.classList.remove('collapsed');
+            header.classList.add('expanded');
+        } else {
+            content.classList.remove('expanded');
+            content.classList.add('collapsed');
+            header.classList.remove('expanded');
+            header.classList.add('collapsed');
+        }
+    }
+    </script>
+            </section>
+        </div>
+    </div>
+    
+    <!-- Section folding JavaScript is included by the folding function -->
+</body>
+</html>

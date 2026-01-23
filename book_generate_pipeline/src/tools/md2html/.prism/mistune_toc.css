@@ -1,0 +1,78 @@
+/* Table of Contents Styling - simple div without title */
+div.toc {
+    background-color: #f8f9fa;
+    border: 1px solid #e1e5e9;
+    border-radius: 6px;
+    padding: 12px;
+    margin: 20px 0;
+    max-width: 100%;
+    width: 100%;
+}
+
+div.toc ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 0;
+}
+
+div.toc ul ul {
+    padding-left: 20px;
+    margin: 4px 0;
+}
+
+div.toc .toc-symbol {
+    margin-right: 4px;
+    color: #666;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: baseline;
+}
+
+div.toc .toc-symbol[data-level="2"],
+div.toc .toc-symbol[data-level="3"] {
+    font-size: 0.5em;
+    transform: translateY(-2px);
+}
+
+div.toc .toc-symbol[data-level="4"],
+div.toc .toc-symbol[data-level="5"] {
+    font-size: 1.2em;
+    transform: translateY(1px);
+}
+
+div.toc li {
+    margin: 3px 0;
+    line-height: 1.4;
+}
+
+div.toc a {
+    color: #0066cc;
+    text-decoration: none;
+    display: inline-block;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 1.0em;
+}
+
+div.toc a:hover {
+    background-color: #e3f2fd;
+    text-decoration: none;
+    color: #004494;
+}
+
+/* Smooth scrolling to anchors */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Style for targeted headers (when clicked from TOC) */
+h1:target, h2:target, h3:target, h4:target, h5:target, h6:target {
+    scroll-margin-top: 20px;
+    animation: highlight-flash 2s ease-out;
+}
+
+@keyframes highlight-flash {
+    0% { background-color: #fff3cd; }
+    100% { background-color: transparent; }
+}

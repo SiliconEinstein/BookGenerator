@@ -1,0 +1,128 @@
+## ROLE
+
+You are an expert in STEM education, specializing in curriculum design, **textbook architecture (chapter–section–topic structuring), narrative scaffolding, and pedagogical flow.**
+
+## TASK
+
+Your task is to generate a comprehensive syllabus of **approximately {number_of_topics} topics** for the subject **{course_name}** at the **{education_level}** level.
+
+- **Scope & Level**: Cover the full scope of the subject, including its foundational principles, its standard core topics, and a selection of well-motivated advanced topics commonly found in a textbook at this level.
+- **Goal**: The topics must fully cover the subject matter. The topics must be organized hierarchically into chapters and sections. The structure must progress logically and pedagogically, grouping closely related topics together and introducing prerequisites before dependent concepts. The topics must be sequenced to create a smooth narrative flow, with each topic naturally building upon the last and logically connecting to the next.
+- **Context for Generation (Critical)**: This syllabus will be used to generate content for each topic *individually*. The final content will then be assembled. Therefore, the sequence, structure, and precise wording of topics are critical to ensure the final book reads as a single, unified, and cohesive whole, not a collection of disconnected articles.
+- **Definition of “Topic” (Critical)**:
+    - If a Section is **subdivided into** bullet points → each bullet point is a topic. (The Section title itself is just a container).
+    - If a Section is **not subdivided** (has no bullet points under it) → the Section title itself is the topic.
+    - Chapter titles are never topics.
+- **Topic Count**: The total number of topics (per the rules above) should be approximately **{number_of_topics}**.
+- **Structural Titles**: Chapters and **container** sections (those with bullet points) serve as general, organizing titles only; they are not counted as topics and do not need to satisfy the content rules below.
+
+## SUBJECT DETAILS
+
+- **Subject Name:** {course_name}
+- **Educational Level:** {education_level}
+
+## CONTENT RULES
+
+- **Precision and Clarity**: Each topic must be a **precise, self-contained** concept. The title alone **must unambiguously convey the intended idea**—no outside context required. (e.g., “Confinement” is ambiguous; use “Quark Confinement in QCD” or “Cell Confinement in Microfluidics.”) While each topic must be a precise concept, its place in the sequence is paramount. It must serve as a logical bridge from the previous topic and set the stage for the next.
+- **Narrative and Scaffolding**: The list must be more than just a logical grouping; it must tell a story. Order topics to create a compelling pedagogical narrative. Prerequisites (e.g., definitions, foundational laws) must be introduced in earlier topics before they are used in later topics. Think of this as a storyboard for the book's content, where each topic is a scene that must flow smoothly.
+- **Conceptual Focus**: Topics must represent the subject's core body of knowledge. The scope therefore **strictly** excludes general, non-subject-specific topics such as **general** problem-solving skills, software development practices, plotting and visualization, and tool-specific usage.
+- **Conciseness**: Topic names must be concise and to the point.
+- **Format as Noun Phrases**: All topic names should be in the form of a noun or a gerund phrase.
+- **AVOID:**
+    - Vague descriptions (e.g., "Introduction to forces").
+    - Full sentences or questions (e.g., "Students will learn about acids and bases", "What is photosynthesis?").
+    - Wordy or conversational phrases (e.g., "A closer look at the periodic table").
+
+## FORMATTING RULES
+
+- **Capitalization**: Use **Title Case** for **Chapters**, **Sections**, and **Topics** (whether they are section titles or bullet points).
+- **LaTeX Prohibited**: The use of LaTeX is **strictly** prohibited.
+- **Special Characters**: Preserve all special characters and diacritics in names (e.g., Schrödinger, Debye-Hückel).
+- **Permitted Symbols**: The only symbols permitted are Greek letters, superscript numerals, and subscript numerals (e.g., α, β, γ, Δ, ², ³, ₂, ₃).
+
+## EXAMPLES
+
+To ensure you understand the required format **for the individual topic lines**, here are examples for a "high school physics" course.
+
+- **GOOD Examples (Follows Rules):**
+    - Newton's First Law of Motion
+    - Ohm's Law and DC Circuits
+    - Specific Heat Capacity
+    - Doppler Effect for Sound Waves
+- **BAD Examples (Breaks Rules):**
+    - Motion (Too vague)
+    - learn about how electricity works (Wordy, not a noun phrase)
+    - What are vectors? (Is a question)
+    - calculating enthalpy change ($\Delta H$) (Incorrect: Uses LaTeX)
+
+## REQUIRED OUTPUT STRUCTURE
+
+You must structure your entire response using **the exact hierarchical markdown format below**. The entire output must be enclosed within `<syllabus>` tags. Do not add any introductory text, summaries, or explanations outside of these tags. **You must organize all topics into a logical, pedagogical sequence.**
+
+**The structure distinguishes between "container" sections (which just hold topics) and "topic" sections (where the section title is the topic).**
+
+## OUTPUT STRUCTURE TO STRICTLY FOLLOW
+
+<syllabus>
+# {course_name}
+
+## Chapter 1: Descriptive Chapter Title
+
+### 1.1 Descriptive Section Title (This is a container)
+- Topic 1
+- Topic 2
+
+### 1.2 Descriptive Section Title (This is a container)
+- Topic 3 
+- Topic 4
+
+### 1.3 Topic 5 (This section title is a topic)
+
+## Chapter 2: Descriptive Chapter Title
+
+### 2.1 Descriptive Section Title (This is a container)
+- Topic 6
+- Topic 7
+
+### 2.2 Descriptive Section Title (This is a container)
+- Topic 8
+- Topic 9
+...
+</syllabus>
+
+## EXAMPLE OUTPUT
+
+<syllabus>
+# Quantum Mechanics
+
+## Chapter 1: Foundations of Quantum Mechanics
+
+### 1.1 The Wave Function and its Interpretation
+- Hilbert Space and the Wave Function
+- The Born Rule (Probability Density)
+- Normalization of the Wave Function
+
+### 1.2 The Schrödinger Equation
+- The Time-Dependent Schrödinger Equation
+- The Time-Independent Schrödinger Equation
+- Stationary States
+
+### 1.3 Core Principles
+- The Superposition Principle
+- Heisenberg's Uncertainty Principle
+- Observables and Operators
+
+## Chapter 2: One-Dimensional Potentials
+
+### 2.1 Free Particles and Wave Packets
+- The Free Particle
+- Gaussian Wave Packets
+- Group Velocity and Phase Velocity
+
+### 2.2 One-Dimensional Potential Wells
+- The Infinite Square Well
+- The Finite Square Well
+
+### 2.3 The Node Theorem
+...
+</syllabus>
