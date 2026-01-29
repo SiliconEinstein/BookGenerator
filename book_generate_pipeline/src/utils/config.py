@@ -1,9 +1,10 @@
 """Configuration management for the project."""
 
 import os
+import re
 import yaml
-from pathlib import Path
 from typing import Dict, Any, Optional
+from pathlib import Path
 
 
 class Config:
@@ -28,14 +29,39 @@ class Config:
         """Set the language for prompts directory selection."""
         self.language = language
 
+    def _load_env(self):
+        """Load environment variables from .env if available."""
+        try:
+            import dotenv
+        except Exception:
+            return
+        project_root = Path(__file__).resolve().parents[2]
+        dotenv_path = project_root / '.env'
+        if dotenv_path.exists():
+            dotenv.load_dotenv(dotenv_path=dotenv_path, override=False)
+
+    def _interpolate_env(self, data: Any) -> Any:
+        """Replace ${VAR} tokens with environment values."""
+        if isinstance(data, dict):
+            return {key: self._interpolate_env(value) for key, value in data.items()}
+        if isinstance(data, list):
+            return [self._interpolate_env(value) for value in data]
+        if isinstance(data, str):
+            def _replace(match: re.Match) -> str:
+                return os.environ.get(match.group(1), "")
+            return re.sub(r"\$\{([^}]+)\}", _replace, data)
+        return data
+
     def _load_config(self):
         """Load configuration from YAML file."""
+        self._load_env()
         config_dir = Path(__file__).parent.parent.parent / 'config'
         config_file = config_dir / f'config.{self.env}.yaml'
 
         if config_file.exists():
             with open(config_file, 'r', encoding='utf-8') as f:
-                self._config_cache = yaml.safe_load(f) or {}
+                raw_config = yaml.safe_load(f) or {}
+                self._config_cache = self._interpolate_env(raw_config)
         else:
             self._config_cache = self._get_default_config()
 
@@ -51,7 +77,7 @@ class Config:
                     },
                     'gpt5': {
                         'model': 'Vendor2/GPT-5.2',
-                        'base_url': 'https://api.gpugeek.com/v1',
+                        'base_url': os.environ.get('GPUGEEK_API_BASE', ''),
                         'api_key': os.environ.get('GPUGEEK_API_KEY', ''),
                     },
                     'deepseek': {
@@ -66,10 +92,10 @@ class Config:
                 }
             },
             'mcp': {
-                'url': 'http://rceb1397946.bohrium.tech:50001/sse',
+                'url': os.environ.get('MCP_URL', ''),
             },
             'wiki': {
-                'search_api_base': 'https://literature-sage.test.bohrium.com',
+                'search_api_base': os.environ.get('WIKI_SEARCH_API_BASE', ''),
             },
             'output': {
                 'base_dir': 'output/books',
@@ -78,6 +104,16 @@ class Config:
             'prompts': {
                 'base_dir_ch': 'prompts',  # Chinese prompts directory
                 'base_dir_en': 'prompts_en',  # English prompts directory
+                'names': {
+                    'abstract': 'prompt_abstract',
+                    'chapter': 'prompt_chapter',
+                    'battle': 'prompt_chapter_refine',
+                    'eval_chapter': 'prompt_chapter_eval',
+                    'book': 'prompt_book',
+                    'book_step2': 'prompt_book_step2',
+                    'book_step3': 'prompt_book_step3',
+                    'select_project_qa': 'prompt_select_project_qa',
+                },
             },
         }
 
@@ -111,6 +147,11 @@ class Config:
     def get_prompt_path(self, prompt_name: str) -> Path:
         """Get full path to a prompt file."""
         return self.prompts_base_dir / prompt_name
+
+    def get_prompt_name(self, key: str, default: Optional[str] = None) -> str:
+        """Get prompt filename by logical key."""
+        names = self._config_cache.get('prompts', {}).get('names', {})
+        return names.get(key, default or key)
 
     def reload(self):
         """Reload configuration from file."""

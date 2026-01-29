@@ -49,7 +49,7 @@ async def main():
         chapter_save_path,
         book_save_dir,
         # Optional: specify which chapters/subchapters to process
-        chapter_ids=[4,5,6],  # Only process chapters 1, 2, 3
+        chapter_ids=[5,6],  # Only process chapters 1, 2, 3
     )
 
     print("\n" + "=" * 50)

@@ -10,13 +10,7 @@ from typing import Dict, Any, Optional, List, Union
 from src.models import gemini_completion, gpt_completion
 from src.utils import get_config, sanitize_filename
 from src.tools import search_wiki_articles_for_subchapter, search_qa_pairs_for_subchapter
-
-
-PROMPT_ABSTRACT = "prompt_abstract"
-PROMPT_BOOK = "prompt_book"
-PROMPT_BOOK_STEP2 = "prompt_book_step2"
-PROMPT_BOOK_STEP3 = "prompt_book_step3"
-WIKI_SEARCH_API_BASE = "https://literature-sage.test.bohrium.com"
+from src.core.chapter_types import SubChapterInfo
 
 
 class BookGenerator:
@@ -33,36 +27,37 @@ class BookGenerator:
         """Generate chapter outline summary."""
         topics_str = ", ".join(topics)
 
-        # 获取Pedia文章（注释）
-        wiki_articles_content, wiki_titles = await search_wiki_articles_for_subchapter(
-            subchapter_title=sub_title,
-            topics=topics,
-            k=5,
-            language="zh-CN" if self.language == 'ch' else "en-US",
-        )
-        wiki_content_str = "\n\n".join(wiki_articles_content) if wiki_articles_content else "No related wiki articles found."
-
-        # 获取问答对
-        # qa_result = await search_qa_pairs_for_subchapter(
+        # 获取Pedia文章
+        # wiki_articles_content, wiki_titles = await search_wiki_articles_for_subchapter(
         #     subchapter_title=sub_title,
         #     topics=topics,
-        #     max_keywords=10,
-        #     max_results_per_keyword=1
+        #     k=5,
+        #     language="zh-CN" if self.language == 'ch' else "en-US",
         # )
+        # wiki_content_str = "\n\n".join(wiki_articles_content) if wiki_articles_content else "No related wiki articles found."
+
+        # 获取问答对
+        qa_result = await search_qa_pairs_for_subchapter(
+            subchapter_title=sub_title,
+            topics=topics,
+            max_keywords=10,
+            max_results_per_keyword=1
+        )
         
-        # qa_pairs = qa_result.get("qa_pairs", [])
-        # qa_content_list = []
-        # for qa in qa_pairs:
-        #     problem_thumbnail = qa.get("problem_thumbnail", "")
-        #     problem = qa.get("problem", "")
-        #     solutions = qa.get("solutions", "")
+        qa_pairs = qa_result.get("qa_pairs", [])
+        qa_content_list = []
+        for qa in qa_pairs:
+            problem_thumbnail = qa.get("problem_thumbnail", "")
+            problem = qa.get("problem", "")
+            solutions = qa.get("solutions", "")
             
-        #     qa_text = f"title: {problem_thumbnail}\n\nQuestion: {problem}\n\nAnswer: {solutions}"
-        #     qa_content_list.append(qa_text)
+            qa_text = f"title: {problem_thumbnail}\n\nQuestion: {problem}\n\nAnswer: {solutions}"
+            qa_content_list.append(qa_text)
         
-        # wiki_content_str = "\n\n\n".join(qa_content_list) if qa_content_list else "No related QA pairs found."
+        wiki_content_str = "\n\n\n".join(qa_content_list) if qa_content_list else "No related QA pairs found."
         
-        prompt_path = self.config.get_prompt_path(PROMPT_ABSTRACT)
+        prompt_name = self.config.get_prompt_name("abstract", "prompt_abstract")
+        prompt_path = self.config.get_prompt_path(prompt_name)
         prompt = self._read_file_safe(prompt_path)
         prompt = prompt.format(
             course_name=course_name,
@@ -100,7 +95,8 @@ class BookGenerator:
             for sc, abst in chapter_abstracts.items()
         )
 
-        prompt_path = self.config.get_prompt_path(PROMPT_BOOK)
+        prompt_name = self.config.get_prompt_name("book", "prompt_book")
+        prompt_path = self.config.get_prompt_path(prompt_name)
         prompt = self._read_file_safe(prompt_path)
         prompt = prompt.format(
             course_name=course_name,
@@ -131,12 +127,20 @@ class BookGenerator:
         return article_content or ""
 
     async def insert_project(self, course_name: str, chapter_title: str,
-                            chapter_structure: Dict[str, Any], sub_chapters: Dict[str, Any],
-                            subchapter_file_paths: Dict[str, str]) -> tuple:
+                            chapter_structure: Dict[str, Any], sub_chapters: Dict[str, SubChapterInfo],
+                            subchapter_file_paths: Dict[str, str], output_dir: str,
+                            chapter_dir: str) -> tuple:
         """Enhance chapter cohesion and insert projects as线索."""
         chapter_content_parts = []
+        project_qa_text = await self._build_project_qa_text(
+            course_name=course_name,
+            chapter_title=chapter_title,
+            chapter_structure=chapter_structure,
+            sub_chapters=sub_chapters
+        )
+        self._save_project_qas(project_qa_text, output_dir, chapter_dir)
         for sub_code, sub_info in sub_chapters.items():
-            sub_title = sub_info['subchapter_title']
+            sub_title = sub_info.subchapter_title
             input_path = subchapter_file_paths.get(sub_code)
             if os.path.exists(input_path):
                 with open(input_path, 'r', encoding='utf-8') as f:
@@ -147,25 +151,29 @@ class BookGenerator:
 
         chapter_content = "\n\n".join(chapter_content_parts)
 
-        prompt_path = self.config.get_prompt_path(PROMPT_BOOK_STEP2)
+        prompt_name = self.config.get_prompt_name("book_step2", "prompt_book_step2")
+        prompt_path = self.config.get_prompt_path(prompt_name)
         prompt = self._read_file_safe(prompt_path)
         prompt = prompt.format(
             course_name=course_name,
             chapter_title=chapter_title,
             chapter_structure=chapter_structure,
-            chapter_content=chapter_content
+            chapter_content=chapter_content,
+            project_qas=project_qa_text
         )
         new_chapter_content = await gemini_completion(prompt)
         print(f"{chapter_title}：Old chapter length {len(chapter_content)}. New chapter length {len(new_chapter_content)}")
 
         # Check for syntax, format errors, and hallucinations
-        prompt_check_path = self.config.get_prompt_path(PROMPT_BOOK_STEP3)
+        prompt_check_name = self.config.get_prompt_name("book_step3", "prompt_book_step3")
+        prompt_check_path = self.config.get_prompt_path(prompt_check_name)
         prompt_check = self._read_file_safe(prompt_check_path)
         prompt_check = prompt_check.format(
             course_name=course_name,
             chapter_title=chapter_title,
             chapter_structure=chapter_structure,
-            chapter_content=new_chapter_content
+            chapter_content=new_chapter_content,
+            project_qas=project_qa_text
         )
         print("Starting content check...")
         check_result = await gpt_completion(prompt_check)
@@ -178,116 +186,157 @@ class BookGenerator:
         articles_content = self._decompose_chapter_content(checked_chapter_content)
         return articles_content, checked_chapter_content, log_text
 
-    # async def _search_wiki_articles_for_subchapter(
-    #     self,
-    #     subchapter_title: str,
-    #     topics: List[str],
-    #     k: int = 5,
-    #     language: str = "zh-CN",
-    # ) -> Union[List[str], tuple]:
-    #     """Search wiki articles based on subchapter title and topics."""
-    #     url = f"{self.wiki_search_api_base}/api/v1/wiki_v2/article/hybrid"
-    #     k = min(k, 5)
-    #     if k <= 0:
-    #         k = 5
+    async def _build_project_qa_text(
+        self,
+        course_name: str,
+        chapter_title: str,
+        chapter_structure: Dict[str, Any],
+        sub_chapters: Dict[str, SubChapterInfo]
+    ) -> str:
+        """Select one QA per subchapter to form a coherent project chain."""
+        async def _fetch_candidates(sub_code: str, sub_info: SubChapterInfo):
+            try:
+                qa_result = await search_qa_pairs_for_subchapter(
+                    subchapter_title=sub_info.subchapter_title,
+                    topics=sub_info.topics,
+                    max_keywords=10,
+                    max_results_per_keyword=1
+                )
+            except Exception as e:
+                print(f"  [Warning] QA search failed for {sub_code}: {e}")
+                qa_result = {}
+            qa_pairs = qa_result.get("qa_pairs", [])
+            candidates = []
+            for idx, qa in enumerate(qa_pairs, 1):
+                thumbnail = (qa.get("problem_thumbnail") or "").strip()
+                if not thumbnail:
+                    continue
+                problem_id = (qa.get("problem_id") or qa.get("_id") or "").strip()
+                if not problem_id:
+                    problem_id = f"{sub_code}-{idx}"
+                candidates.append({
+                    "problem_id": problem_id,
+                    "problem_thumbnail": thumbnail,
+                    "problem": (qa.get("problem") or "").strip(),
+                    "ground_truth_answer": (qa.get("ground_truth_answer") or "").strip(),
+                    "solutions": (qa.get("solutions") or "").strip(),
+                })
+            if not candidates:
+                return None
+            return sub_code, {
+                "title": sub_info.subchapter_title,
+                "candidates": candidates
+            }
 
-    #     all_search_items = topics + [subchapter_title]
-    #     articles_content: List[str] = []
-    #     seen_ids = set()
-    #     seen_keywords = set()
-    #     article_titles = []
+        tasks = [
+            _fetch_candidates(sub_code, sub_info)
+            for sub_code, sub_info in sub_chapters.items()
+        ]
+        results = await asyncio.gather(*tasks)
+        candidates_by_sub = {
+            sub_code: payload
+            for result in results if result
+            for sub_code, payload in [result]
+        }
 
-    #     for search_item in all_search_items:
-    #         def _extract_single_keyword(text: str) -> List[str]:
-    #             keywords = set()
-    #             segments = re.split(r'[与和]', text)
-    #             for segment in segments:
-    #                 segment = segment.strip()
-    #                 if segment and len(segment) >= 2 and segment not in seen_keywords:
-    #                     keywords.add(segment)
-    #                     seen_keywords.add(segment)
-    #             if not keywords and len(text) < 8 and text.strip():
-    #                 keywords.add(text.strip())
-    #             return keywords
+        if not candidates_by_sub:
+            return ""
 
-    #         keywords = _extract_single_keyword(search_item)
-    #         final_keywords = {kw: 1.0 for kw in keywords}
-    #         if not keywords:
-    #             continue
+        selection = await self._select_project_qas(
+            course_name=course_name,
+            chapter_title=chapter_title,
+            sub_chapters=sub_chapters,
+            candidates_by_sub=candidates_by_sub
+        )
+        if not selection:
+            return ""
 
-    #         headers = {"Content-Type": "application/json"}
-    #         payload = {
-    #             "text": search_item or "",
-    #             "keywords": final_keywords,
-    #             "k": 1,
-    #             "language": language or "zh-CN",
-    #             "include_content": True,
-    #         }
+        lines = ["# 项目线索问答对（每个子章节选一个）"]
+        for sub_code, picked in selection.items():
+            sub_title = candidates_by_sub.get(sub_code, {}).get("title", "")
+            lines.append(f"## {sub_code} {sub_title}")
+            lines.append(f"- problem_thumbnail: {picked.get('problem_thumbnail', '')}")
+            lines.append(f"- problem: {picked.get('problem', '')}")
+            lines.append(f"- ground_truth_answer: {picked.get('ground_truth_answer', '')}")
+            lines.append(f"- solutions: {picked.get('solutions', '')}")
+        return "\n".join(lines)
 
-    #         try:
-    #             async with aiohttp.ClientSession() as session:
-    #                 async with session.post(url, json=payload, headers=headers,
-    #                                        timeout=aiohttp.ClientTimeout(total=15)) as resp:
-    #                     if resp.status != 200:
-    #                         continue
-    #                     data = await resp.json()
-    #         except Exception:
-    #             continue
+    def _save_project_qas(self, project_qa_text: str, output_dir: str, chapter_dir: str) -> None:
+        """Save selected project QA pairs to chapter-level file."""
+        if not project_qa_text:
+            return
+        qa_dir = os.path.join(output_dir, "qa_pairs")
+        os.makedirs(qa_dir, exist_ok=True)
+        qa_path = os.path.join(qa_dir, f"{chapter_dir}.md")
+        with open(qa_path, "w", encoding="utf-8") as f:
+            f.write(project_qa_text)
 
-    #         raw_list: List[Dict[str, Any]] = []
-    #         try:
-    #             if isinstance(data, dict):
-    #                 arr = None
-    #                 if isinstance(data.get("data"), list):
-    #                     arr = data.get("data")
-    #                 elif isinstance(data.get("data"), dict):
-    #                     dd = data.get("data")
-    #                     if isinstance(dd.get("items"), list):
-    #                         arr = dd.get("items")
-    #                     elif isinstance(dd.get("results"), list):
-    #                         arr = dd.get("results")
-    #                     elif isinstance(dd.get("result"), list):
-    #                         arr = dd.get("result")
-    #                 elif isinstance(data.get("results"), list):
-    #                     arr = data.get("results")
-    #                 if isinstance(arr, list):
-    #                     raw_list = arr
-    #         except Exception:
-    #             raw_list = []
+    async def _select_project_qas(
+        self,
+        course_name: str,
+        chapter_title: str,
+        sub_chapters: Dict[str, Any],
+        candidates_by_sub: Dict[str, Dict[str, Any]]
+    ) -> Dict[str, Dict[str, str]]:
+        """Use Gemini to pick one QA per subchapter forming a coherent project."""
+        prompt_name = self.config.get_prompt_name("select_project_qa", "prompt_select_project_qa")
+        prompt_path = self.config.get_prompt_path(prompt_name)
+        prompt_template = self._read_file_safe(prompt_path).strip()
+        prompt_lines = [
+            prompt_template,
+            "",
+            "候选列表：",
+            f"教材名称：{course_name}",
+            f"章节标题：{chapter_title}",
+            f"章节结构：{sub_chapters}",
+            ""
+        ]
+        for sub_code, info in candidates_by_sub.items():
+            title = info.get("title", "")
+            candidates = info.get("candidates", [])
+            prompt_lines.append(f"{sub_code} {title}")
+            for idx, cand in enumerate(candidates, 1):
+                prompt_lines.append(f"  {idx}. [problem_id:{cand.get('problem_id', '')}] {cand.get('problem_thumbnail', '')}")
+                prompt_lines.append(f"     problem: {cand.get('problem', '')}")
+        prompt = "\n".join(prompt_lines)
 
-    #         for r in raw_list:
-    #             if not isinstance(r, dict):
-    #                 continue
-    #             aid = r.get("article_id") or r.get("articleId") or r.get("id")
-    #             if aid in seen_ids:
-    #                 continue
-    #             seen_ids.add(aid)
+        try:
+            response = await gemini_completion(prompt)
+        except Exception as e:
+            print(f"  [Warning] QA selection failed: {e}")
+            response = ""
 
-    #             title = r.get("title") or r.get("article_title") or r.get("article_name") or r.get("name") or ""
-    #             main_content = r.get("main_content", "")
-    #             applications = r.get("applications", "")
+        selections = {}
+        try:
+            data = json.loads(response)
+            selections = data.get("selections", {}) if isinstance(data, dict) else {}
+        except Exception:
+            selections = {}
 
-    #             content_parts = []
-    #             if title:
-    #                 content_parts.append(str(title))
-    #             if main_content:
-    #                 content_parts.append(str(main_content))
-    #             if applications:
-    #                 content_parts.append(str(applications))
+        if not selections:
+            # Fallback: pick the first candidate for each subchapter
+            for sub_code, info in candidates_by_sub.items():
+                candidates = info.get("candidates", [])
+                if candidates:
+                    selections[sub_code] = candidates[0].get("problem_id", "")
 
-    #             if content_parts:
-    #                 full_content = "\n".join(content_parts)
-    #                 pattern = r"\(@[^:]+:[^)]*\)"
-    #                 clean_content = re.sub(pattern, "", full_content)
-    #                 articles_content.append(clean_content)
-    #                 article_titles.append(title)
-    #                 if len(articles_content) >= k:
-    #                     print(f"Got {len(articles_content)} articles: {article_titles}")
-    #                     return articles_content[:k], article_titles[:k]
-
-
-    #     print(f"Got {len(articles_content)} articles: {article_titles}")
-    #     return articles_content[:k], article_titles[:k]
+        # Ensure selections only include known subchapters and valid candidates
+        cleaned = {}
+        for sub_code, picked in selections.items():
+            info = candidates_by_sub.get(sub_code)
+            if not info:
+                continue
+            candidates = info.get("candidates", [])
+            matched = None
+            for cand in candidates:
+                if cand.get("problem_id") == picked:
+                    matched = cand
+                    break
+            if matched:
+                cleaned[sub_code] = matched
+            elif candidates:
+                cleaned[sub_code] = candidates[0]
+        return cleaned
 
 
     async def _generate_section_with_content(self, topic: str, style_guide: str = None,

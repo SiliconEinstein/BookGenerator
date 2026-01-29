@@ -141,16 +141,23 @@ async def retrieve_and_check_qa(
 
         logger.info(f"Filtering {len(all_problems)} problems using LLM for query: {keyword}")
 
-        selected_ids, filter_stats = await filter_problems_by_query(all_problems, keyword)
-        if filter_stats:
-            total_stats["prompt_tokens"] += filter_stats.prompt_tokens
-            total_stats["completion_tokens"] += filter_stats.completion_tokens
-            total_stats["total_tokens"] += filter_stats.total_tokens
-            total_stats["llm_calls"] += 1
+        # selected_ids, filter_stats = await filter_problems_by_query(all_problems, keyword)
+        # if filter_stats:
+        #     total_stats["prompt_tokens"] += filter_stats.prompt_tokens
+        #     total_stats["completion_tokens"] += filter_stats.completion_tokens
+        #     total_stats["total_tokens"] += filter_stats.total_tokens
+        #     total_stats["llm_calls"] += 1
+        
+        # Skip LLM filtering for efficiency
+        selected_ids = [
+            p.get("_id", "")
+            for p in all_problems
+            if p.get("_id")
+        ]
 
         if not selected_ids:
             print(f"  [QA] Keyword '{keyword}': No QA pairs found")
-            logger.warning("No problems selected after filtering")
+            # logger.warning("No problems selected after filtering")
             elapsed_time = time.time() - start_time
             usage_stats = {
                 "total_elapsed_time_seconds": round(elapsed_time, 2),
@@ -177,6 +184,7 @@ async def retrieve_and_check_qa(
         all_results = []
         for qa_pair in qa_pairs:
             result_item = {
+                "problem_id": qa_pair.get("_id", ""),
                 "problem_thumbnail": qa_pair.get("problem_thumbnail", ""),
                 "problem": qa_pair.get("problem", ""),
                 "ground_truth_answer": qa_pair.get("ground_truth_answer", ""),

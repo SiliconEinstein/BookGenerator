@@ -10,6 +10,7 @@ from typing import Dict, Any, Optional, List
 from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
 from src.core.chapter_generator import ChapterGenerator
 from src.core.book_generator import BookGenerator
+from src.core.chapter_types import ChapterInfo, SubChapterInfo
 from src.tools import md_to_html, html_to_pdf
 from src.utils import sanitize_filename
 
@@ -18,7 +19,8 @@ from src.utils import sanitize_filename
 class BookGenerationContext:
     """Context for book generation process."""
     course_name: str
-    structure_summary: Dict[str, Any]
+    structure_summary: Dict[str, ChapterInfo]
+    structure_summary_raw: Dict[str, Any]
     filename_map: Dict[str, Any]
     sorted_chapters: List[str]
 
@@ -48,6 +50,7 @@ class BookGenerationContext:
         return sub_code in self.subchapter_ids
 
 
+
 class TopicBookGenerator:
     """Main generator orchestrating the entire book generation pipeline."""
 
@@ -72,17 +75,17 @@ class TopicBookGenerator:
         ctx: BookGenerationContext,
         chap_key: str,
         sub_code: str,
-        sub_info: dict
+        sub_info: SubChapterInfo
     ):
         """Generate a single subchapter abstract."""
         async with self.abstract_semaphore:
             try:
                 result = await self.book_generator.generate_abstract(
-                    sub_title=sub_info['subchapter_title'],
-                    topics=sub_info['topics'],
+                    sub_title=sub_info.subchapter_title,
+                    topics=sub_info.topics,
                     course_name=ctx.course_name,
                     sub_code=sub_code,
-                    structure_summary=ctx.structure_summary
+                    structure_summary=ctx.structure_summary_raw
                 )
                 return chap_key, sub_code, result['abstract'], result['wiki_content']
             except Exception as e:
@@ -94,11 +97,11 @@ class TopicBookGenerator:
         ctx: BookGenerationContext,
         chapter_key: str,
         sub_code: str,
-        sub_info: dict
+        sub_info: SubChapterInfo
     ):
         """Generate content for a single subchapter."""
         async with self.subchapter_semaphore:
-            sub_title = sub_info['subchapter_title']
+            sub_title = sub_info.subchapter_title
             chapter_dir = ctx.get_chapter_dir(chapter_key)
             filename = ctx.get_subchapter_filename(sub_code)
             output_path = os.path.join(ctx.output_dir, chapter_dir, "step1", filename)
@@ -110,10 +113,10 @@ class TopicBookGenerator:
             try:
                 article_content = await self.book_generator.generate_content(
                     sub_title=sub_title,
-                    topics=sub_info['topics'],
+                    topics=sub_info.topics,
                     course_name=ctx.course_name,
                     sub_code=sub_code,
-                    structure_summary=ctx.structure_summary,
+                    structure_summary=ctx.structure_summary_raw,
                     chapter_abstracts=ctx.chapter_abstracts_map.get(chapter_key, {}),
                     wiki_content=ctx.chapter_wiki_contents_map.get(chapter_key, {}).get(sub_code),
                 )
@@ -132,17 +135,17 @@ class TopicBookGenerator:
         self,
         ctx: BookGenerationContext,
         chapter_key: str,
-        chapter_info: dict
+        chapter_info: ChapterInfo
     ):
         """Process a chapter with project integration."""
         async with self.chapter_semaphore:
-            chapter_title = chapter_info['title']
+            chapter_title = chapter_info.title
             chapter_dir = ctx.get_chapter_dir(chapter_key)
             print(f"\nProcessing Chapter {chapter_key} for project integration: {chapter_title}...")
 
             try:
                 subchapter_file_paths = {}
-                for sub_code in chapter_info['sub_chapters'].keys():
+                for sub_code in chapter_info.sub_chapters.keys():
                     if ctx.should_process_subchapter(sub_code):
                         filename = ctx.get_subchapter_filename(sub_code)
                         path = os.path.join(ctx.output_dir, chapter_dir, "step1", filename)
@@ -151,9 +154,11 @@ class TopicBookGenerator:
                 articles_content, chapter_content, log_text = await self.book_generator.insert_project(
                     course_name=ctx.course_name,
                     chapter_title=chapter_title,
-                    chapter_structure=ctx.structure_summary,
-                    sub_chapters=chapter_info['sub_chapters'],
-                    subchapter_file_paths=subchapter_file_paths
+                    chapter_structure=ctx.structure_summary_raw,
+                    sub_chapters=chapter_info.sub_chapters,
+                    subchapter_file_paths=subchapter_file_paths,
+                    output_dir=ctx.output_dir,
+                    chapter_dir=chapter_dir
                 )
 
                 full_chapter_path = os.path.join(ctx.output_dir, "md", f"{chapter_dir}.md")
@@ -206,7 +211,7 @@ class TopicBookGenerator:
         self,
         ctx: BookGenerationContext,
         chapter_key: str,
-        chapter_info: dict
+        chapter_info: ChapterInfo
     ) -> tuple:
         """Generate abstracts for all subchapters in a chapter.
         
@@ -238,7 +243,7 @@ class TopicBookGenerator:
 
         print(f"  [Generating Abstracts for {chapter_key}]")
         subchapter_tasks = []
-        for sub_code, sub_info in chapter_info['sub_chapters'].items():
+        for sub_code, sub_info in chapter_info.sub_chapters.items():
             if ctx.should_process_subchapter(sub_code):
                 subchapter_tasks.append(
                     self._generate_single_abstract(ctx, chapter_key, sub_code, sub_info)
@@ -253,7 +258,7 @@ class TopicBookGenerator:
             total_abstracts = ""
             total_wiki_contents = ""
             for sub_code, abst in abstracts.items():
-                sub_title = chapter_info['sub_chapters'][sub_code]['subchapter_title']
+                sub_title = chapter_info.sub_chapters[sub_code].subchapter_title
                 wiki_content = wiki_contents.get(sub_code, "")
                 total_abstracts += f"### 子章节 {sub_code}：{sub_title}\n"
                 total_abstracts += f"{abst}\n\n"
@@ -283,7 +288,8 @@ class TopicBookGenerator:
         syllabus_dict = self.parse_syllabus_to_dict(syllabus)
 
         course_name = syllabus_dict.get("course_name", "Unknown Course")
-        structure_summary = syllabus_dict["structure_summary"]
+        structure_summary_raw = syllabus_dict["structure_summary"]
+        structure_summary = self._convert_structure_summary(structure_summary_raw)
         filename_map = syllabus_dict["filename_map"]
         sorted_chapters = sorted(
             structure_summary.keys(),
@@ -293,6 +299,7 @@ class TopicBookGenerator:
         ctx = BookGenerationContext(
             course_name=course_name,
             structure_summary=structure_summary,
+            structure_summary_raw=structure_summary_raw,
             filename_map=filename_map,
             sorted_chapters=sorted_chapters,
             chapter_ids=chapter_ids,
@@ -323,7 +330,7 @@ class TopicBookGenerator:
             if not ctx.should_process_chapter(key):
                 continue
             chapter_info = ctx.structure_summary[key]
-            for sub_code, sub_info in chapter_info['sub_chapters'].items():
+            for sub_code, sub_info in chapter_info.sub_chapters.items():
                 if not ctx.should_process_subchapter(sub_code):
                     continue
                 content_tasks.append(
@@ -339,7 +346,7 @@ class TopicBookGenerator:
                 continue
             chapter_info = ctx.structure_summary[key]
             ctx.subchapter_file_paths_map[key] = {}
-            for sub_code in chapter_info['sub_chapters'].keys():
+            for sub_code in chapter_info.sub_chapters.keys():
                 if not ctx.should_process_subchapter(sub_code):
                     continue
                 path = file_paths[idx]
@@ -436,6 +443,13 @@ class TopicBookGenerator:
                     result["structure_summary"][current_chapter_key]["sub_chapters"][current_subchapter_key]["topics"].append(topic_text)
 
         return result
+
+    def _convert_structure_summary(self, structure_summary: Dict[str, Any]) -> Dict[str, ChapterInfo]:
+        """Convert raw structure summary dict to ChapterInfo objects."""
+        return {
+            chapter_key: ChapterInfo.from_dict(chapter_data)
+            for chapter_key, chapter_data in structure_summary.items()
+        }
 
 
 async def main():

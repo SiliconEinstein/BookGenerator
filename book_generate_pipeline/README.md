@@ -31,7 +31,6 @@ book_generate_pipeline/
 ├── output/                   # Generated output
 │   ├── books/                # Generated books
 │   └── temp/                 # Temporary files
-├── docs_input/               # Input documents (papers, job requirements, etc.)
 ├── main.py                  # Main entry point
 ├── requirements.txt         # Python dependencies
 └── pyproject.toml           # Project configuration

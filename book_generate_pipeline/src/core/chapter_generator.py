@@ -5,16 +5,21 @@ import re
 import json
 import asyncio
 import pdfplumber
+from dataclasses import dataclass
 from typing import Dict, Any, Optional
 from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
 from src.tools import DatabaseManager
 from src.utils import get_config
 
 
-PROMPT_ABSTRACT = "prompt_abstract"
-PROMPT_CHAPTER = "prompt_chapter"
-PROMPT_BATTLE = "prompt_refine_chapter"
-PROMPT_EVAL_CHAPTER = "prompt_eval_chapter"
+@dataclass
+class BookInfo:
+    """Structured book info."""
+    education_level: str
+    course_name: str
+    number_of_topics: str
+    wiki_field_content: Optional[str]
+    job_requirements: str
 
 
 class ChapterGenerator:
@@ -24,7 +29,7 @@ class ChapterGenerator:
         self.language = language
         self.config = get_config(language=language)
 
-        self.prompt_chapter = PROMPT_CHAPTER
+        self.prompt_chapter = self.config.get_prompt_name("chapter", "prompt_chapter")
         self.gemini = gemini_completion
         self.gpt5 = gpt_completion
         self.deepseek = deepseek_completion
@@ -33,7 +38,7 @@ class ChapterGenerator:
 
         self.db_manager = DatabaseManager(llm_config={})
         self.get_field_index = self.db_manager.init_get_field_index_content()
-        self.book_info: Dict[str, Any] = {}
+        self.book_info: Optional[BookInfo] = None
 
         self.strategy = "auto"
         self.battle_cnt = 0
@@ -58,25 +63,30 @@ class ChapterGenerator:
                     print(e)
                     continue
 
-        self.book_info["education_level"] = education_level
-        self.book_info["course_name"] = course_name
-        self.book_info["number_of_topics"] = number_of_topics
-        self.book_info["wiki_field_content"] = wiki_field_content
-
         # Read job requirements file
         job_file = os.path.join(docs_path, f"{course_name}_job.md")
-        self.book_info["job_requirements"] = self._read_file_safe(job_file)
+        job_requirements = self._read_file_safe(job_file)
+
+        self.book_info = BookInfo(
+            education_level=education_level,
+            course_name=course_name,
+            number_of_topics=number_of_topics,
+            wiki_field_content=wiki_field_content,
+            job_requirements=job_requirements,
+        )
 
     def generate_prompt(self) -> str:
         """Generate the prompt for chapter outline generation."""
         context_paper = ""
-        self.prompt_chapter = f"{PROMPT_CHAPTER}"
+        self.prompt_chapter = self.config.get_prompt_name("chapter", "prompt_chapter")
         prompt_path = self.config.get_prompt_path(self.prompt_chapter)
         prompt = self._read_file_safe(prompt_path)
+        if not self.book_info:
+            raise ValueError("book_info is not initialized. Call build_book_info first.")
         prompt = prompt.format(
-            course_name=self.book_info['course_name'],
-            education_level=self.book_info['education_level'],
-            wiki_field_content=self.book_info['wiki_field_content'] or '',
+            course_name=self.book_info.course_name,
+            education_level=self.book_info.education_level,
+            wiki_field_content=self.book_info.wiki_field_content or '',
             language=self.language,
         )
         return context_paper + prompt
@@ -91,13 +101,16 @@ class ChapterGenerator:
             print("Error splitting chapter into abstract and syllabus sections")
             last_abstract, last_syllabus = last_chapter, None
 
-        prompt_path = self.config.get_prompt_path(PROMPT_BATTLE)
+        prompt_battle_name = self.config.get_prompt_name("battle", "prompt_chapter_refine")
+        prompt_path = self.config.get_prompt_path(prompt_battle_name)
         prompt_battle = self._read_file_safe(prompt_path)
+        if not self.book_info:
+            raise ValueError("book_info is not initialized. Call build_book_info first.")
         prompt_battle = prompt_battle.format(
-            course_name=self.book_info["course_name"],
-            education_level=self.book_info["education_level"],
-            wiki_field_content=self.book_info["wiki_field_content"],
-            job_requirements=self.book_info["job_requirements"],
+            course_name=self.book_info.course_name,
+            education_level=self.book_info.education_level,
+            wiki_field_content=self.book_info.wiki_field_content,
+            job_requirements=self.book_info.job_requirements,
             language=self.language,
             abstract=last_abstract,
             reference_syllabus=last_syllabus
@@ -106,11 +119,14 @@ class ChapterGenerator:
 
     def generate_eval_prompt(self, last_chapter: str, curr_chapter: str) -> str:
         """Generate the evaluation prompt for comparing two syllabi."""
-        prompt_path = self.config.get_prompt_path(PROMPT_EVAL_CHAPTER)
+        prompt_eval_name = self.config.get_prompt_name("eval_chapter", "prompt_chapter_eval")
+        prompt_path = self.config.get_prompt_path(prompt_eval_name)
         prompt_eval = self._read_file_safe(prompt_path)
+        if not self.book_info:
+            raise ValueError("book_info is not initialized. Call build_book_info first.")
         prompt_eval = prompt_eval.format(
-            course_name=self.book_info["course_name"],
-            job_requirements=self.book_info["job_requirements"],
+            course_name=self.book_info.course_name,
+            job_requirements=self.book_info.job_requirements,
             syllabus_a=last_chapter,
             syllabus_b=curr_chapter
         )

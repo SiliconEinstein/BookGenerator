@@ -5,31 +5,50 @@ import litellm
 import httpx
 from openai import OpenAI, AsyncOpenAI
 from typing import Optional
+from src.utils import get_config
 
-# Default configuration - can be overridden by environment variables or config file
-DEFAULT_API_KEY = "00u14bi9fo1k9h01000deu6szt7f07n5009w6vsv"
-DEFAULT_LITELLM_PROXY_BASE = "http://8.219.58.57:4000"
-DEFAULT_LITELLM_API_KEY = "sk-WNrS8wC5RXbYvAx6KKdyEw"
-DEFAULT_GPUGEEK_BASE = "https://api.gpugeek.com/v1"
+# Configuration helpers
+def _get_config_value(config: dict, key: str, env_key: Optional[str] = None, default: str = "") -> str:
+    """Return value from config or environment fallback."""
+    if config:
+        value = config.get(key)
+        if value:
+            return value
+    if env_key:
+        return os.environ.get(env_key, default)
+    return default
 
 
-def _get_env_var(key: str, default: str) -> str:
-    """Get environment variable or return default."""
-    return os.environ.get(key, default)
+def _get_provider_model(config: dict, default: str) -> str:
+    """Return provider model from config or default."""
+    if config:
+        value = config.get("model")
+        if value:
+            return value
+    return default
 
 
 # Initialize clients
-_litellm_api_base = _get_env_var("LITELLM_PROXY_API_BASE", DEFAULT_LITELLM_PROXY_BASE)
-_litellm_api_key = _get_env_var("LITELLM_PROXY_API_KEY", DEFAULT_LITELLM_API_KEY)
-_gpugeek_api_key = _get_env_var("GPUGEEK_API_KEY", DEFAULT_API_KEY)
+_config = get_config()
+_gemini_cfg = _config.get_provider_config("gemini")
+_gpt5_cfg = _config.get_provider_config("gpt5")
+_deepseek_cfg = _config.get_provider_config("deepseek")
+_qwen_cfg = _config.get_provider_config("qwen")
+_doubao_cfg = _config.get_provider_config("doubao")
+
+_litellm_api_base = _get_config_value(_gemini_cfg, "base_url", "LITELLM_PROXY_API_BASE")
+_litellm_api_key = _get_config_value(_gemini_cfg, "api_key", "LITELLM_API_KEY")
+_gpugeek_api_base = _get_config_value(_gpt5_cfg, "base_url", "GPUGEEK_API_BASE")
+_gpugeek_api_key = _get_config_value(_gpt5_cfg, "api_key", "GPUGEEK_API_KEY")
 
 os.environ["LITELLM_PROXY_API_BASE"] = _litellm_api_base
 os.environ["LITELLM_PROXY_API_KEY"] = _litellm_api_key
+os.environ["LITELLM_API_KEY"] = _litellm_api_key
 
 # Create async OpenAI client for GPUgeek API
 _async_client = AsyncOpenAI(
     api_key=_gpugeek_api_key,
-    base_url=DEFAULT_GPUGEEK_BASE,
+    base_url=_gpugeek_api_base,
     http_client=httpx.AsyncClient(
         limits=httpx.Limits(
             max_connections=100,

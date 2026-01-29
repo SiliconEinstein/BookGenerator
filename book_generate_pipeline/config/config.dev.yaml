@@ -4,30 +4,30 @@ llm:
   providers:
     gemini:
       model: "litellm_proxy/gemini-3-pro-preview"
-      base_url: "http://8.219.58.57:4000"
+      base_url: "${LITELLM_PROXY_API_BASE}"
       api_key: "${LITELLM_API_KEY}"
     gpt5:
       model: "Vendor2/GPT-5.2"
-      base_url: "https://api.gpugeek.com/v1"
+      base_url: "${GPUGEEK_API_BASE}"
       api_key: "${GPUGEEK_API_KEY}"
     deepseek:
       model: "DeepSeek/DeepSeek-V3-0324"
-      base_url: "https://api.gpugeek.com/v1"
+      base_url: "${GPUGEEK_API_BASE}"
       api_key: "${GPUGEEK_API_KEY}"
     qwen:
       model: "GpuGeek/Qwen3-VL-30B-A3B-Thinking"
-      base_url: "https://api.gpugeek.com/v1"
+      base_url: "${GPUGEEK_API_BASE}"
       api_key: "${GPUGEEK_API_KEY}"
     doubao:
       model: "Volcengine/Doubao-Seed-1.6"
-      base_url: "https://api.gpugeek.com/v1"
+      base_url: "${GPUGEEK_API_BASE}"
       api_key: "${GPUGEEK_API_KEY}"
 
 mcp:
-  url: "http://rceb1397946.bohrium.tech:50001/sse"
+  url: "${MCP_URL}"
 
 wiki:
-  search_api_base: "https://literature-sage.test.bohrium.com"
+  search_api_base: "${WIKI_SEARCH_API_BASE}"
 
 output:
   base_dir: "output/books"
@@ -36,6 +36,15 @@ output:
 prompts:
   base_dir_ch: "prompts"      # 中文场景下默认prompt保存路径
   base_dir_en: "prompts_en"    # 英文场景下prompt保存路径
+  names:
+    abstract: "prompt_abstract"
+    chapter: "prompt_chapter"
+    battle: "prompt_chapter_refine"
+    eval_chapter: "prompt_chapter_eval"
+    book: "prompt_book_withqa"
+    book_step2: "prompt_book_withqa_step2"
+    book_step3: "prompt_book_step3"
+    select_project_qa: "prompt_select_project_qa"
 
 concurrency:
   abstract_semaphore: 20
