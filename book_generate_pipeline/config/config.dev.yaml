@@ -41,8 +41,8 @@ prompts:
     chapter: "prompt_chapter"
     battle: "prompt_chapter_refine"
     eval_chapter: "prompt_chapter_eval"
-    book: "prompt_book_withqa"
-    book_step2: "prompt_book_withqa_step2"
+    book: "prompt_book"
+    book_step2: "prompt_book_step2"
     book_step3: "prompt_book_step3"
     select_project_qa: "prompt_select_project_qa"
 

@@ -137,6 +137,11 @@ class Config:
         return Path(self._config_cache.get('output', {}).get('base_dir', 'output/books'))
 
     @property
+    def output_temp_dir(self) -> Path:
+        """Get temp output directory."""
+        return Path(self._config_cache.get('output', {}).get('temp_dir', 'output/temp'))
+
+    @property
     def prompts_base_dir(self) -> Path:
         """Get prompts base directory based on language setting."""
         prompts_config = self._config_cache.get('prompts', {})

@@ -79,6 +79,7 @@ async def gpt_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str
         model="Vendor2/GPT-5.2",
         messages=messages,
         temperature=temperature,
+        max_completion_tokens=128000,
         **kwargs
     )
     return response.choices[0].message.content

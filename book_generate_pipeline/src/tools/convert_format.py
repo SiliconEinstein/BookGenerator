@@ -63,6 +63,22 @@ async def _html_to_pdf(page, html_path: str, pdf_path: str):
         # Extra wait for rendering stability
         await page.wait_for_timeout(500)
 
+        # Hide MathJax processing overlays/messages before PDF
+        await page.evaluate(
+            """
+            () => {
+                const ids = ['MathJax_Message'];
+                ids.forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.style.display = 'none';
+                });
+                document.querySelectorAll('.MathJax_Message,.MathJax-Processing,.MathJax-Loading').forEach(el => {
+                    el.style.display = 'none';
+                });
+            }
+            """
+        )
+
         await page.pdf(
             path=pdf_path,
             format="A4",
@@ -115,9 +131,9 @@ async def html_to_pdf(html_files_dir: str, pdf_output_dir: str):
 
 async def main():
     """Example usage for single file full pipeline."""
-    md_file = r"F:/SciencePedia/topic_book_generation/workspace/output/books/ch/Ising模型/md/第1章_统计物理基础.md"
-    html_file = r"F:/SciencePedia/topic_book_generation/workspace/output/books/ch/Ising模型/html/第1章_统计物理基础.html"
-    pdf_file = r"F:/SciencePedia/topic_book_generation/workspace/output/books/ch/Ising模型/pdf/第1章_统计物理基础.pdf"
+    md_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md\第11章_聚变堆工程约束与系统一致性收敛.md"
+    html_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md\第11章_聚变堆工程约束与系统一致性收敛.html"
+    pdf_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\pdf\第11章_聚变堆工程约束与系统一致性收敛.pdf"
 
     os.makedirs(os.path.dirname(html_file), exist_ok=True)
     os.makedirs(os.path.dirname(pdf_file), exist_ok=True)

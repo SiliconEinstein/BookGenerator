@@ -4,50 +4,17 @@ import os
 import re
 import json
 import asyncio
+from pathlib import Path
 from dataclasses import dataclass
 from typing import Dict, Any, Optional, List
 
 from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
 from src.core.chapter_generator import ChapterGenerator
 from src.core.book_generator import BookGenerator
-from src.core.chapter_types import ChapterInfo, SubChapterInfo
+from src.core.chapter_types import ChapterInfo, SubChapterInfo, BookGenerationContext
 from src.tools import md_to_html, html_to_pdf
+from src.tools import draw_images_for_markdown
 from src.utils import sanitize_filename
-
-
-@dataclass
-class BookGenerationContext:
-    """Context for book generation process."""
-    course_name: str
-    structure_summary: Dict[str, ChapterInfo]
-    structure_summary_raw: Dict[str, Any]
-    filename_map: Dict[str, Any]
-    sorted_chapters: List[str]
-
-    chapter_abstracts_map: Optional[Dict[str, Dict[str, str]]] = None
-    chapter_wiki_contents_map: Optional[Dict[str, Dict[str, str]]] = None
-    subchapter_file_paths_map: Optional[Dict[str, Dict[str, str]]] = None
-    chapter_ids: Optional[List[int]] = None
-    subchapter_ids: Optional[List[str]] = None
-    output_dir: str = ""
-
-    def get_chapter_dir(self, chapter_key: str) -> str:
-        return self.filename_map["chapters"][chapter_key]
-
-    def get_subchapter_filename(self, sub_code: str) -> str:
-        safe_title = self.filename_map["subchapters"][sub_code]
-        return f"Section_{sub_code.replace('.', '_')}_{safe_title}.md"
-
-    def should_process_chapter(self, chapter_key: str) -> bool:
-        if not self.chapter_ids:
-            return True
-        chapter_id = int(chapter_key.replace("chapter", "").strip())
-        return chapter_id in self.chapter_ids
-
-    def should_process_subchapter(self, sub_code: str) -> bool:
-        if not self.subchapter_ids:
-            return True
-        return sub_code in self.subchapter_ids
 
 
 
@@ -85,7 +52,7 @@ class TopicBookGenerator:
                     topics=sub_info.topics,
                     course_name=ctx.course_name,
                     sub_code=sub_code,
-                    structure_summary=ctx.structure_summary_raw
+                    book_structure=ctx.book_structure_raw
                 )
                 return chap_key, sub_code, result['abstract'], result['wiki_content']
             except Exception as e:
@@ -107,18 +74,15 @@ class TopicBookGenerator:
             output_path = os.path.join(ctx.output_dir, chapter_dir, "step1", filename)
 
             if os.path.exists(output_path):
-                print(f"  [Skip] File already exists: {output_path}")
+                print(f"  [Skip step2] File already exists: {output_path}")
                 return output_path
 
             try:
                 article_content = await self.book_generator.generate_content(
-                    sub_title=sub_title,
-                    topics=sub_info.topics,
-                    course_name=ctx.course_name,
+                    ctx=ctx,
+                    sub_info=sub_info,
                     sub_code=sub_code,
-                    structure_summary=ctx.structure_summary_raw,
-                    chapter_abstracts=ctx.chapter_abstracts_map.get(chapter_key, {}),
-                    wiki_content=ctx.chapter_wiki_contents_map.get(chapter_key, {}).get(sub_code),
+                    chapter_key=chapter_key
                 )
 
                 os.makedirs(os.path.dirname(output_path), exist_ok=True)
@@ -144,6 +108,12 @@ class TopicBookGenerator:
             print(f"\nProcessing Chapter {chapter_key} for project integration: {chapter_title}...")
 
             try:
+                full_chapter_path = os.path.join(ctx.output_dir, "md", f"{chapter_dir}.md")
+                
+                if os.path.exists(full_chapter_path):
+                    print(f"  [Skip step3] Chapter already exists: {full_chapter_path}")
+                    return
+
                 subchapter_file_paths = {}
                 for sub_code in chapter_info.sub_chapters.keys():
                     if ctx.should_process_subchapter(sub_code):
@@ -152,16 +122,12 @@ class TopicBookGenerator:
                         subchapter_file_paths[sub_code] = path
 
                 articles_content, chapter_content, log_text = await self.book_generator.insert_project(
-                    course_name=ctx.course_name,
-                    chapter_title=chapter_title,
-                    chapter_structure=ctx.structure_summary_raw,
-                    sub_chapters=chapter_info.sub_chapters,
+                    ctx=ctx,
+                    chapter_info=chapter_info,
+                    chapter_key=chapter_key,
                     subchapter_file_paths=subchapter_file_paths,
-                    output_dir=ctx.output_dir,
-                    chapter_dir=chapter_dir
                 )
-
-                full_chapter_path = os.path.join(ctx.output_dir, "md", f"{chapter_dir}.md")
+                
                 os.makedirs(os.path.dirname(full_chapter_path), exist_ok=True)
                 with open(full_chapter_path, "w", encoding="utf-8") as f:
                     f.write(chapter_content)
@@ -223,22 +189,43 @@ class TopicBookGenerator:
         abstract_path = os.path.join(abstract_base_dir, f"{chapter_key}.md")
 
         if os.path.exists(abstract_path):
-            print(f"  [Skip Abstracts] Already exists: {abstract_path}")
+            print(f"  [Skip step1] Abstracts already exists: {abstract_path}")
             with open(abstract_path, "r", encoding="utf-8") as f:
                 content = f.read()
             abstracts = {}
             wiki_contents = {}
-            parts = content.split("### 子章节 ")
-            for part in parts[1:]:
-                if ":" in part:
-                    header, rest = part.split("：", 1) if "：" in part else part.split(":", 1)
-                    sub_code = header.strip().split()[0]
-                    # 解析 abstract 标签
-                    abstract_match = re.search(r'<abstract>(.*?)</abstract>', rest, re.DOTALL)
-                    # 解析 wiki_content 标签
-                    wiki_match = re.search(rf'<wiki_content{sub_code}>(.*?)</wiki_content{sub_code}>', rest, re.DOTALL)
-                    abstracts[sub_code] = abstract_match.group(1).strip() if abstract_match else rest.strip()
-                    wiki_contents[sub_code] = wiki_match.group(1).strip() if wiki_match else ""
+
+            abstract_block = None
+            abstract_match = re.search(r"<abstract>(.*?)</abstract>", content, re.DOTALL)
+            if abstract_match:
+                abstract_block = abstract_match.group(1).strip()
+
+            if abstract_block:
+                parts = re.split(r"###\s*子章节\s+", abstract_block)
+                for part in parts[1:]:
+                    lines = part.strip().splitlines()
+                    if not lines:
+                        continue
+                    header_line = lines[0]
+                    if "：" in header_line:
+                        sub_code = header_line.split("：", 1)[0].strip()
+                    elif ":" in header_line:
+                        sub_code = header_line.split(":", 1)[0].strip()
+                    else:
+                        continue
+                    abstracts[sub_code] = "\n".join(lines[1:]).strip()
+            else:
+                parts = content.split("### 子章节 ")
+                for part in parts[1:]:
+                    if ":" in part:
+                        header, rest = part.split("：", 1) if "：" in part else part.split(":", 1)
+                        sub_code = header.strip().split()[0]
+                        abstracts[sub_code] = rest.strip()
+
+            for match in re.finditer(
+                r"<wiki_content([0-9.]+)>(.*?)</wiki_content\1>", content, re.DOTALL
+            ):
+                wiki_contents[match.group(1)] = match.group(2).strip()
             return abstracts, wiki_contents
 
         print(f"  [Generating Abstracts for {chapter_key}]")
@@ -274,7 +261,8 @@ class TopicBookGenerator:
         chapter_path: str,
         output_dir: str,
         chapter_ids: Optional[List[int]] = None,
-        subchapter_ids: Optional[List[str]] = None
+        subchapter_ids: Optional[List[str]] = None,
+        prompt_config: Optional[Dict[str, str]] = None,
     ):
         """Generate full book content from chapter outline."""
         os.makedirs(output_dir, exist_ok=True)
@@ -288,20 +276,21 @@ class TopicBookGenerator:
         syllabus_dict = self.parse_syllabus_to_dict(syllabus)
 
         course_name = syllabus_dict.get("course_name", "Unknown Course")
-        structure_summary_raw = syllabus_dict["structure_summary"]
-        structure_summary = self._convert_structure_summary(structure_summary_raw)
+        book_structure_raw = syllabus_dict["book_structure"]
+        book_structure = self._convert_book_structure(book_structure_raw)
         filename_map = syllabus_dict["filename_map"]
         sorted_chapters = sorted(
-            structure_summary.keys(),
+            book_structure.keys(),
             key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0
         )
 
         ctx = BookGenerationContext(
             course_name=course_name,
-            structure_summary=structure_summary,
-            structure_summary_raw=structure_summary_raw,
+            book_structure=book_structure,
+            book_structure_raw=book_structure_raw,
             filename_map=filename_map,
             sorted_chapters=sorted_chapters,
+            prompt_config=prompt_config,
             chapter_ids=chapter_ids,
             subchapter_ids=subchapter_ids,
             output_dir=output_dir
@@ -315,7 +304,7 @@ class TopicBookGenerator:
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
                 continue
-            chapter_info = ctx.structure_summary[key]
+            chapter_info = ctx.book_structure[key]
             abstracts, wiki_contents = await self.generate_abstracts(ctx, key, chapter_info)
             chapter_abstracts_map[key] = abstracts
             chapter_wiki_contents_map[key] = wiki_contents
@@ -329,7 +318,7 @@ class TopicBookGenerator:
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
                 continue
-            chapter_info = ctx.structure_summary[key]
+            chapter_info = ctx.book_structure[key]
             for sub_code, sub_info in chapter_info.sub_chapters.items():
                 if not ctx.should_process_subchapter(sub_code):
                     continue
@@ -344,7 +333,7 @@ class TopicBookGenerator:
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
                 continue
-            chapter_info = ctx.structure_summary[key]
+            chapter_info = ctx.book_structure[key]
             ctx.subchapter_file_paths_map[key] = {}
             for sub_code in chapter_info.sub_chapters.keys():
                 if not ctx.should_process_subchapter(sub_code):
@@ -360,13 +349,37 @@ class TopicBookGenerator:
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
                 continue
-            chapter_info = ctx.structure_summary[key]
+            chapter_info = ctx.book_structure[key]
             chapter_tasks.append(
                 self._process_chapter_with_semaphore(ctx, key, chapter_info)
             )
         await asyncio.gather(*chapter_tasks)
-
+        print("[Phase 3 Done]")
+        
+        # print("\n[Phase 4] Adding images to chapter content...")
         md_files_dir = os.path.join(ctx.output_dir, "md")
+        new_md_files_dir = os.path.join(ctx.output_dir, "md_with_images")
+        images_base_dir = ctx.output_dir.replace("books", "images")
+        image_tasks = []
+        for key in ctx.sorted_chapters:
+            if not ctx.should_process_chapter(key):
+                continue
+            chapter_dir = ctx.get_chapter_dir(key)
+            md_path = os.path.join(md_files_dir, f"{chapter_dir}.md")
+            image_output_dir = os.path.join(images_base_dir, chapter_dir)
+            new_md_path = os.path.join(new_md_files_dir, f"{chapter_dir}.md")
+            image_tasks.append(
+                draw_images_for_markdown(
+                    md_path=md_path,
+                    image_output_dir=image_output_dir,
+                    new_md_path=new_md_path,
+                )
+            )
+        if image_tasks:
+            await asyncio.gather(*image_tasks)
+        print("[Phase 4 Done]")
+        
+        md_files_dir = new_md_files_dir if os.path.isdir(new_md_files_dir) else md_files_dir
         html_files_dir = os.path.join(ctx.output_dir, "html")
         pdf_files_dir = os.path.join(ctx.output_dir, "pdf")
         os.makedirs(html_files_dir, exist_ok=True)
@@ -380,7 +393,7 @@ class TopicBookGenerator:
         """Parse syllabus text into structured dictionary."""
         result = {
             "course_name": "",
-            "structure_summary": {},
+            "book_structure": {},
             "filename_map": {
                 "chapters": {},
                 "subchapters": {}
@@ -406,7 +419,7 @@ class TopicBookGenerator:
                     chapter_num = match.group(1)
                     chapter_key = f"chapter{chapter_num}"
 
-                    result["structure_summary"][chapter_key] = {
+                    result["book_structure"][chapter_key] = {
                         "title": full_chapter_title,
                         "sub_chapters": {}
                     }
@@ -427,7 +440,7 @@ class TopicBookGenerator:
                     sub_code = parts[0].strip()
                     sub_title = parts[1].strip()
 
-                    result["structure_summary"][current_chapter_key]["sub_chapters"][sub_code] = {
+                    result["book_structure"][current_chapter_key]["sub_chapters"][sub_code] = {
                         "subchapter_title": sub_title,
                         "topics": []
                     }
@@ -440,15 +453,15 @@ class TopicBookGenerator:
             elif line.startswith('- '):
                 if current_chapter_key and current_subchapter_key:
                     topic_text = line.replace('- ', '').strip()
-                    result["structure_summary"][current_chapter_key]["sub_chapters"][current_subchapter_key]["topics"].append(topic_text)
+                    result["book_structure"][current_chapter_key]["sub_chapters"][current_subchapter_key]["topics"].append(topic_text)
 
         return result
 
-    def _convert_structure_summary(self, structure_summary: Dict[str, Any]) -> Dict[str, ChapterInfo]:
-        """Convert raw structure summary dict to ChapterInfo objects."""
+    def _convert_book_structure(self, book_structure: Dict[str, Any]) -> Dict[str, ChapterInfo]:
+        """Convert raw book structure dict to ChapterInfo objects."""
         return {
             chapter_key: ChapterInfo.from_dict(chapter_data)
-            for chapter_key, chapter_data in structure_summary.items()
+            for chapter_key, chapter_data in book_structure.items()
         }
 
 

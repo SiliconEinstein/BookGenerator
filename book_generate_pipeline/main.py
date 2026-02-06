@@ -24,7 +24,8 @@ async def main():
 
     # Book info: [education_level, course_name, number_of_topics, wiki_field_ids]
     if language == "ch":
-        book_info = ["研究生", "可控核聚变", "50", "860559", "1545472"]
+        # book_info = ["研究生", "可控核聚变", "50", "860559", "1545472"]
+        book_info = ["本科生", "离散数学", "50"]
     else:
         book_info = ["Master", "Controlled Nuclear Fusion", "50", "860559", "1545472"]
 
@@ -45,11 +46,18 @@ async def main():
     print("\n" + "=" * 50)
     print("Phase 2: Generating book content...")
     print("=" * 50)
+    prompt_config = {
+        "course_type": "理论主导", # 理论主导，工程实践导向，理实融合，跨学科交叉
+        "formal_density": "高", # 高，中，低
+        "case_strategy": "本学科经典案例", # 本学科经典案例，多场景应用示例，历史演进案例
+        "reader_level": "本科入门", # 本科入门，本科高阶，研究生，专业进阶
+        "style_tendency": "严谨推演型", # 严谨推演型，叙事引导型，问题驱动型
+    }   
     await agent.generate_book(
         chapter_save_path,
         book_save_dir,
-        # Optional: specify which chapters/subchapters to process
-        chapter_ids=[5,6],  # Only process chapters 1, 2, 3
+        chapter_ids=[1],  # Only process chapters 1, 2, 3, 4, 5, 6
+        prompt_config=prompt_config,
     )
 
     print("\n" + "=" * 50)

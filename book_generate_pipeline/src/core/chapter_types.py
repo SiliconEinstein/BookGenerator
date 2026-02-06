@@ -1,7 +1,8 @@
 """Typed structures for chapter data."""
 
 from dataclasses import dataclass
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
+
 
 
 @dataclass
@@ -47,3 +48,39 @@ class ChapterInfo:
             "title": self.title,
             "sub_chapters": {code: info.to_dict() for code, info in self.sub_chapters.items()},
         }
+
+
+@dataclass
+class BookGenerationContext:
+    """Context for book generation process."""
+    course_name: str
+    book_structure: Dict[str, ChapterInfo]
+    book_structure_raw: Dict[str, Any]
+    filename_map: Dict[str, Any]
+    sorted_chapters: List[str]
+    prompt_config: Optional[Dict[str, str]] = None
+    
+    chapter_abstracts_map: Optional[Dict[str, Dict[str, str]]] = None
+    chapter_wiki_contents_map: Optional[Dict[str, Dict[str, str]]] = None
+    subchapter_file_paths_map: Optional[Dict[str, Dict[str, str]]] = None
+    chapter_ids: Optional[List[int]] = None
+    subchapter_ids: Optional[List[str]] = None
+    output_dir: str = ""
+
+    def get_chapter_dir(self, chapter_key: str) -> str:
+        return self.filename_map["chapters"][chapter_key]
+
+    def get_subchapter_filename(self, sub_code: str) -> str:
+        safe_title = self.filename_map["subchapters"][sub_code]
+        return f"Section_{sub_code.replace('.', '_')}_{safe_title}.md"
+
+    def should_process_chapter(self, chapter_key: str) -> bool:
+        if not self.chapter_ids:
+            return True
+        chapter_id = int(chapter_key.replace("chapter", "").strip())
+        return chapter_id in self.chapter_ids
+
+    def should_process_subchapter(self, sub_code: str) -> bool:
+        if not self.subchapter_ids:
+            return True
+        return sub_code in self.subchapter_ids

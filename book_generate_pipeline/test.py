@@ -181,7 +181,24 @@ async def run_all_tests():
     print("=" * 60)
 
 
+
+import asyncio
+from fastmcp import Client
+
+async def test_mcp_tool():
+    mcp_url = "http://rceb1397946.bohrium.tech:50001/mcp"
+    async with Client(mcp_url) as client:
+        result = await client.call_tool(
+            "generate_article",
+            arguments={
+                'topic': "path integral molecular dynamics",
+                "language": "en",
+            },
+            # async_mode=True,
+        )
+        print("result: ", result)
+
 if __name__ == "__main__":
-    # Run all tests
-    asyncio.run(run_all_tests())
+    asyncio.run(test_mcp_tool())
+
 
