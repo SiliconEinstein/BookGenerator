@@ -183,18 +183,18 @@ async def run_all_tests():
 
 
 import asyncio
-from fastmcp import Client
+from dp.agent.client import MCPClient
 
 async def test_mcp_tool():
     mcp_url = "http://rceb1397946.bohrium.tech:50001/mcp"
-    async with Client(mcp_url) as client:
+    async with MCPClient(mcp_url) as client:
         result = await client.call_tool(
             "generate_article",
             arguments={
                 'topic': "path integral molecular dynamics",
                 "language": "en",
             },
-            # async_mode=True,
+            async_mode=True,
         )
         print("result: ", result)
 

@@ -35,7 +35,7 @@ class TopicBookGenerator:
 
         self.abstract_semaphore = asyncio.Semaphore(20)
         self.subchapter_semaphore = asyncio.Semaphore(20)
-        self.chapter_semaphore = asyncio.Semaphore(12)
+        self.chapter_semaphore = asyncio.Semaphore(7)
 
     async def _generate_single_abstract(
         self,
@@ -283,7 +283,6 @@ class TopicBookGenerator:
             book_structure.keys(),
             key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0
         )
-
         ctx = BookGenerationContext(
             course_name=course_name,
             book_structure=book_structure,
@@ -356,7 +355,7 @@ class TopicBookGenerator:
         await asyncio.gather(*chapter_tasks)
         print("[Phase 3 Done]")
         
-        # print("\n[Phase 4] Adding images to chapter content...")
+        print("\n[Phase 4] Adding images to chapter content...")
         md_files_dir = os.path.join(ctx.output_dir, "md")
         new_md_files_dir = os.path.join(ctx.output_dir, "md_with_images")
         images_base_dir = ctx.output_dir.replace("books", "images")

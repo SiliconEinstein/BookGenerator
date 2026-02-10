@@ -48,7 +48,7 @@ async def main():
     print("=" * 50)
     prompt_config = {
         "course_type": "理论主导", # 理论主导，工程实践导向，理实融合，跨学科交叉
-        "formal_density": "高", # 高，中，低
+        "formal_density": "高", # 高，中，低 （是否要严谨的公式推导）
         "case_strategy": "本学科经典案例", # 本学科经典案例，多场景应用示例，历史演进案例
         "reader_level": "本科入门", # 本科入门，本科高阶，研究生，专业进阶
         "style_tendency": "严谨推演型", # 严谨推演型，叙事引导型，问题驱动型
@@ -56,7 +56,7 @@ async def main():
     await agent.generate_book(
         chapter_save_path,
         book_save_dir,
-        chapter_ids=[1],  # Only process chapters 1, 2, 3, 4, 5, 6
+        # chapter_ids=[1],  # Only process chapters 1, 2, 3, 4, 5, 6
         prompt_config=prompt_config,
     )
 

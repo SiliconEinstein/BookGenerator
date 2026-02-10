@@ -22,6 +22,51 @@ from .pipelines.draw_by_markdown import (
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+def _fix_json_invalid_escapes(s: str) -> str:
+    """修复 LLM 返回的 JSON 中非法反斜杠转义（如 C:\\Users、LaTeX \\in），使 json.loads 能通过。"""
+    result = []
+    i = 0
+    while i < len(s):
+        if s[i] == "\\" and i + 1 < len(s):
+            n = s[i + 1]
+            if n in '"\\/bfnrt':
+                result.append(s[i : i + 2])
+                i += 2
+            elif n == "u" and i + 5 <= len(s) and all(
+                c in "0123456789abcdefABCDEF" for c in s[i + 2 : i + 6]
+            ):
+                result.append(s[i : i + 6])
+                i += 6
+            else:
+                result.append("\\\\")
+                result.append(s[i + 1])
+                i += 2
+        else:
+            result.append(s[i])
+            i += 1
+    return "".join(result)
+
+
+def _try_parse_json(s: str):
+    """解析 JSON，失败时尝试修复常见 LLM 错误（尾随逗号、缺失逗号等）再解析。"""
+    try:
+        return json.loads(s)
+    except json.JSONDecodeError:
+        pass
+    repaired = s
+    # 修复尾随逗号：,] -> ]，,} -> }
+    repaired = re.sub(r",\s*]", "]", repaired)
+    repaired = re.sub(r",\s*}", "}", repaired)
+    # 修复缺失逗号：} 后紧跟 " 或 { 时补逗号（常见于对象成员之间）
+    repaired = re.sub(r"}\s*(\")", r"}, \1", repaired)
+    repaired = re.sub(r"}\s*(\{)", r"}, \1", repaired)
+    try:
+        return json.loads(repaired)
+    except json.JSONDecodeError:
+        raise
+
+
 os.environ["LITELLM_PROXY_API_BASE"] = "http://8.219.58.57:4000"
 os.environ["LITELLM_PROXY_API_KEY"] = "sk-WNrS8wC5RXbYvAx6KKdyEw"
 
@@ -62,7 +107,8 @@ class DrawImageAgent:
             if response.get("choices") and len(response["choices"]) > 0:
                 content = response["choices"][0]["message"]["content"]
                 content = self.parse_result(content)
-                parsed = json.loads(content)
+                content = _fix_json_invalid_escapes(content)
+                parsed = _try_parse_json(content)
                 if isinstance(parsed, list):
                     return parsed
                 logger.error("LLM response is not a list.")

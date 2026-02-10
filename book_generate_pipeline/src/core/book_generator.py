@@ -7,6 +7,7 @@ import asyncio
 import aiohttp
 import importlib.util
 from fastmcp import Client
+from dp.agent.client import MCPClient
 from typing import Dict, Any, Optional, List, Union
 from src.models import gemini_completion, gpt_completion
 from src.utils import get_config, sanitize_filename
@@ -23,6 +24,18 @@ class BookGenerator:
         self.mcp_url = self.config.mcp_url
         self.wiki_search_api_base = self.config.wiki_search_api_base
         self._prompt_book_module = None
+
+    def _load_prompt_step2_module(self):
+        """加载 prompt_book_step2.py 模块以根据 course_type 获取对应 step2 提示词。"""
+        prompt_path = self.config.get_prompt_path("prompt_book_step2.py")
+        if not os.path.exists(prompt_path):
+            raise FileNotFoundError(f"prompt_book_step2.py not found: {prompt_path}")
+        spec = importlib.util.spec_from_file_location("prompt_book_step2", str(prompt_path))
+        if spec is None or spec.loader is None:
+            raise ImportError(f"Failed to load module: {prompt_path}")
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module
 
     def _load_prompt_book_module(self):
         if self._prompt_book_module is not None:
@@ -175,9 +188,17 @@ class BookGenerator:
 
         chapter_content = "\n\n".join(chapter_content_parts)
 
-        prompt_name = self.config.get_prompt_name("book_step2", "prompt_book_step2")
-        prompt_path = self.config.get_prompt_path(prompt_name)
-        prompt = self._read_file_safe(prompt_path)
+        # 根据课程类型选择 step2 提示词：理论主导 → 章节末练习题；其余 → 实战项目（prompt_book_step2）
+        course_type = None
+        if ctx.prompt_config:
+            course_type = ctx.prompt_config.get("course_type")
+        if course_type is not None:
+            step2_module = self._load_prompt_step2_module()
+            prompt = step2_module.get_step2_prompt(course_type, self.config.prompts_base_dir)
+        else:
+            prompt_name = self.config.get_prompt_name("book_step2", "prompt_book_step2")
+            prompt_path = self.config.get_prompt_path(prompt_name)
+            prompt = self._read_file_safe(prompt_path)
         prompt = prompt.format(
             course_name=ctx.course_name,
             chapter_title=chapter_title,
@@ -186,25 +207,41 @@ class BookGenerator:
             project_qas=project_qa_text
         )
         new_chapter_content = await gemini_completion(prompt)
-        # Check for syntax, format errors, and hallucinations
+        # 第一步结果按节切分，再对每节分别纠错，避免整章合并纠错时内容过长
+        first_line = ""
+        if new_chapter_content and new_chapter_content.strip():
+            first_line = new_chapter_content.strip().split("\n")[0]
+        articles_after_step1 = self._decompose_chapter_content(new_chapter_content)
+        if not articles_after_step1:
+            articles_content = {}
+            return articles_content, new_chapter_content, ""
+
+        print(f"Start checking {chapter_title}")
         prompt_check_name = self.config.get_prompt_name("book_step3", "prompt_book_step3")
         prompt_check_path = self.config.get_prompt_path(prompt_check_name)
-        prompt_check = self._read_file_safe(prompt_check_path)
-        prompt_check = prompt_check.format(
-            course_name=ctx.course_name,
-            chapter_title=chapter_title,
-            chapter_structure=chapter_structure,
-            chapter_content=new_chapter_content,
-            project_qas=project_qa_text
-        )
-        print(f"Starting {chapter_title} chapter content check...")
-        check_result = await gpt_completion(prompt_check)
-        log_match = re.search(r'<log>\s*(.*?)\s*</log>', check_result, re.DOTALL | re.IGNORECASE)
-        content_match = re.search(r'<content>\s*(.*?)\s*</content>', check_result, re.DOTALL | re.IGNORECASE)
-        log_text = log_match.group(1).strip() if log_match else ""
-        checked_chapter_content = content_match.group(1).strip() if content_match else ""
-        print(f"{chapter_title}：Old chapter length {len(chapter_content)}. New chapter length {len(new_chapter_content)}. Checked chapter length: {len(checked_chapter_content)}")
-
+        prompt_check_template = self._read_file_safe(prompt_check_path)
+        section_titles = list(articles_after_step1.keys())
+        checked_sections = []
+        log_parts = []
+        for i, (section_title, section_content) in enumerate[tuple[str, str]](articles_after_step1.items(), 1):
+            print(f"  [{chapter_title}] 纠错 {i}/{len(section_titles)}: {section_title[:40]}...")
+            prompt_check = prompt_check_template.format(
+                course_name=ctx.course_name,
+                chapter_title=chapter_title,
+                chapter_structure=chapter_structure,
+                chapter_content=section_content,
+                project_qas=project_qa_text
+            )
+            check_result = await gpt_completion(prompt_check)
+            log_match = re.search(r'<log>\s*(.*?)\s*</log>', check_result, re.DOTALL | re.IGNORECASE)
+            content_match = re.search(r'<content>\s*(.*?)\s*</content>', check_result, re.DOTALL | re.IGNORECASE)
+            log_parts.append(log_match.group(1).strip() if log_match else "")
+            checked_sections.append(content_match.group(1).strip() if content_match else section_content)
+        log_text = "\n\n".join(p for p in log_parts if p)
+        checked_chapter_content = ("\n\n".join(checked_sections))
+        if first_line:
+            checked_chapter_content = first_line + "\n\n" + checked_chapter_content
+        print(f"{chapter_title}：Step1 长度 {len(new_chapter_content)}，纠错后全长 {len(checked_chapter_content)}")
         articles_content = self._decompose_chapter_content(checked_chapter_content)
         return articles_content, checked_chapter_content, log_text
 
@@ -452,15 +489,14 @@ class BookGenerator:
                                              language: str = "Chinese", mode: str = "advanced") -> Optional[str]:
         """Call MCP tool to generate article."""
         try:
-            async with Client(self.mcp_url) as client:
-                print(f"  [API] Requesting generation for: {topic}...")
+            async with MCPClient(self.mcp_url) as client:
                 result = await client.call_tool("generate_article", {
                         "topic": topic,
                         "language": language,
                         "style_guide": style_guide,
                         "mode": mode,
                     },
-                    async_mode=True                                
+                    async_mode=True
                 )
                 try:
                     content_data = json.loads(result.content[0].text)

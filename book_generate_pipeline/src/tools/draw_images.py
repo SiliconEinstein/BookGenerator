@@ -1,6 +1,7 @@
 """High-level helpers for drawing images into markdown files."""
 
 import os
+import re
 from pathlib import Path
 from typing import Dict, List, Optional
 
@@ -57,10 +58,9 @@ async def draw_images_for_markdown(
             continue
         image_name = f"image_{index}.png"
         rel_path = os.path.relpath(image_path, new_md_dir).replace("\\", "/")
-        tagged_content = tagged_content.replace(
-            f"![{image_name}]({image_name})",
-            f"![{image_name}]({rel_path})",
-        )
+        pattern = re.escape(f"![{image_name}](") + r"[^)]*\)"
+        replacement = f"![{image_name}]({rel_path})"
+        tagged_content = re.sub(pattern, replacement, tagged_content, count=1)
 
     Path(new_md_path).write_text(tagged_content, encoding="utf-8")
     return items

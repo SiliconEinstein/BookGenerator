@@ -33,14 +33,24 @@ async def md_to_html(md_files_dir: str, html_output_dir: str):
     await asyncio.gather(*tasks)
 
 
+def _file_path_to_url(html_path: str) -> str:
+    """Build file:// URL for Playwright. Use forward slashes and file:/// (three slashes) for Windows."""
+    abs_path = os.path.abspath(html_path)
+    url_path = abs_path.replace("\\", "/")
+    if not url_path.startswith("/") and len(url_path) >= 2 and url_path[1] == ":":
+        url_path = "/" + url_path
+    return "file://" + url_path
+
+
 async def _html_to_pdf(page, html_path: str, pdf_path: str):
     """Internal function to convert HTML to PDF."""
     if not os.path.exists(html_path):
         raise FileNotFoundError(f"HTML file not found: {html_path}")
 
-    url = f"file://{os.path.abspath(html_path)}"
+    url = _file_path_to_url(html_path)
     try:
-        await page.goto(url, wait_until="domcontentloaded", timeout=30000)
+        # 超时常见原因：1) file:// 下中文路径在部分环境加载慢/失败 2) 页面大、MathJax 等外链脚本加载慢
+        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
 
         # Wait for MathJax rendering to complete
         await page.wait_for_function(
@@ -57,7 +67,7 @@ async def _html_to_pdf(page, html_path: str, pdf_path: str):
                 return window.MathJax?.Hub?.Queue?.length === 0;
             }
             """,
-            timeout=30000
+            timeout=60000
         )
 
         # Extra wait for rendering stability
@@ -140,7 +150,6 @@ async def main():
 
     await md2html_single_file(md_file, html_file)
     await html2pdf_single_file(html_file, pdf_file)
-
 
 if __name__ == "__main__":
     asyncio.run(main())

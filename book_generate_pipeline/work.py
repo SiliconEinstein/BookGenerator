@@ -6,9 +6,9 @@ from src.tools.convert_format import md_to_html, html_to_pdf, md2html_single_fil
 
 async def main():
     # 单文件全流程示例
-    md_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md_with_images\第1章_工程目标_指标体系与方案闭环边界.md"
-    html_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\html\第1章_工程目标_指标体系与方案闭环边界.html"
-    pdf_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\pdf\第1章_工程目标_指标体系与方案闭环边界.pdf"
+    md_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\离散数学\md_with_images\第9章_容斥原理.md"
+    html_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\离散数学\html\第9章_容斥原理.html"
+    pdf_file = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\离散数学\pdf\第9章_容斥原理.pdf"
 
     # 多文件处理
     md_dir = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md"

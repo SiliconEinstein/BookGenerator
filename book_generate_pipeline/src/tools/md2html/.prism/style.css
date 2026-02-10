@@ -154,7 +154,7 @@ body > *:first-child,
 
 /* DISABLED body.dark-theme .markdown-body h1 {
     color: #FFFFFF !important; /* White in dark theme */
-} */
+/* } */ */
 
 .markdown-body h2 {
     border-bottom: 1px solid rgba(239, 73, 73, 0.5);
@@ -365,11 +365,9 @@ body > *:first-child,
     /* Content area becoming constrained, reduce table padding */
     .markdown-body table th {
         padding: 6px 16px !important;
-        background: red !important;
     }
     .markdown-body table td {
         padding: 5px 16px !important;
-        background: yellow !important;
     }
 }
 
@@ -377,11 +375,9 @@ body > *:first-child,
     /* Approaching 70% threshold for 700px content */
     .markdown-body table th {
         padding: 6px 12px !important;
-        background: blue !important;
     }
     .markdown-body table td {
         padding: 5px 12px !important;
-        background: green !important;
     }
 }
 
@@ -389,11 +385,9 @@ body > *:first-child,
     /* At content width limit, minimal padding */
     .markdown-body table th {
         padding: 6px 8px !important;
-        background: purple !important;
     }
     .markdown-body table td {
         padding: 5px 8px !important;
-        background: orange !important;
     }
 }
 
@@ -430,13 +424,13 @@ body > *:first-child,
     border-bottom: none;
 }
 
-/* Light modern table hover effect */
+/* Light modern table hover effect - soft gray accent */
 .markdown-body table:hover {
-    border-color: #3b82f6;
+    border-color: #cbd5e1;
     box-shadow: 
-        0 10px 25px rgba(0, 0, 0, 0.12),
-        0 0 20px rgba(59, 130, 246, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+        0 10px 25px rgba(0, 0, 0, 0.08),
+        0 0 20px rgba(148, 163, 184, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
     transition: all 0.3s ease;
 }
 
@@ -1484,7 +1478,7 @@ body.dark-theme .wrap-content-collapsible .content-collapsible-content pre::-web
 .callout[data-callout="fail"],
 .callout[data-callout="missing"] {
     border-color: #e74c3c;
-    background-color: #fbeee D;
+    background-color: #fbeeeD;
 }
 
 .callout[data-callout="failure"] .callout-title,
