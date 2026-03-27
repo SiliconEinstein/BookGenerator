@@ -40,7 +40,8 @@ def get_output_path(book_name: str, chapter: str = None, subchapter: str = None,
     Returns:
         Path object pointing to the output location
     """
-    base = Path('output/books') / sanitize_filename(book_name)
+    # New layout: output/<course_name>/...
+    base = Path('output') / sanitize_filename(book_name)
 
     if chapter:
         base = base / 'chapters' / sanitize_filename(chapter)
@@ -54,7 +55,7 @@ def get_output_path(book_name: str, chapter: str = None, subchapter: str = None,
 
 def get_md_output_path(book_name: str, chapter: str = None) -> Path:
     """Get path for markdown output."""
-    base = Path('output/books') / sanitize_filename(book_name) / 'md'
+    base = Path('output') / sanitize_filename(book_name) / 'temp' / 'md'
     if chapter:
         base = base / sanitize_filename(f"{chapter}.md")
     return base
@@ -62,17 +63,17 @@ def get_md_output_path(book_name: str, chapter: str = None) -> Path:
 
 def get_html_output_path(book_name: str) -> Path:
     """Get path for HTML output directory."""
-    return Path('output/books') / sanitize_filename(book_name) / 'html'
+    return Path('output') / sanitize_filename(book_name) / 'book' / 'html'
 
 
 def get_pdf_output_path(book_name: str) -> Path:
     """Get path for PDF output directory."""
-    return Path('output/books') / sanitize_filename(book_name) / 'pdf'
+    return Path('output') / sanitize_filename(book_name) / 'book' / 'pdf'
 
 
 def get_log_output_path(book_name: str, chapter: str) -> Path:
     """Get path for log output."""
-    return Path('output/books') / sanitize_filename(book_name) / 'log' / sanitize_filename(f"{chapter}.md")
+    return Path('output') / sanitize_filename(book_name) / 'temp' / 'log' / sanitize_filename(f"{chapter}.md")
 
 
 def ensure_dir(path: Union[str, Path]) -> Path:

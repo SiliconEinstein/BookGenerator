@@ -3,14 +3,14 @@
 import os
 import re
 import json
+import shutil
 import asyncio
-from pathlib import Path
-from dataclasses import dataclass
 from typing import Dict, Any, Optional, List
 
 from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
 from src.core.chapter_generator import ChapterGenerator
 from src.core.book_generator import BookGenerator
+from src.core.material_pack_generator import MaterialPackGenerator
 from src.core.chapter_types import ChapterInfo, SubChapterInfo, BookGenerationContext
 from src.tools import md_to_html, html_to_pdf
 from src.tools import draw_images_for_markdown
@@ -29,35 +29,13 @@ class TopicBookGenerator:
         self.doubao = doubao_completion
 
         self.chapter_generator = ChapterGenerator(language)
+        self.material_pack_generator = MaterialPackGenerator(language)
         self.book_generator = BookGenerator(language)
         self.language = language
         self.battle_cnt = 0
 
-        self.abstract_semaphore = asyncio.Semaphore(20)
         self.subchapter_semaphore = asyncio.Semaphore(20)
         self.chapter_semaphore = asyncio.Semaphore(7)
-
-    async def _generate_single_abstract(
-        self,
-        ctx: BookGenerationContext,
-        chap_key: str,
-        sub_code: str,
-        sub_info: SubChapterInfo
-    ):
-        """Generate a single subchapter abstract."""
-        async with self.abstract_semaphore:
-            try:
-                result = await self.book_generator.generate_abstract(
-                    sub_title=sub_info.subchapter_title,
-                    topics=sub_info.topics,
-                    course_name=ctx.course_name,
-                    sub_code=sub_code,
-                    book_structure=ctx.book_structure_raw
-                )
-                return chap_key, sub_code, result['abstract'], result['wiki_content']
-            except Exception as e:
-                print(f"  [Warning] Failed to generate abstract for {sub_code}: {e}")
-                return chap_key, sub_code, "[摘要生成失败]", ""
 
     async def _generate_single_subchapter(
         self,
@@ -69,9 +47,8 @@ class TopicBookGenerator:
         """Generate content for a single subchapter."""
         async with self.subchapter_semaphore:
             sub_title = sub_info.subchapter_title
-            chapter_dir = ctx.get_chapter_dir(chapter_key)
             filename = ctx.get_subchapter_filename(sub_code)
-            output_path = os.path.join(ctx.output_dir, chapter_dir, "step1", filename)
+            output_path = os.path.join(ctx.get_chapter_step1_dir(chapter_key), filename)
 
             if os.path.exists(output_path):
                 print(f"  [Skip step2] File already exists: {output_path}")
@@ -108,7 +85,7 @@ class TopicBookGenerator:
             print(f"\nProcessing Chapter {chapter_key} for project integration: {chapter_title}...")
 
             try:
-                full_chapter_path = os.path.join(ctx.output_dir, "md", f"{chapter_dir}.md")
+                full_chapter_path = os.path.join(ctx.temp_md_dir, f"{chapter_dir}.md")
                 
                 if os.path.exists(full_chapter_path):
                     print(f"  [Skip step3] Chapter already exists: {full_chapter_path}")
@@ -118,7 +95,7 @@ class TopicBookGenerator:
                 for sub_code in chapter_info.sub_chapters.keys():
                     if ctx.should_process_subchapter(sub_code):
                         filename = ctx.get_subchapter_filename(sub_code)
-                        path = os.path.join(ctx.output_dir, chapter_dir, "step1", filename)
+                        path = os.path.join(ctx.get_chapter_step1_dir(chapter_key), filename)
                         subchapter_file_paths[sub_code] = path
 
                 articles_content, chapter_content, log_text = await self.book_generator.insert_project(
@@ -132,7 +109,7 @@ class TopicBookGenerator:
                 with open(full_chapter_path, "w", encoding="utf-8") as f:
                     f.write(chapter_content)
 
-                log_path = os.path.join(ctx.output_dir, "log", f"{chapter_dir}.md")
+                log_path = os.path.join(ctx.temp_log_dir, f"{chapter_dir}.md")
                 os.makedirs(os.path.dirname(log_path), exist_ok=True)
                 with open(log_path, "w", encoding="utf-8") as f:
                     f.write(log_text)
@@ -151,7 +128,7 @@ class TopicBookGenerator:
                         safe_title = "summary"
 
                     filename = f"Section_{sub_code.replace('.', '_')}_{safe_title}.md"
-                    output_path = os.path.join(ctx.output_dir, chapter_dir, "step2", filename)
+                    output_path = os.path.join(ctx.get_chapter_step2_dir(chapter_key), filename)
                     os.makedirs(os.path.dirname(output_path), exist_ok=True)
                     with open(output_path, "w", encoding="utf-8") as f:
                         f.write(optimized_content)
@@ -168,93 +145,11 @@ class TopicBookGenerator:
         print("Generating chapter...")
         res = await self.gemini(prompt_chapter)
         res = await self.chapter_generator.battle_syllabus(self.gpt5, self.doubao, res, 0)
+        os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         with open(output_path, 'a', encoding="utf-8") as f:
             f.write("\n\n### 最终版 ###\n\n")
             f.write(res)
         print(f"[Done!] Chapter generated successfully! Saved to {output_path}")
-
-    async def generate_abstracts(
-        self,
-        ctx: BookGenerationContext,
-        chapter_key: str,
-        chapter_info: ChapterInfo
-    ) -> tuple:
-        """Generate abstracts for all subchapters in a chapter.
-        
-        Returns:
-            tuple: (abstracts: Dict[str, str], wiki_contents: Dict[str, str])
-        """
-        # 替换 /books/ 为 /abstract/ 以生成摘要路径
-        abstract_base_dir = ctx.output_dir.replace("/books/", "/abstract/", 1)
-        abstract_path = os.path.join(abstract_base_dir, f"{chapter_key}.md")
-
-        if os.path.exists(abstract_path):
-            print(f"  [Skip step1] Abstracts already exists: {abstract_path}")
-            with open(abstract_path, "r", encoding="utf-8") as f:
-                content = f.read()
-            abstracts = {}
-            wiki_contents = {}
-
-            abstract_block = None
-            abstract_match = re.search(r"<abstract>(.*?)</abstract>", content, re.DOTALL)
-            if abstract_match:
-                abstract_block = abstract_match.group(1).strip()
-
-            if abstract_block:
-                parts = re.split(r"###\s*子章节\s+", abstract_block)
-                for part in parts[1:]:
-                    lines = part.strip().splitlines()
-                    if not lines:
-                        continue
-                    header_line = lines[0]
-                    if "：" in header_line:
-                        sub_code = header_line.split("：", 1)[0].strip()
-                    elif ":" in header_line:
-                        sub_code = header_line.split(":", 1)[0].strip()
-                    else:
-                        continue
-                    abstracts[sub_code] = "\n".join(lines[1:]).strip()
-            else:
-                parts = content.split("### 子章节 ")
-                for part in parts[1:]:
-                    if ":" in part:
-                        header, rest = part.split("：", 1) if "：" in part else part.split(":", 1)
-                        sub_code = header.strip().split()[0]
-                        abstracts[sub_code] = rest.strip()
-
-            for match in re.finditer(
-                r"<wiki_content([0-9.]+)>(.*?)</wiki_content\1>", content, re.DOTALL
-            ):
-                wiki_contents[match.group(1)] = match.group(2).strip()
-            return abstracts, wiki_contents
-
-        print(f"  [Generating Abstracts for {chapter_key}]")
-        subchapter_tasks = []
-        for sub_code, sub_info in chapter_info.sub_chapters.items():
-            if ctx.should_process_subchapter(sub_code):
-                subchapter_tasks.append(
-                    self._generate_single_abstract(ctx, chapter_key, sub_code, sub_info)
-                )
-
-        results = await asyncio.gather(*subchapter_tasks)
-        abstracts = {sub_code: abst for _, sub_code, abst, _ in results}
-        wiki_contents = {sub_code: wiki for _, sub_code, _, wiki in results}
-
-        os.makedirs(os.path.dirname(abstract_path), exist_ok=True)
-        with open(abstract_path, "w", encoding="utf-8") as f:
-            total_abstracts = ""
-            total_wiki_contents = ""
-            for sub_code, abst in abstracts.items():
-                sub_title = chapter_info.sub_chapters[sub_code].subchapter_title
-                wiki_content = wiki_contents.get(sub_code, "")
-                total_abstracts += f"### 子章节 {sub_code}：{sub_title}\n"
-                total_abstracts += f"{abst}\n\n"
-                if wiki_content:
-                    total_wiki_contents += f"<wiki_content{sub_code}>{wiki_content}</wiki_content{sub_code}>\n\n"
-            f.write(f"<abstract>{total_abstracts}</abstract>\n\n")
-            f.write(f"{total_wiki_contents}")
-        print(f"  [Chapter Abstracts Saved] {abstract_path}")
-        return abstracts, wiki_contents
 
     async def generate_book(
         self,
@@ -263,56 +158,33 @@ class TopicBookGenerator:
         chapter_ids: Optional[List[int]] = None,
         subchapter_ids: Optional[List[str]] = None,
         prompt_config: Optional[Dict[str, str]] = None,
+        preface_inputs: Optional[Dict[str, str]] = None,
     ):
-        """Generate full book content from chapter outline."""
-        os.makedirs(output_dir, exist_ok=True)
-
-        with open(chapter_path, 'r', encoding='utf-8') as f:
-            chapter = f.read()
-        syllabus_match = re.search(r'<syllabus>(.*?)</syllabus>', chapter, re.DOTALL)
-        if not syllabus_match:
-            raise ValueError("No <syllabus> tag found in chapter file.")
-        syllabus = syllabus_match.group(1)
-        syllabus_dict = self.parse_syllabus_to_dict(syllabus)
-
-        course_name = syllabus_dict.get("course_name", "Unknown Course")
-        book_structure_raw = syllabus_dict["book_structure"]
-        book_structure = self._convert_book_structure(book_structure_raw)
-        filename_map = syllabus_dict["filename_map"]
-        sorted_chapters = sorted(
-            book_structure.keys(),
-            key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0
-        )
-        ctx = BookGenerationContext(
-            course_name=course_name,
-            book_structure=book_structure,
-            book_structure_raw=book_structure_raw,
-            filename_map=filename_map,
-            sorted_chapters=sorted_chapters,
-            prompt_config=prompt_config,
+        """Generate full book content using existing material pack."""
+        ctx, _, _ = self._build_generation_context(
+            chapter_path=chapter_path,
+            output_dir=output_dir,
             chapter_ids=chapter_ids,
             subchapter_ids=subchapter_ids,
-            output_dir=output_dir
+            prompt_config=prompt_config,
+            preface_inputs=preface_inputs,
         )
 
         print(f"Parsed Course: {ctx.course_name}")
 
-        print("\n[Phase 1] Generating abstracts...")
-        chapter_abstracts_map = {}
-        chapter_wiki_contents_map = {}
-        for key in ctx.sorted_chapters:
-            if not ctx.should_process_chapter(key):
-                continue
-            chapter_info = ctx.book_structure[key]
-            abstracts, wiki_contents = await self.generate_abstracts(ctx, key, chapter_info)
-            chapter_abstracts_map[key] = abstracts
-            chapter_wiki_contents_map[key] = wiki_contents
-        print("[Phase 1 Done]")
+        print("\n[Phase 0] Loading material pack...")
+        material_pack_result = self.material_pack_generator.load_material_pack(ctx)
+        ctx.material_pack_dir = material_pack_result.get("material_pack_dir", "")
+        ctx.chapter_abstracts_map = material_pack_result.get("chapter_abstracts_map", {})
+        ctx.chapter_wiki_contents_map = material_pack_result.get("chapter_wiki_contents_map", {})
+        if not os.path.isdir(ctx.material_pack_dir):
+            raise FileNotFoundError(
+                f"Material pack not found: {ctx.material_pack_dir}. "
+                "Please run generate_material_pack(...) first."
+            )
+        print(f"[Phase 0 Done] Material pack loaded: {ctx.material_pack_dir}")
 
-        ctx.chapter_abstracts_map = chapter_abstracts_map
-        ctx.chapter_wiki_contents_map = chapter_wiki_contents_map
-
-        print("\n[Phase 2] Generating subchapter content...")
+        print("\n[Phase 1] Generating subchapter content...")
         content_tasks = []
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
@@ -341,9 +213,18 @@ class TopicBookGenerator:
                 if path:
                     ctx.subchapter_file_paths_map[key][sub_code] = path
                 idx += 1
-        print("[Phase 2 Done]")
+        print("[Phase 1 Done]")
 
-        print("\n[Phase 3] Inserting projects and refining chapters...")
+        # 当显式指定 subchapter_ids 时，通常用于“只生成部分小节正文(step1)”的场景：
+        # 此时跳过后续的项目插入/整章纠错、插图与格式转换等步骤，以节省时间与成本。
+        if ctx.subchapter_ids:
+            print(
+                "\n[Info] Detected subchapter_ids filter. "
+                "Skipping Phase 2+ (project insertion/refine, images, md→html→pdf)."
+            )
+            return
+
+        print("\n[Phase 2] Inserting projects and refining chapters...")
         chapter_tasks = []
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
@@ -353,12 +234,12 @@ class TopicBookGenerator:
                 self._process_chapter_with_semaphore(ctx, key, chapter_info)
             )
         await asyncio.gather(*chapter_tasks)
-        print("[Phase 3 Done]")
+        print("[Phase 2 Done]")
         
-        print("\n[Phase 4] Adding images to chapter content...")
-        md_files_dir = os.path.join(ctx.output_dir, "md")
-        new_md_files_dir = os.path.join(ctx.output_dir, "md_with_images")
-        images_base_dir = ctx.output_dir.replace("books", "images")
+        print("\n[Phase 3] Adding images to chapter content...")
+        md_files_dir = ctx.temp_md_dir
+        new_md_files_dir = ctx.temp_md_with_images_dir
+        images_base_dir = ctx.images_dir
         image_tasks = []
         for key in ctx.sorted_chapters:
             if not ctx.should_process_chapter(key):
@@ -376,17 +257,223 @@ class TopicBookGenerator:
             )
         if image_tasks:
             await asyncio.gather(*image_tasks)
-        print("[Phase 4 Done]")
+        print("[Phase 3 Done]")
         
         md_files_dir = new_md_files_dir if os.path.isdir(new_md_files_dir) else md_files_dir
-        html_files_dir = os.path.join(ctx.output_dir, "html")
-        pdf_files_dir = os.path.join(ctx.output_dir, "pdf")
+        html_files_dir = ctx.book_html_dir
+        pdf_files_dir = ctx.book_pdf_dir
         os.makedirs(html_files_dir, exist_ok=True)
         os.makedirs(pdf_files_dir, exist_ok=True)
         await md_to_html(md_files_dir, html_files_dir)
         await html_to_pdf(html_files_dir, pdf_files_dir)
 
         print(f"\n[Done] All chapters for '{ctx.course_name}' have been processed.")
+
+    async def generate_material_pack(
+        self,
+        chapter_path: str,
+        output_dir: str,
+        chapter_ids: Optional[List[int]] = None,
+        subchapter_ids: Optional[List[str]] = None,
+        prompt_config: Optional[Dict[str, str]] = None,
+        preface_inputs: Optional[Dict[str, str]] = None,
+    ) -> Dict[str, Any]:
+        """Generate only material pack without book content generation."""
+        ctx, resolved_preface_inputs, _ = self._build_generation_context(
+            chapter_path=chapter_path,
+            output_dir=output_dir,
+            chapter_ids=chapter_ids,
+            subchapter_ids=subchapter_ids,
+            prompt_config=prompt_config,
+            preface_inputs=preface_inputs,
+        )
+        print(f"Parsed Course: {ctx.course_name}")
+        print("\n[Material Pack] Generating...")
+        material_pack_result = await self.material_pack_generator.generate_material_pack(
+            ctx=ctx,
+            chapter_path=chapter_path,
+            preface_inputs=resolved_preface_inputs,
+        )
+        print(f"[Material Pack Done] {material_pack_result.get('material_pack_dir', '')}")
+        return material_pack_result
+
+    def _build_generation_context(
+        self,
+        chapter_path: str,
+        output_dir: str,
+        chapter_ids: Optional[List[int]],
+        subchapter_ids: Optional[List[str]],
+        prompt_config: Optional[Dict[str, str]],
+        preface_inputs: Optional[Dict[str, str]],
+    ) -> tuple[BookGenerationContext, Dict[str, str], Dict[str, str]]:
+        os.makedirs(output_dir, exist_ok=True)
+        with open(chapter_path, 'r', encoding='utf-8') as f:
+            chapter = f.read()
+        syllabus_match = re.search(r'<syllabus>(.*?)</syllabus>', chapter, re.DOTALL)
+        if not syllabus_match:
+            raise ValueError("No <syllabus> tag found in chapter file.")
+        syllabus = syllabus_match.group(1)
+        syllabus_dict = self.parse_syllabus_to_dict(syllabus)
+        course_name = syllabus_dict.get("course_name", "Unknown Course")
+        book_structure_raw = syllabus_dict["book_structure"]
+        book_structure = self._convert_book_structure(book_structure_raw)
+        filename_map = syllabus_dict["filename_map"]
+        sorted_chapters = sorted(
+            book_structure.keys(),
+            key=lambda x: int(re.search(r'\d+', x).group()) if re.search(r'\d+', x) else 0
+        )
+        ctx = BookGenerationContext(
+            course_name=course_name,
+            book_structure=book_structure,
+            book_structure_raw=book_structure_raw,
+            filename_map=filename_map,
+            sorted_chapters=sorted_chapters,
+            prompt_config=prompt_config,
+            chapter_ids=chapter_ids,
+            subchapter_ids=subchapter_ids,
+            output_dir=output_dir,
+        )
+        self._prepare_course_layout(ctx)
+        book_info = self._save_book_info(ctx, chapter_path, preface_inputs, prompt_config)
+        resolved_preface_inputs, resolved_prompt_config = self._resolve_prompt_inputs(
+            course_info=book_info,
+            preface_inputs=preface_inputs,
+            prompt_config=prompt_config,
+        )
+        ctx.prompt_config = resolved_prompt_config
+        return ctx, resolved_preface_inputs, resolved_prompt_config
+
+    def _prepare_course_layout(self, ctx: BookGenerationContext) -> None:
+        os.makedirs(ctx.pack_dir, exist_ok=True)
+        os.makedirs(ctx.book_dir, exist_ok=True)
+        os.makedirs(ctx.book_info_dir, exist_ok=True)
+
+    def _save_book_info(
+        self,
+        ctx: BookGenerationContext,
+        chapter_path: str,
+        preface_inputs: Optional[Dict[str, str]],
+        prompt_config: Optional[Dict[str, str]],
+    ) -> Dict[str, str]:
+        syllabus_target = os.path.join(ctx.book_info_dir, "syllabus.md")
+        try:
+            shutil.copy2(chapter_path, syllabus_target)
+        except Exception as e:
+            print(f"[Warning] Failed to copy syllabus to book_info: {e}")
+
+        existing_info = self._read_book_info(ctx)
+        preface_inputs = preface_inputs or {}
+        prompt_config = prompt_config or {}
+        info_payload = {
+            "教材名称": ctx.course_name,
+            "语言": existing_info.get("语言", "中文" if self.language == "ch" else "英文"),
+            "面向人群": existing_info.get("面向人群", "{{面向人群}}"),
+            "教学方式": existing_info.get("教学方式", "{{教学方式}}"),
+            "教学目的": existing_info.get("教学目的", "{{教学目的}}"),
+            "教学要求": existing_info.get("教学要求", "{{教学要求}}"),
+            "教材行文风格": existing_info.get("教材行文风格", "{{教材行文风格}}"),
+        }
+        if preface_inputs.get("target_audience"):
+            info_payload["面向人群"] = preface_inputs["target_audience"]
+        if preface_inputs.get("teaching_methodology"):
+            info_payload["教学方式"] = preface_inputs["teaching_methodology"]
+        if preface_inputs.get("teaching_objectives"):
+            info_payload["教学目的"] = preface_inputs["teaching_objectives"]
+        if preface_inputs.get("teaching_requirements"):
+            info_payload["教学要求"] = preface_inputs["teaching_requirements"]
+        if prompt_config.get("style_tendency"):
+            info_payload["教材行文风格"] = prompt_config["style_tendency"]
+
+        info_path = os.path.join(ctx.book_info_dir, "book_info.json")
+        with open(info_path, "w", encoding="utf-8") as f:
+            json.dump(info_payload, f, ensure_ascii=False, indent=2)
+        return info_payload
+
+    def _read_book_info(self, ctx: BookGenerationContext) -> Dict[str, str]:
+        info_path = os.path.join(ctx.book_info_dir, "book_info.json")
+        if not os.path.exists(info_path):
+            return {}
+        try:
+            with open(info_path, "r", encoding="utf-8") as f:
+                data = json.load(f) or {}
+            if isinstance(data, dict):
+                return data
+            return {}
+        except Exception:
+            return {}
+
+    def _resolve_prompt_inputs(
+        self,
+        course_info: Dict[str, str],
+        preface_inputs: Optional[Dict[str, str]],
+        prompt_config: Optional[Dict[str, str]],
+    ) -> tuple[Dict[str, str], Dict[str, str]]:
+        preface_inputs = preface_inputs or {}
+        prompt_config = prompt_config or {}
+        resolved_preface_inputs = {
+            "target_audience": preface_inputs.get("target_audience") or course_info.get("面向人群", "{{面向人群}}"),
+            "teaching_methodology": preface_inputs.get("teaching_methodology") or course_info.get("教学方式", "{{教学方式}}"),
+            "teaching_objectives": preface_inputs.get("teaching_objectives") or course_info.get("教学目的", "{{教学目的}}"),
+            "teaching_requirements": preface_inputs.get("teaching_requirements") or course_info.get("教学要求", "{{教学要求}}"),
+        }
+        audience = course_info.get("面向人群", "")
+        teaching_methodology = course_info.get("教学方式", "")
+        style_tendency = prompt_config.get("style_tendency") or course_info.get("教材行文风格", "问题驱动型")
+        resolved_prompt_config = {
+            "course_type": prompt_config.get("course_type")
+            or self._infer_course_type(teaching_methodology, style_tendency),
+            "formal_density": prompt_config.get("formal_density")
+            or self._infer_formal_density(style_tendency, audience),
+            "case_strategy": prompt_config.get("case_strategy")
+            or self._infer_case_strategy(teaching_methodology, style_tendency),
+            "reader_level": prompt_config.get("reader_level")
+            or self._infer_reader_level(audience),
+            "style_tendency": style_tendency,
+        }
+        return resolved_preface_inputs, resolved_prompt_config
+
+    @staticmethod
+    def _infer_course_type(teaching_methodology: str, style_tendency: str) -> str:
+        text = f"{teaching_methodology} {style_tendency}"
+        if "跨学科" in text or "交叉" in text:
+            return "跨学科交叉"
+        if "实践" in text or "项目" in text or "实验" in text:
+            if "理论" in text:
+                return "理实融合"
+            return "工程实践导向"
+        return "理论主导"
+
+    @staticmethod
+    def _infer_formal_density(style_tendency: str, audience: str) -> str:
+        if "严谨" in style_tendency:
+            return "高"
+        if "研究生" in audience or "博士" in audience:
+            return "高"
+        if "本科" in audience:
+            return "中"
+        return "中"
+
+    @staticmethod
+    def _infer_case_strategy(teaching_methodology: str, style_tendency: str) -> str:
+        text = f"{teaching_methodology} {style_tendency}"
+        if "历史" in text or "演进" in text:
+            return "历史演进案例"
+        if "实践" in text or "应用" in text or "项目" in text:
+            return "多场景应用示例"
+        return "本学科经典案例"
+
+    @staticmethod
+    def _infer_reader_level(audience: str) -> str:
+        text = audience or ""
+        if "研究生" in text or "硕士" in text or "博士" in text:
+            return "研究生"
+        if "工程师" in text or "从业" in text or "专业人员" in text:
+            return "专业进阶"
+        if "本科" in text and ("高年级" in text or "高阶" in text):
+            return "本科高阶"
+        if "本科" in text:
+            return "本科入门"
+        return "本科入门"
 
     def parse_syllabus_to_dict(self, syllabus_text: str) -> Dict[str, Any]:
         """Parse syllabus text into structured dictionary."""
@@ -474,8 +561,9 @@ async def main():
 
     book_info = ["本科", "可控核聚变", "50"]
 
-    chapter_save_path = f"{output_path}/chapter/{language}/{book_info[1]}.md"
-    book_save_dir = f"{output_path}/books/{language}/{book_info[1]}"
+    course_dir = os.path.join(output_path, book_info[1])
+    chapter_save_path = os.path.join(course_dir, "book_info", "syllabus.md")
+    book_save_dir = course_dir
 
     await agent.generate_chapter(book_info, chapter_save_path, docs_path)
     await agent.generate_book(chapter_save_path, book_save_dir)

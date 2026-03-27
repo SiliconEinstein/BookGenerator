@@ -4,15 +4,13 @@ import os
 import re
 import json
 import asyncio
-import aiohttp
 import importlib.util
-from fastmcp import Client
 from dp.agent.client import MCPClient
-from typing import Dict, Any, Optional, List, Union
+from typing import Dict, Any, Optional, List
 from src.models import gemini_completion, gpt_completion
 from src.utils import get_config, sanitize_filename
-from src.tools import search_wiki_articles_for_subchapter, search_qa_pairs_for_subchapter
-from src.core.chapter_types import SubChapterInfo,ChapterInfo, BookGenerationContext
+from src.core.chapter_types import SubChapterInfo, ChapterInfo, BookGenerationContext
+from src.core.material_pack_generator import MaterialPackGenerator
 
 
 class BookGenerator:
@@ -22,8 +20,8 @@ class BookGenerator:
         self.language = language
         self.config = get_config(language=language)
         self.mcp_url = self.config.mcp_url
-        self.wiki_search_api_base = self.config.wiki_search_api_base
         self._prompt_book_module = None
+        self.material_pack_generator = MaterialPackGenerator(language=language)
 
     def _load_prompt_step2_module(self):
         """加载 prompt_book_step2.py 模块以根据 course_type 获取对应 step2 提示词。"""
@@ -51,72 +49,25 @@ class BookGenerator:
         self._prompt_book_module = module
         return module
 
-    async def generate_abstract(self, sub_title: str, topics: List[str], course_name: str,
-                              sub_code: str, book_structure: Dict[str, Any]) -> Dict[str, Any]:
-        """Generate chapter outline summary."""
-        topics_str = ", ".join(topics)
-
-        # 获取Pedia文章
-        wiki_articles_content, wiki_titles = await search_wiki_articles_for_subchapter(
-            subchapter_title=sub_title,
-            topics=topics,
-            k=5,
-            language="zh-CN" if self.language == 'ch' else "en-US",
-        )
-        wiki_content_str = "\n\n".join(wiki_articles_content) if wiki_articles_content else "No related wiki articles found."
-
-        # 获取问答对
-        # qa_result = await search_qa_pairs_for_subchapter(
-        #     subchapter_title=sub_title,
-        #     topics=topics,
-        #     max_keywords=10,
-        #     max_results_per_keyword=1
-        # )
-        
-        # qa_pairs = qa_result.get("qa_pairs", [])
-        # qa_content_list = []
-        # for qa in qa_pairs:
-        #     problem_thumbnail = qa.get("problem_thumbnail", "")
-        #     problem = qa.get("problem", "")
-        #     solutions = qa.get("solutions", "")
-            
-        #     qa_text = f"title: {problem_thumbnail}\n\nQuestion: {problem}\n\nAnswer: {solutions}"
-        #     qa_content_list.append(qa_text)
-        
-        # wiki_content_str = "\n\n\n".join(qa_content_list) if qa_content_list else "No related QA pairs found."
-        
-        prompt_name = self.config.get_prompt_name("abstract", "prompt_abstract")
-        prompt_path = self.config.get_prompt_path(prompt_name)
-        prompt = self._read_file_safe(prompt_path)
-        prompt = prompt.format(
-            course_name=course_name,
-            subchapter_code=sub_code,
-            subchapter_title=sub_title,
-            topics=topics_str,
-            wiki_content=wiki_content_str,
-            book_structure=book_structure
-        )
-
-        abstract = await gpt_completion(prompt)
-        return {"abstract": abstract, "wiki_content": wiki_content_str}
-
     async def generate_content(self, ctx: BookGenerationContext, sub_info: SubChapterInfo, sub_code: str, chapter_key: str) -> str:
-        """Generate textbook content."""
+        """Generate textbook content using material-pack context."""
         sub_title = sub_info.subchapter_title
         topics = sub_info.topics
         topics_str = ", ".join(topics)
-        chapter_abstracts = ctx.chapter_abstracts_map.get(chapter_key, {})
-        wiki_content = ctx.chapter_wiki_contents_map.get(chapter_key, {}).get(sub_code)
+        chapter_abstracts = (ctx.chapter_abstracts_map or {}).get(chapter_key, {})
+        wiki_content = self._load_wiki_content_from_pack(ctx, chapter_key, sub_code, sub_title)
+        if not chapter_abstracts:
+            chapter_abstracts, wiki_contents = self._load_chapter_abstracts_from_material_pack(ctx, chapter_key)
+            if chapter_abstracts:
+                if ctx.chapter_abstracts_map is None:
+                    ctx.chapter_abstracts_map = {}
+                ctx.chapter_abstracts_map[chapter_key] = chapter_abstracts
+            if wiki_contents and not wiki_content:
+                wiki_content = wiki_contents.get(sub_code)
 
-        # 如果没有提供 wiki_content，则调用接口获取
         if wiki_content is None:
-            wiki_articles_content, wiki_titles = await search_wiki_articles_for_subchapter(
-                subchapter_title=sub_title,
-                topics=topics,
-                k=5,
-                language="zh-CN" if self.language == 'ch' else "en-US",
-            )
-            wiki_content_str = "\n\n".join(wiki_articles_content) if wiki_articles_content else "No related wiki articles found."
+            print(f"  [Warning] Missing wiki content in material pack for {sub_code}.")
+            wiki_content_str = ""
         else:
             wiki_content_str = wiki_content
 
@@ -168,14 +119,14 @@ class BookGenerator:
         chapter_structure = ctx.book_structure_raw.get(chapter_key, {})
         chapter_title = chapter_info.title
         sub_chapters = chapter_info.sub_chapters
-        chapter_dir = ctx.get_chapter_dir(chapter_key)
         
         chapter_content_parts = []
         project_qa_text = await self._build_project_qa_text(
-            course_name=ctx.course_name,
-            chapter_info=chapter_info
+            ctx=ctx,
+            chapter_info=chapter_info,
+            chapter_key=chapter_key,
         )
-        self._save_project_qas(project_qa_text, ctx.output_dir, chapter_dir)
+        self._save_project_qas(ctx, chapter_key, project_qa_text)
         for sub_code, sub_info in sub_chapters.items():
             sub_title = sub_info.subchapter_title
             input_path = subchapter_file_paths.get(sub_code)
@@ -197,7 +148,7 @@ class BookGenerator:
             prompt = step2_module.get_step2_prompt(course_type, self.config.prompts_base_dir)
         else:
             prompt_name = self.config.get_prompt_name("book_step2", "prompt_book_step2")
-            prompt_path = self.config.get_prompt_path(prompt_name)
+            prompt_path = self._resolve_prompt_path(ctx, prompt_name)
             prompt = self._read_file_safe(prompt_path)
         prompt = prompt.format(
             course_name=ctx.course_name,
@@ -218,7 +169,7 @@ class BookGenerator:
 
         print(f"Start checking {chapter_title}")
         prompt_check_name = self.config.get_prompt_name("book_step3", "prompt_book_step3")
-        prompt_check_path = self.config.get_prompt_path(prompt_check_name)
+        prompt_check_path = self._resolve_prompt_path(ctx, prompt_check_name)
         prompt_check_template = self._read_file_safe(prompt_check_path)
         section_titles = list(articles_after_step1.keys())
         checked_sections = []
@@ -247,37 +198,23 @@ class BookGenerator:
 
     async def _build_project_qa_text(
         self,
-        course_name: str,
-        chapter_info: ChapterInfo
+        ctx: BookGenerationContext,
+        chapter_info: ChapterInfo,
+        chapter_key: str,
     ) -> str:
         """Select one QA per subchapter to form a coherent project chain."""
         chapter_title = chapter_info.title
         sub_chapters = chapter_info.sub_chapters
-        raw_cache = self._load_raw_qa_cache(course_name, chapter_title)
+        raw_cache = self._load_raw_qa_cache(ctx, chapter_key)
 
         async def _fetch_candidates(sub_code: str, sub_info: SubChapterInfo):
             cached_entry = raw_cache.get(sub_code) if raw_cache else None
             if isinstance(cached_entry, dict) and cached_entry.get("qa_result") is not None:
                 print(f"  [Skip] Using existing QA pairs for {sub_code}")
                 qa_result = cached_entry.get("qa_result", {}) or {}
-                should_update_cache = False
             else:
-                try:
-                    qa_result = await search_qa_pairs_for_subchapter(
-                        subchapter_title=sub_info.subchapter_title,
-                        topics=sub_info.topics,
-                        max_keywords=10,
-                        max_results_per_keyword=1
-                    )
-                except Exception as e:
-                    print(f"  [Warning] QA search failed for {sub_code}: {e}")
-                    qa_result = {}
-                cached_entry = {
-                    "subchapter_title": sub_info.subchapter_title,
-                    "topics": sub_info.topics,
-                    "qa_result": qa_result
-                }
-                should_update_cache = True
+                print(f"  [Warning] Material pack QA missing for {sub_code}, skip.")
+                qa_result = {}
             qa_pairs = qa_result.get("qa_pairs", [])
             candidates = []
             for idx, qa in enumerate(qa_pairs, 1):
@@ -300,7 +237,7 @@ class BookGenerator:
                     "title": sub_info.subchapter_title,
                     "candidates": candidates
                 }
-            return sub_code, payload, cached_entry, should_update_cache
+            return sub_code, payload
 
         tasks = [
             _fetch_candidates(sub_code, sub_info)
@@ -308,25 +245,19 @@ class BookGenerator:
         ]
         results = await asyncio.gather(*tasks)
         candidates_by_sub = {}
-        cache_updates = {}
         for result in results:
             if not result:
                 continue
-            sub_code, payload, cached_entry, should_update_cache = result
+            sub_code, payload = result
             if payload:
                 candidates_by_sub[sub_code] = payload
-            if should_update_cache:
-                cache_updates[sub_code] = cached_entry
-        if cache_updates:
-            merged_cache = dict(raw_cache) if raw_cache else {}
-            merged_cache.update(cache_updates)
-            self._save_raw_qa_cache(course_name, chapter_title, merged_cache)
 
         if not candidates_by_sub:
             return ""
 
         selection = await self._select_project_qas(
-            course_name=course_name,
+            ctx=ctx,
+            chapter_key=chapter_key,
             chapter_title=chapter_title,
             sub_chapters=sub_chapters,
             candidates_by_sub=candidates_by_sub
@@ -344,14 +275,14 @@ class BookGenerator:
             lines.append(f"- solutions: {picked.get('solutions', '')}")
         return "\n".join(lines)
 
-    def _get_raw_qa_cache_path(self, course_name: str, chapter_title: str) -> str:
-        safe_course = sanitize_filename(course_name)
-        safe_chapter = sanitize_filename(chapter_title)
-        temp_dir = os.path.join(str(self.config.output_temp_dir), safe_course)
-        return os.path.join(temp_dir, f"{safe_chapter}.json")
+    def _get_raw_qa_cache_path(self, ctx: BookGenerationContext, chapter_key: str) -> str:
+        """Raw QA cache JSON path in material pack."""
+        chapter_dir = ctx.get_chapter_dir(chapter_key)
+        material_pack_dir = self._get_material_pack_dir(ctx)
+        return os.path.join(material_pack_dir, "qa_pairs", f"{chapter_dir}.json")
 
-    def _load_raw_qa_cache(self, course_name: str, chapter_title: str) -> Dict[str, Any]:
-        cache_path = self._get_raw_qa_cache_path(course_name, chapter_title)
+    def _load_raw_qa_cache(self, ctx: BookGenerationContext, chapter_key: str) -> Dict[str, Any]:
+        cache_path = self._get_raw_qa_cache_path(ctx, chapter_key)
         if not os.path.exists(cache_path):
             return {}
         try:
@@ -361,39 +292,31 @@ class BookGenerator:
             print(f"  [Warning] Failed to load raw QA cache: {e}")
             return {}
 
-    def _save_raw_qa_cache(self, course_name: str, chapter_title: str, data: Dict[str, Any]) -> None:
-        cache_path = self._get_raw_qa_cache_path(course_name, chapter_title)
-        os.makedirs(os.path.dirname(cache_path), exist_ok=True)
-        try:
-            with open(cache_path, "w", encoding="utf-8") as f:
-                json.dump(data, f, ensure_ascii=False, indent=2)
-        except Exception as e:
-            print(f"  [Warning] Failed to save raw QA cache: {e}")
-
-    def _save_project_qas(self, project_qa_text: str, output_dir: str, chapter_dir: str) -> None:
-        """Save selected project QA pairs to chapter-level file."""
+    def _save_project_qas(self, ctx: BookGenerationContext, chapter_key: str, project_qa_text: str) -> None:
+        """Save selected project QA pairs (filtered) to {course}/temp/qa_pairs/<chapter_dir>.md."""
         if not project_qa_text:
             return
-        qa_dir = os.path.join(output_dir, "qa_pairs")
-        os.makedirs(qa_dir, exist_ok=True)
-        qa_path = os.path.join(qa_dir, f"{chapter_dir}.md")
+        chapter_dir = ctx.get_chapter_dir(chapter_key)
+        os.makedirs(ctx.temp_qa_pairs_dir, exist_ok=True)
+        qa_path = os.path.join(ctx.temp_qa_pairs_dir, f"{chapter_dir}.md")
         with open(qa_path, "w", encoding="utf-8") as f:
             f.write(project_qa_text)
 
     async def _select_project_qas(
         self,
-        course_name: str,
+        ctx: BookGenerationContext,
+        chapter_key: str,
         chapter_title: str,
         sub_chapters: Dict[str, Any],
         candidates_by_sub: Dict[str, Dict[str, Any]]
     ) -> Dict[str, Dict[str, str]]:
         """Use Gemini to pick one QA per subchapter forming a coherent project."""
         prompt_name = self.config.get_prompt_name("select_project_qa", "prompt_select_project_qa")
-        prompt_path = self.config.get_prompt_path(prompt_name)
+        prompt_path = self._resolve_prompt_path(ctx, prompt_name)
         prompt_template = self._read_file_safe(prompt_path).strip()
         
         # 读取step1章节内容（用于更准确地筛选问答对）
-        chapter_abstracts = self._load_chapter_step1_content(course_name, chapter_title)
+        chapter_abstracts = self._load_chapter_step1_content(ctx, chapter_key)
         
         # 构建候选问答对列表
         candidates_list = []
@@ -406,7 +329,7 @@ class BookGenerator:
                 candidates_list.append(f"     problem: {cand.get('problem', '')}")
         candidates_str = "\n".join(candidates_list)
         prompt = prompt_template.format(
-            course_name=course_name,
+            course_name=ctx.course_name,
             chapter_title=chapter_title,
             sub_chapters=sub_chapters,
             chapter_abstracts=chapter_abstracts,
@@ -453,23 +376,74 @@ class BookGenerator:
                 cleaned[sub_code] = candidates[0]
         return cleaned
 
-    # def _load_chapter_abstracts(self, course_name: str, chapter_title: str) -> Dict[str, str]:
-    #     """Load chapter abstracts from file."""
-    #     chapter_num = re.search(r'第(\d+)章', chapter_title).group(1)
-    #     abstract_base_dir = str(self.config.output_base_dir).replace("books", "abstract")
-    #     abstract_path = os.path.join(abstract_base_dir, f"{course_name}/chapter{chapter_num}.md")
-    #     if not os.path.exists(abstract_path):
-    #         return {}
-    #     with open(abstract_path, "r", encoding="utf-8") as f:
-    #         abstracts = f.read()
-    #         abstracts = re.search(r'<abstract>(.*?)</abstract>', abstracts, re.DOTALL).group(1).strip()
-    #     return abstracts
+    def _load_chapter_abstracts_from_material_pack(self, ctx: BookGenerationContext, chapter_key: str) -> tuple[Dict[str, str], Dict[str, str]]:
+        chapter_dir = ctx.get_chapter_dir(chapter_key)
+        material_pack_dir = self._get_material_pack_dir(ctx)
+        abstract_path = os.path.join(material_pack_dir, "abstracts", f"{chapter_dir}.md")
+        if not os.path.exists(abstract_path):
+            return {}, {}
+        content = self._read_file_safe(abstract_path)
+        abstracts: Dict[str, str] = {}
+        wiki_contents: Dict[str, str] = {}
 
-    def _load_chapter_step1_content(self, course_name: str, chapter_title: str) -> str:
-        """Load step1 chapter content by concatenating subchapter files."""
-        safe_course = sanitize_filename(course_name)
-        safe_chapter = sanitize_filename(chapter_title)
-        step1_dir = os.path.join(str(self.config.output_base_dir), safe_course, safe_chapter, "step1")
+        abstract_match = re.search(r"<abstract>(.*?)</abstract>", content, re.DOTALL)
+        abstract_block = abstract_match.group(1).strip() if abstract_match else ""
+        if abstract_block:
+            parts = re.split(r"###\s*子章节\s+", abstract_block)
+            for part in parts[1:]:
+                lines = part.strip().splitlines()
+                if not lines:
+                    continue
+                header_line = lines[0]
+                if "：" in header_line:
+                    sub_code = header_line.split("：", 1)[0].strip()
+                elif ":" in header_line:
+                    sub_code = header_line.split(":", 1)[0].strip()
+                else:
+                    continue
+                abstracts[sub_code] = "\n".join(lines[1:]).strip()
+
+        for match in re.finditer(r"<wiki_content([0-9.]+)>(.*?)</wiki_content\1>", content, re.DOTALL):
+            wiki_contents[match.group(1)] = match.group(2).strip()
+        return abstracts, wiki_contents
+
+    def _load_wiki_content_from_pack(
+        self,
+        ctx: BookGenerationContext,
+        chapter_key: str,
+        sub_code: str,
+        sub_title: str,
+    ) -> str:
+        chapter_dir = ctx.get_chapter_dir(chapter_key)
+        sub_folder = f"{sub_code.replace('.', '_')}_{sanitize_filename(sub_title, 40)}"
+        wiki_dir = os.path.join(self._get_material_pack_dir(ctx), "wiki_articles", chapter_dir, sub_folder)
+        if not os.path.isdir(wiki_dir):
+            return ""
+        contents = []
+        for filename in sorted(os.listdir(wiki_dir)):
+            if not filename.lower().endswith(".md"):
+                continue
+            file_path = os.path.join(wiki_dir, filename)
+            text = self._read_file_safe(file_path).strip()
+            if text:
+                contents.append(text)
+        return "\n\n".join(contents)
+
+    def _get_material_pack_dir(self, ctx: BookGenerationContext) -> str:
+        return ctx.material_pack_dir or self.material_pack_generator.get_material_pack_dir(
+            ctx.course_name,
+            ctx.course_dir,
+        )
+
+    def _resolve_prompt_path(self, ctx: BookGenerationContext, prompt_name: str) -> str:
+        pack_prompt_path = os.path.join(self._get_material_pack_dir(ctx), "prompts", prompt_name)
+        if os.path.exists(pack_prompt_path):
+            return pack_prompt_path
+        return str(self.config.get_prompt_path(prompt_name))
+
+    def _load_chapter_step1_content(self, ctx: BookGenerationContext, chapter_key: str) -> str:
+        """Load step1 chapter content by concatenating subchapter files (new layout)."""
+        step1_dir = ctx.get_chapter_step1_dir(chapter_key)
 
         if not os.path.isdir(step1_dir):
             return ""

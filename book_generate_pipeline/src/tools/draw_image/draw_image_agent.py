@@ -4,9 +4,19 @@ import json
 import re
 import base64
 import logging
+from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Union
+from urllib.parse import urlparse
 
 import litellm
+import httpx
+try:
+    from src.models import gpugeek_image_generation
+except ImportError:
+    project_root = Path(__file__).resolve().parents[3]
+    if str(project_root) not in sys.path:
+        sys.path.insert(0, str(project_root))
+    from src.models import gpugeek_image_generation
 
 from .services.article_fetcher import fetch_article_content
 from .pipelines.draw_by_text import generate_image_from_context
@@ -67,8 +77,8 @@ def _try_parse_json(s: str):
         raise
 
 
-os.environ["LITELLM_PROXY_API_BASE"] = "http://8.219.58.57:4000"
-os.environ["LITELLM_PROXY_API_KEY"] = "sk-WNrS8wC5RXbYvAx6KKdyEw"
+os.environ["LITELLM_PROXY_API_BASE"] = os.environ.get("LITELLM_PROXY_API_BASE", "https://litellm.dp.tech")
+os.environ["LITELLM_PROXY_API_KEY"] = os.environ.get("LITELLM_PROXY_API_KEY", "")
 
 
 class DrawImageAgent:
@@ -76,14 +86,16 @@ class DrawImageAgent:
         sys.path.append("F:/SciencePedia")
         self.model_gemini_2_5_pro = "litellm_proxy/gemini-2.5-pro"
         self.model_gemini_3_pro = "litellm_proxy/gemini-3-pro-preview"
-        self.model_gemini_3_pro_image = "litellm_proxy/gemini-3-pro-image-preview"
         self.model_kwargs: Dict[str, object] = {}
 
     def get_article(self, article_id: int) -> Union[str, Tuple[str, str]]:
         return fetch_article_content(article_id)
 
     def get_prompt(self, prompt_path: str, prompt_name: str, content: Dict[str, str]) -> str:
-        file_path = f"{prompt_path}/{prompt_name}"
+        file_path = Path(prompt_path) / prompt_name
+        if not file_path.exists():
+            # 允许调用方仅在 pack/prompts 中覆盖部分提示词，缺失项回退到默认目录。
+            file_path = Path(__file__).resolve().parent / "prompt" / prompt_name
         with open(file_path, "r", encoding="utf-8") as f:
             prompt = f.read()
         for key, value in content.items():
@@ -124,17 +136,11 @@ class DrawImageAgent:
     ) -> Optional[str]:
         first_path: Optional[str] = None
         try:
-            response = await litellm.acompletion(
-                model=self.model_gemini_3_pro_image,
-                messages=[{"role": "user", "content": prompt}],
-            )
-            for i, img in enumerate(response.choices[0].message.images):
-                img_url = img["image_url"]["url"]
-                if "," in img_url:
-                    base64_data = img_url.split(",", 1)[1]
-                else:
-                    raise ValueError("Invalid image URL format.")
-                image_data = base64.b64decode(base64_data)
+            outputs = await gpugeek_image_generation(prompt=prompt)
+            for i, raw_output in enumerate(outputs):
+                image_data = await self._resolve_output_to_bytes(raw_output)
+                if image_data is None:
+                    continue
                 if i > 0:
                     sub_name = image_name[:-4] + f"_{i}.png"
                 else:
@@ -148,6 +154,46 @@ class DrawImageAgent:
         except Exception as exc:
             logger.exception(f"Error occurred while calling LLM API: {str(exc)}")
             return None
+
+    async def _resolve_output_to_bytes(self, output: object) -> Optional[bytes]:
+        if isinstance(output, str):
+            # data URL
+            if output.startswith("data:image") and "," in output:
+                return base64.b64decode(output.split(",", 1)[1])
+            # raw base64 content
+            if self._looks_like_base64(output):
+                try:
+                    return base64.b64decode(output)
+                except Exception:
+                    return None
+            # remote image URL
+            parsed = urlparse(output)
+            if parsed.scheme in {"http", "https"}:
+                async with httpx.AsyncClient(timeout=30.0) as client:
+                    resp = await client.get(output)
+                    if resp.status_code == 200:
+                        return resp.content
+                return None
+            return None
+
+        if isinstance(output, dict):
+            # common API shapes
+            for key in ("url", "image_url", "imageUrl"):
+                val = output.get(key)
+                if isinstance(val, str):
+                    return await self._resolve_output_to_bytes(val)
+            if isinstance(output.get("image"), str):
+                return await self._resolve_output_to_bytes(output["image"])
+            return None
+
+        return None
+
+    @staticmethod
+    def _looks_like_base64(text: str) -> bool:
+        compact = "".join(text.strip().split())
+        if len(compact) < 64:
+            return False
+        return re.fullmatch(r"[A-Za-z0-9+/=]+", compact) is not None
 
     def eval_image(self, image_path: str, prompt: str) -> Dict[str, object]:
         try:

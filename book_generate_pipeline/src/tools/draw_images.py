@@ -26,7 +26,13 @@ async def draw_images_for_markdown(
         List of generated image metadata.
     """
     if prompt_dir is None:
-        prompt_dir = Path(__file__).parent / "draw_image" / "prompt"
+        default_prompt_dir = Path(__file__).parent / "draw_image" / "prompt"
+        pack_prompt_dir = Path(md_path).resolve().parents[2] / "pack" / "prompts"
+        # 优先使用 pack 中的绘图提示词；其余缺失提示词由 DrawImageAgent 内部回退到默认目录。
+        if (pack_prompt_dir / "draw_by_text").exists():
+            prompt_dir = pack_prompt_dir
+        else:
+            prompt_dir = default_prompt_dir
         
     if not os.path.exists(md_path):
         raise FileNotFoundError(f"Markdown file not found: {md_path}")

@@ -3,7 +3,18 @@
 import asyncio
 import sys
 import os
+import litellm
+from pathlib import Path
 
+try:
+    from dotenv import load_dotenv
+except Exception:
+    load_dotenv = None
+
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parent / ".env")
 # Add src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
@@ -13,7 +24,60 @@ from src.tools.get_qa_pair import (
     get_qa_pair_for_subchapter,
     search_qa_pairs_by_outline
 )
+from src.models import gpugeek_image_generation
 
+def test_draw_image():
+    env_path = Path(__file__).resolve().parent / ".env"
+    if load_dotenv and env_path.exists():
+        # 测试脚本优先使用当前项目 .env，避免被外部环境变量污染
+        load_dotenv(dotenv_path=env_path, override=True)
+
+    LITELLM_PROXY_API_BASE = os.environ.get("LITELLM_PROXY_API_BASE", "").strip()
+    LITELLM_PROXY_API_KEY = os.environ.get("LITELLM_PROXY_API_KEY", "").strip()
+    if LITELLM_PROXY_API_KEY:
+        os.environ["LITELLM_API_KEY"] = LITELLM_PROXY_API_KEY
+
+    print(f"LITELLM_PROXY_API_BASE: {LITELLM_PROXY_API_BASE}")
+    print(f"LITELLM_PROXY_API_KEY set: {bool(LITELLM_PROXY_API_KEY)}")
+
+    if not LITELLM_PROXY_API_BASE or not LITELLM_PROXY_API_KEY:
+        raise RuntimeError(
+            "缺少绘图配置：请在 .env 中设置 LITELLM_PROXY_API_BASE 和 LITELLM_PROXY_API_KEY"
+        )
+
+    # model = "litellm_proxy/gemini-3-pro-image-preview"
+    model = "litellm_proxy/gemini-3-pro-preview"
+    prompt = "画一个苹果"
+    response = litellm.completion(
+        model=model,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    print(response)
+
+
+async def test_gpugeek_image_generation():
+    """Test gpugeek image provider registration and API availability."""
+    env_path = Path(__file__).resolve().parent / ".env"
+    if load_dotenv and env_path.exists():
+        load_dotenv(dotenv_path=env_path, override=True)
+
+    api_key = os.environ.get("GPUGEEK_API_KEY", "").strip()
+    print(f"GPUGEEK_API_KEY set: {bool(api_key)}")
+    if not api_key:
+        raise RuntimeError("缺少 GPUGEEK_API_KEY，请先在 .env 中配置。")
+
+    outputs = await gpugeek_image_generation(
+        prompt="画一个气球",
+        aspect_ratio="16:9",
+        image_size="1K",
+    )
+    print(f"gpugeek_image_generation outputs count: {len(outputs)}")
+    if outputs:
+        first = outputs[0]
+        if isinstance(first, str):
+            print(f"First output preview: {first[:120]}")
+        else:
+            print(f"First output type: {type(first)}")
 
 async def test_search_qa_pairs():
     """Test searching QA pairs for a subchapter."""
@@ -199,6 +263,8 @@ async def test_mcp_tool():
         print("result: ", result)
 
 if __name__ == "__main__":
-    asyncio.run(test_mcp_tool())
+    # asyncio.run(test_mcp_tool())
+    # test_draw_image()
+    asyncio.run(test_gpugeek_image_generation())
 
 
