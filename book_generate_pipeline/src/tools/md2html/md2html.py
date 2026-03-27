@@ -1908,6 +1908,36 @@ def convert_md_to_html_block_based(md_file_path, css_file_path='style.css', pris
         mermaid_js=mermaid_js
     )
 
+    # --- 4.1 Table header alignment fix ---
+    # Mistune table plugin may emit inline styles like: <th style="text-align:left">...
+    # Some PDF renderers / embedded styles may end up honoring inline alignment.
+    # We force thead cells to be centered by rewriting inline styles inside <thead> blocks.
+    def _force_thead_center(html: str) -> str:
+        import re
+
+        def _fix_thead_block(m: re.Match) -> str:
+            block = m.group(0)
+            # Replace any existing text-align value in style attribute
+            block = re.sub(
+                r'(<t[hd]\b[^>]*\bstyle="[^"]*?)text-align\s*:\s*(left|right)([^"]*")',
+                r'\1text-align:center\3',
+                block,
+                flags=re.IGNORECASE,
+            )
+            # If no style attribute, add one
+            block = re.sub(
+                # Use tag boundary to avoid matching <thead> or other tags starting with "th"
+                r'<(th|td)\b(?![^>]*\bstyle=)([^>]*)>',
+                r'<\1 style="text-align:center"\2>',
+                block,
+                flags=re.IGNORECASE,
+            )
+            return block
+
+        return re.sub(r'<thead>[\s\S]*?</thead>', _fix_thead_block, html, flags=re.IGNORECASE)
+
+    final_html = _force_thead_center(final_html)
+
     # Report processing statistics
     total_blocks = successful_blocks + failed_blocks
     if failed_blocks > 0:

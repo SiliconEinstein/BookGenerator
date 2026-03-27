@@ -50,24 +50,116 @@ async def _html_to_pdf(page, html_path: str, pdf_path: str):
     url = _file_path_to_url(html_path)
     try:
         # 超时常见原因：1) file:// 下中文路径在部分环境加载慢/失败 2) 页面大、MathJax 等外链脚本加载慢
-        await page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        # timeout=0 表示不限制超时
+        await page.goto(url, wait_until="domcontentloaded", timeout=0)
 
-        # Wait for MathJax rendering to complete
+        # 强制覆盖表格表头居中（避免历史 HTML 内联旧样式或结构差异导致表头未居中）
+        await page.add_style_tag(
+            content="""
+            /* Table header centering overrides (PDF rendering) */
+            .markdown-body table thead th,
+            .markdown-body table thead td,
+            table thead th,
+            table thead td {
+                text-align: center !important;
+            }
+            .markdown-body table thead th > p,
+            .markdown-body table thead td > p,
+            table thead th > p,
+            table thead td > p {
+                text-align: center !important;
+                margin: 0 !important;
+            }
+            /* Fallback: some generators put header row in first tbody row */
+            .markdown-body table tbody tr:first-child > th,
+            .markdown-body table tbody tr:first-child > td,
+            table tbody tr:first-child > th,
+            table tbody tr:first-child > td {
+                text-align: center !important;
+            }
+            .markdown-body table tbody tr:first-child > th > p,
+            .markdown-body table tbody tr:first-child > td > p,
+            table tbody tr:first-child > th > p,
+            table tbody tr:first-child > td > p {
+                text-align: center !important;
+                margin: 0 !important;
+            }
+            """
+        )
+
+        # MathJax 渲染：需要避免 “MathJax 还没加载就直接放行”，否则会导出未排版完的公式。
+        # 这里采用更稳妥的策略：
+        # 1) 若页面包含潜在公式，则等待 window.MathJax 出现
+        # 2) 显式触发并等待 typeset 完成（v3: typesetPromise / v2: Hub.Queue）
+        # 3) 等待/隐藏 Processing math 提示层，避免出现在 PDF 中
+
+        # 先把可能的进度提示层隐藏一次（有些主题会默认显示）
+        await page.evaluate(
+            """
+            () => {
+                const selectors = [
+                    '#MathJax_Message',
+                    '.MathJax_Message',
+                    '.MathJax-Processing',
+                    '.MathJax-Loading',
+                    '#MathJaxProcessingMessage'
+                ];
+                selectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                    });
+                });
+            }
+            """
+        )
+
+        # 如果正文里存在潜在公式标记，则等待 MathJax 加载完成
+        await page.wait_for_function(
+            r"""
+            () => {
+                const body = document.body;
+                const text = (body && (body.innerText || body.textContent)) ? (body.innerText || body.textContent) : '';
+                const hasPotentialMath = /\\\(|\\\[|\\begin\{|\\$\\$|\\$/.test(text);
+                if (!hasPotentialMath) return true;
+                return !!window.MathJax;
+            }
+            """,
+            timeout=0,
+        )
+
+        # 显式等待 MathJax 排版完成（best-effort，避免未渲染就导出）
+        await page.evaluate(
+            """
+            async () => {
+                const mj = window.MathJax;
+                if (!mj) return;
+                // MathJax v3
+                if (typeof mj.typesetPromise === 'function') {
+                    try { await mj.typesetPromise(); } catch (e) {}
+                    return;
+                }
+                // MathJax v2
+                if (mj.Hub && typeof mj.Hub.Queue === 'function') {
+                    await new Promise(resolve => {
+                        try { mj.Hub.Queue(resolve); } catch (e) { resolve(); }
+                    });
+                }
+            }
+            """,
+        )
+
+        # 等待进度提示层彻底不可见（否则可能被打印到 PDF）
         await page.wait_for_function(
             """
             () => {
-                if (typeof MathJax === 'undefined') return true; // Skip if no MathJax
-                if (typeof MathJax.typesetPromise === 'function') {
-                    // MathJax v3
-                    return MathJax.typesetPromise &&
-                           (window.MathJax?.Hub?.Queue?.length === 0 ||
-                            !window.MathJax?.Hub);
-                }
-                // MathJax v2
-                return window.MathJax?.Hub?.Queue?.length === 0;
+                const el = document.getElementById('MathJax_Message');
+                if (!el) return true;
+                const style = window.getComputedStyle(el);
+                return style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0';
             }
             """,
-            timeout=60000
+            timeout=0,
         )
 
         # Extra wait for rendering stability
@@ -77,13 +169,18 @@ async def _html_to_pdf(page, html_path: str, pdf_path: str):
         await page.evaluate(
             """
             () => {
-                const ids = ['MathJax_Message'];
-                ids.forEach(id => {
-                    const el = document.getElementById(id);
-                    if (el) el.style.display = 'none';
-                });
-                document.querySelectorAll('.MathJax_Message,.MathJax-Processing,.MathJax-Loading').forEach(el => {
-                    el.style.display = 'none';
+                const selectors = [
+                    '#MathJax_Message',
+                    '.MathJax_Message',
+                    '.MathJax-Processing',
+                    '.MathJax-Loading',
+                    '#MathJaxProcessingMessage'
+                ];
+                selectors.forEach(sel => {
+                    document.querySelectorAll(sel).forEach(el => {
+                        el.style.display = 'none';
+                        el.style.visibility = 'hidden';
+                    });
                 });
             }
             """

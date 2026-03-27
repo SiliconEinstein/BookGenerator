@@ -1,5 +1,6 @@
 """Typed structures for chapter data."""
 
+import os
 from dataclasses import dataclass
 from typing import Dict, Any, List, Optional
 
@@ -66,9 +67,75 @@ class BookGenerationContext:
     chapter_ids: Optional[List[int]] = None
     subchapter_ids: Optional[List[str]] = None
     output_dir: str = ""
+    material_pack_dir: str = ""
+
+    # -------- unified course layout --------
+    # course_dir/
+    #   pack/...
+    #   book/{chapters,md,md_with_images,log,qa_pairs,images,html,pdf}/...
+    #   book_info/{syllabus.md,book_info.json}
+
+    @property
+    def course_dir(self) -> str:
+        """Root dir for a single course (course_name folder)."""
+        return self.output_dir
+
+    @property
+    def pack_dir(self) -> str:
+        return os.path.join(self.course_dir, "pack")
+
+    @property
+    def book_dir(self) -> str:
+        return os.path.join(self.course_dir, "book")
+
+    @property
+    def book_info_dir(self) -> str:
+        return os.path.join(self.course_dir, "book_info")
+
+    @property
+    def chapters_dir(self) -> str:
+        return os.path.join(self.book_dir, "chapters")
+
+    @property
+    def temp_md_dir(self) -> str:
+        return os.path.join(self.book_dir, "md")
+
+    @property
+    def temp_md_with_images_dir(self) -> str:
+        return os.path.join(self.book_dir, "md_with_images")
+
+    @property
+    def temp_log_dir(self) -> str:
+        return os.path.join(self.book_dir, "log")
+
+    @property
+    def temp_qa_pairs_dir(self) -> str:
+        return os.path.join(self.book_dir, "qa_pairs")
+
+    @property
+    def book_html_dir(self) -> str:
+        return os.path.join(self.book_dir, "html")
+
+    @property
+    def book_pdf_dir(self) -> str:
+        return os.path.join(self.book_dir, "pdf")
+
+    @property
+    def images_dir(self) -> str:
+        return os.path.join(self.book_dir, "images")
 
     def get_chapter_dir(self, chapter_key: str) -> str:
         return self.filename_map["chapters"][chapter_key]
+
+    def get_chapter_root_dir(self, chapter_key: str) -> str:
+        """Directory for a chapter under chapters/."""
+        return os.path.join(self.chapters_dir, self.get_chapter_dir(chapter_key))
+
+    def get_chapter_step1_dir(self, chapter_key: str) -> str:
+        return os.path.join(self.get_chapter_root_dir(chapter_key), "step1")
+
+    def get_chapter_step2_dir(self, chapter_key: str) -> str:
+        return os.path.join(self.get_chapter_root_dir(chapter_key), "step2")
 
     def get_subchapter_filename(self, sub_code: str) -> str:
         safe_title = self.filename_map["subchapters"][sub_code]

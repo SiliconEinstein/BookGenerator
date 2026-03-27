@@ -28,7 +28,11 @@ def build_parser() -> argparse.ArgumentParser:
     text_parser.add_argument("--reason", default="")
 
     md_parser = subparsers.add_parser("markdown", help="解析markdown标签生成图片")
-    md_parser.add_argument("--markdown-path", default=r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md\第1章_工程目标_指标体系与方案闭环边界.md", required=True)
+    md_parser.add_argument(
+        "--markdown-path",
+        default=r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\可控核聚变\temp\md\第1章_工程目标_指标体系与方案闭环边界.md",
+        required=True
+    )
     md_parser.add_argument("--output-dir", default="./output")
     md_parser.add_argument("--manifest", default="")
     md_parser.add_argument("--eval", action="store_true")
@@ -98,8 +102,8 @@ def main():
     #     asyncio.run(run_text(context, output_dir, image_name))
         
     # 测试markdown绘图接口
-    markdown_path = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\books\可控核聚变\md\第1章_工程目标_指标体系与方案闭环边界.md"
-    output_dir = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\images\可控核聚变\第1章_工程目标_指标体系与方案闭环边界"
+    markdown_path = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\可控核聚变\temp\md\第1章_工程目标_指标体系与方案闭环边界.md"
+    output_dir = r"F:\SciencePedia\topic_book_generation\book_generate_pipeline\output\可控核聚变\images\第1章_工程目标_指标体系与方案闭环边界"
     asyncio.run(run_markdown_file(markdown_path, output_dir))
 
 if __name__ == "__main__":

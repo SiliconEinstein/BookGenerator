@@ -331,9 +331,20 @@ body > *:first-child,
     border-bottom: 1px solid #d1d5db;
 }
 
+.markdown-body table thead th,
+.markdown-body table thead td {
+    text-align: center !important;
+}
+
+.markdown-body table thead th > p,
+.markdown-body table thead td > p {
+    text-align: center !important;
+    margin: 0;
+}
+
 .markdown-body table th {
     padding: 6px 24px;
-    text-align: left;
+    text-align: center;
     font-weight: 600;
     color: #374151;
     font-size: 0.9em;
