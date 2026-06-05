@@ -492,6 +492,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 3200
 
 ## 相关文档
 
+- [**隧道调用、API 封装与缩略图生成**](./docs/TUNNEL_API_AND_THUMBNAIL.md) — Agent 复现必读
 - [PPT API 接口文档](./Claude-Code-To-API/docs/PPT_API.md)
 - [html-ppt 封装实例（v2 踩坑记录）](./Claude-Code-To-API/docs/EXAMPLE_HTML_PPT.md)
 - [html-ppt-skill 中文文档](./html-ppt-skill/README.zh-CN.md)
