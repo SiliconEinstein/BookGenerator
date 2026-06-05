@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+.env
+.env.*
+
+# Node
+node_modules/
+
+# API keys & secrets
+api_keys.json
+!api_keys.json.example
+
+# Logs & temp
+*.log
+*.tmp
+
+# Claude local
+.claude/
+
+# Generated output
+html-ppt-skill/output/*.html
+!html-ppt-skill/output/.gitkeep

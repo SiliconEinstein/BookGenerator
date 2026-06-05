@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="academic-paper">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第5章 自然语言处理</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/academic-paper.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="academic-paper" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="课程概览">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">课程概览</h2>
+    <ul class="list mt-m"><li>本章主题：自然语言处理（NLP）核心技术</li><li>知识点：命名实体识别、关系抽取、文本分类</li><li>教学目标：理解NLP基本概念，掌握NER流程</li><li>应用场景：信息抽取、智能问答、舆情分析</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="自然语言处理基本概念">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">自然语言处理基本概念</h2>
+    <ul class="list mt-m"><li>NLP：让计算机理解、生成和处理人类语言的技术</li><li>核心挑战：歧义性、多义性、上下文依赖</li><li>处理层次：词法分析 → 句法分析 → 语义分析 → 语用分析</li><li>基础任务：分词、词性标注、句法解析、语义角色标注</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="命名实体识别（NER）概述">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">命名实体识别（NER）概述</h2>
+    <ul class="list mt-m"><li>定义：从非结构化文本中识别具有特定意义的实体</li><li>常见实体类型：人名、地名、机构名、时间、数值</li><li>核心价值：信息抽取的基础环节，下游任务的前置步骤</li><li>难点：嵌套实体、新兴实体、领域迁移</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="NER 技术方法演进">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">NER 技术方法演进</h2>
+    <ul class="list mt-m"><li>规则方法：基于词典匹配和正则表达式</li><li>统计方法：HMM、CRF 序列标注模型</li><li>深度学习：BiLSTM-CRF、BERT+CRF</li><li>前沿方向：少样本NER、跨语言NER、多模态NER</li><li>标注体系：BIO / BIOES 序列标注规范</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="NER 处理流程">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">NER 处理流程</h2>
+    <ul class="list mt-m"><li>Step 1：文本预处理（分词、清洗、归一化）</li><li>Step 2：特征提取（字符嵌入、词嵌入、上下文编码）</li><li>Step 3：序列标注（逐token预测实体标签）</li><li>Step 4：实体解码（标签序列 → 实体片段）</li><li>Step 5：后处理（实体链接、去重、置信度过滤）</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="关系抽取">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">关系抽取</h2>
+    <ul class="list mt-m"><li>目标：识别文本中实体之间的语义关系</li><li>关系类型示例：任职于、位于、创始人、属于</li><li>主流方法：管道式（先NER后分类）vs 联合抽取</li><li>模型架构：基于注意力机制的关系分类器</li><li>应用：知识图谱构建、事件抽取、因果推理</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="文本分类">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">文本分类</h2>
+    <ul class="list mt-m"><li>任务定义：将文本自动归入预定义类别</li><li>典型应用：情感分析、垃圾邮件检测、新闻分类、意图识别</li><li>经典方法：TF-IDF + SVM / 朴素贝叶斯</li><li>深度方法：TextCNN、BERT 微调、Prompt-based 分类</li><li>评估指标：准确率、精确率、召回率、F1值</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="三大任务对比">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">三大任务对比</h2>
+    <ul class="list mt-m"><li>NER：序列标注任务，输出实体边界与类型</li><li>关系抽取：分类任务，输出实体对之间的关系标签</li><li>文本分类：整体分类任务，输出文档级别的类别</li><li>共性：均依赖高质量标注数据和预训练语言模型</li><li>联系：NER → 关系抽取 → 知识图谱，形成信息抽取流水线</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="实践与应用案例">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">实践与应用案例</h2>
+    <ul class="list mt-m"><li>医疗NLP：病历实体识别、药物关系抽取</li><li>金融NLP：公告事件抽取、舆情情感分析</li><li>法律NLP：案件要素识别、法条关系推理</li><li>开源工具：spaCy、HanLP、LAC、PaddleNLP</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="9" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="本章小结与思考">
+    <p class="kicker">第5章 自然语言处理</p>
+    <h2 class="h2">本章小结与思考</h2>
+    <ul class="list mt-m"><li>NLP三大核心任务：NER、关系抽取、文本分类</li><li>技术趋势：预训练大模型 + 少样本/零样本学习</li><li>关键能力：理解序列标注范式，掌握NER完整流程</li><li>思考题：如何针对特定领域构建NER系统？</li><li>下一步：动手实践 BiLSTM-CRF 命名实体识别</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="10" data-total="10"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

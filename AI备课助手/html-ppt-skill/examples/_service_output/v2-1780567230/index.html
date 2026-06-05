@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 函数式编程</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="Python 函数式编程">
+    
+    <h1 class="h1 anim-fade-up">Python 函数式编程</h1>
+    <p class="lede">lambda 表达式、map/filter/reduce、列表推导式</p>
+    <p class="dim mt-m">Python 编程课程</p>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="Lambda 表达式">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">Lambda 表达式</h2>
+    <div class="grid g2 mt-m">
+      <div class="card"><ul class="list"><li>匿名函数的快速定义方式</li><li>语法：lambda 参数: 表达式</li><li>适用于简单的一次性函数</li><li>常与 map/filter 配合使用</li></ul></div>
+      <div class="card"><ul class="list"><li>示例：lambda x: x * 2</li><li>多参数：lambda x, y: x + y</li><li>返回值自动计算</li><li>不支持多行语句</li></ul></div>
+    </div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="map / filter / reduce">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">map / filter / reduce</h2>
+    <div class="grid g3 mt-m">
+      <div class="card"><ul class="list"><li>map(func, iter)</li><li>对每个元素应用函数</li><li>返回迭代器</li><li>示例：map(lambda x: x**2, [1,2,3])</li></ul></div>
+      <div class="card"><ul class="list"><li>filter(func, iter)</li><li>筛选满足条件的元素</li><li>返回迭代器</li><li>示例：filter(lambda x: x&gt;0, nums)</li></ul></div>
+      <div class="card"><ul class="list"><li>reduce(func, iter)</li><li>累积计算结果</li><li>需导入 functools</li><li>示例：reduce(lambda x,y: x+y, [1,2,3])</li></ul></div>
+    </div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="列表推导式">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">列表推导式</h2>
+    <ul class="list mt-m"><li>更 Pythonic 的函数式写法：[表达式 for 变量 in 可迭代对象 if 条件]</li><li>基础用法：[x*2 for x in range(5)] → [0,2,4,6,8]</li><li>带条件筛选：[x for x in range(10) if x%2==0] → [0,2,4,6,8]</li><li>嵌套推导式：[[j for j in range(3)] for i in range(2)]</li><li>性能优于 map/filter，可读性更强</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="最佳实践">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">最佳实践</h2>
+    <div class="mt-m"><table style='width:100%;border-collapse:collapse'><thead><tr><th style='padding:12px;border-bottom:2px solid var(--border-strong);text-align:left'>场景</th><th style='padding:12px;border-bottom:2px solid var(--border-strong);text-align:left'>推荐方案</th><th style='padding:12px;border-bottom:2px solid var(--border-strong);text-align:left'>原因</th></tr></thead><tbody><tr><td style='padding:12px;border-bottom:1px solid var(--border)'>简单转换</td><td style='padding:12px;border-bottom:1px solid var(--border)'>列表推导式</td><td style='padding:12px;border-bottom:1px solid var(--border)'>可读性最佳</td></tr><tr><td style='padding:12px;border-bottom:1px solid var(--border)'>复杂筛选</td><td style='padding:12px;border-bottom:1px solid var(--border)'>filter + lambda</td><td style='padding:12px;border-bottom:1px solid var(--border)'>逻辑清晰</td></tr><tr><td style='padding:12px;border-bottom:1px solid var(--border)'>累积计算</td><td style='padding:12px;border-bottom:1px solid var(--border)'>reduce</td><td style='padding:12px;border-bottom:1px solid var(--border)'>语义明确</td></tr><tr><td style='padding:12px;border-bottom:1px solid var(--border)'>一次性函数</td><td style='padding:12px;border-bottom:1px solid var(--border)'>lambda</td><td style='padding:12px;border-bottom:1px solid var(--border)'>代码简洁</td></tr></tbody></table></div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="5"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="第5章 自然语言处理、知识图谱和可解释人工智能">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">第5章 自然语言处理、知识图谱和可解释人工智能</h2>
+    <ul class="list mt-m"><li>本节主题：自然语言处理与文本挖掘</li><li>从非结构化文本到结构化知识</li><li>在生物医学与药物研发场景中的应用</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="教学目标">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">教学目标</h2>
+    <ul class="list mt-m"><li>理解 NLP 基础任务：命名实体识别（NER）与关系抽取（RE）</li><li>掌握医学 NLP 两大应用：关系抽取与不良反应抽取</li><li>学会使用评估度量指导任务改进</li><li>完成从文本到结构化信息的完整流程</li><li>具备对抽取结果进行质检与纠错的能力</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="NLP 基础任务：信息抽取的核心">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">NLP 基础任务：信息抽取的核心</h2>
+    <ul class="list mt-m"><li>目标：将非结构化生物医学文本转为结构化信息</li><li>命名实体识别（NER）：识别实体边界与类型（药物、疾病、基因等）</li><li>关系抽取（RE）：判断实体对之间的关系类型与方向</li><li>输出形式：实体表 + 关系表/三元组</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学 NLP 应用场景">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学 NLP 应用场景</h2>
+    <ul class="list mt-m"><li>关系抽取：药物—靶点、药物—疾病、药物—通路</li><li>不良反应抽取：识别药物安全性信号</li><li>扩展信息：严重程度、时间、剂量、人群特征</li><li>应用价值：知识图谱构建、证据汇总、药物警戒</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="实体识别（NER）方法要点">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">实体识别（NER）方法要点</h2>
+    <ul class="list mt-m"><li>定位实体边界并赋予类型标签</li><li>课堂工具：spaCy（领域模型）或 BERT（预训练/微调）</li><li>输出内容：实体文本、起止位置、类型、置信度</li><li>常见类型：药物、疾病、基因/蛋白、不良反应</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="关系抽取（RE）方法要点">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">关系抽取（RE）方法要点</h2>
+    <ul class="list mt-m"><li>判断实体对之间是否存在特定关系</li><li>基础方法：规则/模式、关键词、句法依存</li><li>模型方法：基于 Transformer 的 RE 组件</li><li>输出格式：实体1 - 关系类型 - 实体2 + 证据句</li><li>关键点：明确关系方向与存在性</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估度量：衡量抽取质量">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">评估度量：衡量抽取质量</h2>
+    <ul class="list mt-m"><li>为什么需要：比较方法、指导迭代、保证质量</li><li>NER 评估：边界正确性、类型正确性（Precision/Recall/F1）</li><li>RE 评估：关系正确性、方向正确性、漏检率</li><li>严格匹配 vs 宽松匹配的权衡</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="典型应用产出">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">典型应用产出</h2>
+    <ul class="list mt-m"><li>关系抽取产出：实体—关系—实体的结构化结果</li><li>用于证据汇总、候选靶点发现、知识问答</li><li>不良反应抽取产出：药物安全性信号汇总</li><li>用于药物警戒、说明书整理、候选分子对比</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="常见抽取误差来源">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">常见抽取误差来源</h2>
+    <ul class="list mt-m"><li>实体边界问题：过长或过短</li><li>实体类型混淆：药物/代谢物、疾病/症状</li><li>同义词与缩写：同一实体的多种写法</li><li>关系误判：共现不等于因果关系</li><li>否定/假设/对照句容易导致方向误判</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="9" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="质量控制与改进策略">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">质量控制与改进策略</h2>
+    <ul class="list mt-m"><li>评估与复核意识：抽取结果是候选证据</li><li>可追溯：保留证据句与来源信息</li><li>改进方向：调整实体类型集合、加入规则过滤</li><li>提高阈值、替换模型、同义词归一化</li><li>任务对齐：先定义再抽取</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="10" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂实操流程">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂实操流程</h2>
+    <ul class="list mt-m"><li>步骤1：使用 spaCy/BERT 运行 NER，识别 ≥5 个实体</li><li>步骤2：进行关系抽取，输出 ≥2 条关系与证据句</li><li>步骤3：人工复核，识别边界、类型、否定、方向错误</li><li>步骤4：提出 1 条可执行的改进建议</li><li>步骤5：交叉复核，组间互评找出误判点</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="11" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="结构化输出模板">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">结构化输出模板</h2>
+    <ul class="list mt-m"><li>实体表：实体 | 类型 | 起止位置 | 证据片段</li><li>关系表：实体1 | 类型1 | 关系 | 实体2 | 类型2 | 证据句</li><li>质检标记：是否可能误判（Y/N）</li><li>改进建议：明确改什么、怎么改</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="12" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂达成要求（45分钟验收）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂达成要求（45分钟验收）</h2>
+    <ul class="list mt-m"><li>提交 ≥5 个实体（含类型标注）</li><li>提交 ≥2 条关系（含方向、证据句）</li><li>简述评估度量的作用（评估什么、为什么）</li><li>提出 1 条可落地的改进建议</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="13" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="拓展实践方向">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">拓展实践方向</h2>
+    <ul class="list mt-m"><li>对比不同文本来源：文献摘要 vs 说明书 vs 病例报道</li><li>加入规则集：否定词、触发词、方向词</li><li>观察对 Precision/Recall 的影响</li><li>实体归一化：处理同义词与缩写</li><li>证据管理：记录来源句与文献 ID</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="14" data-total="15"></span></div>
+  </section>
+
+  <section class="slide" data-title="小结">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">小结</h2>
+    <ul class="list mt-m"><li>NER 输出实体表，RE 输出关系/三元组</li><li>不良反应抽取汇总药物安全性信号</li><li>评估度量用于衡量质量、指导迭代</li><li>共现不等于因果，需要规则与人工复核</li><li>结构化输出是知识图谱构建的基础</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="15" data-total="15"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

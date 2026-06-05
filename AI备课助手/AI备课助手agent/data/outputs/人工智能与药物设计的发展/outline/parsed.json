@@ -1,0 +1,323 @@
+{
+  "courseName": "人工智能与药物设计的发展",
+  "chapters": [
+    {
+      "chapterName": "绪论 人工智能与药物设计的发展",
+      "sort": 1,
+      "sections": [
+        {
+          "sectionName": "新药研发流程、成本与挑战",
+          "sort": 1
+        },
+        {
+          "sectionName": "人工智能赋能药物研发的历史与现状（成功案例）",
+          "sort": 2
+        },
+        {
+          "sectionName": "课程安排、学习方法与评价方式",
+          "sort": 3
+        },
+        {
+          "sectionName": "分组讨论：列举已知的 AI 药物研发成功案例，分析 AI 介入的关键环节",
+          "sort": 4
+        }
+      ]
+    },
+    {
+      "chapterName": "第一部分 人工智能算法基础",
+      "sort": 2,
+      "sections": [
+        {
+          "sectionName": "第 1 章 机器学习基础",
+          "sort": 1
+        },
+        {
+          "sectionName": "监督学习",
+          "sort": 2
+        },
+        {
+          "sectionName": "无监督学习",
+          "sort": 3
+        },
+        {
+          "sectionName": "强化学习",
+          "sort": 4
+        },
+        {
+          "sectionName": "模型评估与验证",
+          "sort": 5
+        },
+        {
+          "sectionName": "应用实例与代码",
+          "sort": 6
+        },
+        {
+          "sectionName": "第 2 章 深度网络结构设计基础",
+          "sort": 7
+        },
+        {
+          "sectionName": "卷积神经网络",
+          "sort": 8
+        },
+        {
+          "sectionName": "循环神经网络",
+          "sort": 9
+        },
+        {
+          "sectionName": "Transformer",
+          "sort": 10
+        },
+        {
+          "sectionName": "图神经网络",
+          "sort": 11
+        },
+        {
+          "sectionName": "小结",
+          "sort": 12
+        },
+        {
+          "sectionName": "第 3 章 深度生成模型",
+          "sort": 13
+        },
+        {
+          "sectionName": "变分自编码器",
+          "sort": 14
+        },
+        {
+          "sectionName": "生成式对抗网络",
+          "sort": 15
+        },
+        {
+          "sectionName": "流生成模型",
+          "sort": 16
+        },
+        {
+          "sectionName": "小结",
+          "sort": 17
+        },
+        {
+          "sectionName": "第 4 章 深度强化学习",
+          "sort": 18
+        },
+        {
+          "sectionName": "基于值函数的算法",
+          "sort": 19
+        },
+        {
+          "sectionName": "策略梯度算法",
+          "sort": 20
+        },
+        {
+          "sectionName": "CartPole 编程实例",
+          "sort": 21
+        },
+        {
+          "sectionName": "小结",
+          "sort": 22
+        },
+        {
+          "sectionName": "第 5 章 自然语言处理、知识图谱和可解释人工智能",
+          "sort": 23
+        },
+        {
+          "sectionName": "自然语言处理与文本挖掘",
+          "sort": 24
+        },
+        {
+          "sectionName": "知识图谱",
+          "sort": 25
+        },
+        {
+          "sectionName": "可解释人工智能",
+          "sort": 26
+        }
+      ]
+    },
+    {
+      "chapterName": "第二部分 数据基础与表征",
+      "sort": 3,
+      "sections": [
+        {
+          "sectionName": "第 6 章 分子结构与生物活性数据",
+          "sort": 1
+        },
+        {
+          "sectionName": "生物大分子结构数据库",
+          "sort": 2
+        },
+        {
+          "sectionName": "小分子结构数据库",
+          "sort": 3
+        },
+        {
+          "sectionName": "生物活性数据库",
+          "sort": 4
+        },
+        {
+          "sectionName": "小结",
+          "sort": 5
+        },
+        {
+          "sectionName": "第 7 章 分子数据的表征",
+          "sort": 6
+        },
+        {
+          "sectionName": "小分子化合物的表征",
+          "sort": 7
+        },
+        {
+          "sectionName": "蛋白质的表征",
+          "sort": 8
+        },
+        {
+          "sectionName": "核酸序列的表征",
+          "sort": 9
+        },
+        {
+          "sectionName": "小结与展望",
+          "sort": 10
+        }
+      ]
+    },
+    {
+      "chapterName": "第三部分 + 第四部分",
+      "sort": 4,
+      "sections": [
+        {
+          "sectionName": "第 8 章 药物靶标发现与识别",
+          "sort": 1
+        },
+        {
+          "sectionName": "生物组学分析与药物靶标发现和药物重定位",
+          "sort": 2
+        },
+        {
+          "sectionName": "基于序列的蛋白质可药靶性的发现",
+          "sort": 3
+        },
+        {
+          "sectionName": "基于结构与网络的可药靶性识别",
+          "sort": 4
+        },
+        {
+          "sectionName": "网络药理学与药物重定向",
+          "sort": 5
+        },
+        {
+          "sectionName": "第 9 章 分子结构预测",
+          "sort": 6
+        },
+        {
+          "sectionName": "蛋白质结构预测",
+          "sort": 7
+        },
+        {
+          "sectionName": "核酸结构预测",
+          "sort": 8
+        },
+        {
+          "sectionName": "小分子构象预测",
+          "sort": 9
+        },
+        {
+          "sectionName": "第 11 章 小分子药物生成与从头设计",
+          "sort": 10
+        },
+        {
+          "sectionName": "基于片段的药物设计",
+          "sort": 11
+        },
+        {
+          "sectionName": "分子生成模型",
+          "sort": 12
+        },
+        {
+          "sectionName": "三维分子生成",
+          "sort": 13
+        },
+        {
+          "sectionName": "逆合成预测",
+          "sort": 14
+        },
+        {
+          "sectionName": "反应表现预测及反应条件优化",
+          "sort": 15
+        },
+        {
+          "sectionName": "第 12 章 小分子药物设计与优化",
+          "sort": 16
+        },
+        {
+          "sectionName": "小分子-靶标结合亲和力预测与打分函数的设计",
+          "sort": 17
+        },
+        {
+          "sectionName": "小分子药物吸收、分布、代谢、排泄和毒性性质的预测",
+          "sort": 18
+        },
+        {
+          "sectionName": "第 13 章 大分子药物设计",
+          "sort": 19
+        },
+        {
+          "sectionName": "抗体药物设计",
+          "sort": 20
+        },
+        {
+          "sectionName": "多肽药物设计",
+          "sort": 21
+        },
+        {
+          "sectionName": "其他大分子药物",
+          "sort": 22
+        },
+        {
+          "sectionName": "第 14 章 ADMET 性质预测",
+          "sort": 23
+        },
+        {
+          "sectionName": "基于人工智能的 ADMET 预测",
+          "sort": 24
+        },
+        {
+          "sectionName": "药物毒性预测",
+          "sort": 25
+        },
+        {
+          "sectionName": "药物代谢产物预测",
+          "sort": 26
+        },
+        {
+          "sectionName": "第四部分 程序代码（综合项目）",
+          "sort": 27
+        },
+        {
+          "sectionName": "综合项目实践",
+          "sort": 28
+        },
+        {
+          "sectionName": "第 15 章项目练习",
+          "sort": 29
+        },
+        {
+          "sectionName": "人工智能药物设计的挑战",
+          "sort": 30
+        },
+        {
+          "sectionName": "未来发展方向",
+          "sort": 31
+        },
+        {
+          "sectionName": "分组辩论“AI 能否完全取代传统药物设计方法”",
+          "sort": 32
+        },
+        {
+          "sectionName": "小组设计一个未来 AI 药物发现平台的蓝图并展示",
+          "sort": 33
+        }
+      ]
+    }
+  ],
+  "outlineSourceUrl": "/personal/AI备课助手/docs/project/人工智能与药物设计的发展.md",
+  "sourceFileUrl": "/personal/AI备课助手/docs/project/人工智能与药物设计的发展.pdf"
+}

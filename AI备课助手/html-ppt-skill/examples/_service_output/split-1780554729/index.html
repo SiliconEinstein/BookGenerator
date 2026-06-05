@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="第5章 自然语言处理、知识图谱和可解释人工智能">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">第5章 自然语言处理、知识图谱和可解释人工智能</h2>
+    <ul class="list mt-m"><li>本节主题：自然语言处理与文本挖掘</li><li>从非结构化文本到结构化知识</li><li>面向生物医学与药物研发的信息抽取</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="教学目标">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">教学目标</h2>
+    <ul class="list mt-m"><li>理解并区分命名实体识别（NER）与关系抽取（RE）的目标与差异</li><li>掌握医学NLP应用：关系抽取与不良反应抽取的典型任务产出</li><li>能够解释评估度量在任务中的作用与使用场景</li><li>完成从文本到结构化信息的完整流程实践</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="核心问题：为什么需要NLP？">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">核心问题：为什么需要NLP？</h2>
+    <ul class="list mt-m"><li>海量生物医学文献、病例、说明书处于非结构化状态</li><li>人工阅读效率低，难以大规模检索与证据汇总</li><li>需要将文本转化为可计算的结构化信息</li><li>目标：实体识别 → 关系抽取 → 知识组织 → 智能决策</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="NLP基础任务：命名实体识别（NER）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">NLP基础任务：命名实体识别（NER）</h2>
+    <ul class="list mt-m"><li>目标：识别文本中的实体边界与类型</li><li>生物医学实体：药物、疾病、基因/蛋白、不良反应等</li><li>输出：实体列表（文本、起止位置、类型、置信度）</li><li>课堂工具：spaCy（领域模型）或 BERT（预训练/微调）</li><li>常见挑战：边界过长/过短、缩写、同义词</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="NLP基础任务：关系抽取（RE）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">NLP基础任务：关系抽取（RE）</h2>
+    <ul class="list mt-m"><li>目标：判断实体对之间是否存在特定关系</li><li>输出：关系类型与方向（三元组：实体1—关系—实体2）</li><li>实现路径：规则/模式（触发词、依存句法）或模型（Transformer）</li><li>核心要点：共现 ≠ 因果，需要证据句支撑</li><li>必须处理：否定句、对照句、假设句</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学NLP应用（1）：关系抽取">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学NLP应用（1）：关系抽取</h2>
+    <ul class="list mt-m"><li>典型关系：药物—靶点、药物—疾病、药物—通路、药物—不良反应</li><li>产出：可计算的「实体—关系—实体」结构化结果</li><li>应用价值：证据汇总、候选靶点/适应症线索、知识图谱构建</li><li>案例：从文献中抽取「阿司匹林 抑制 COX-2」</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学NLP应用（2）：不良反应抽取">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学NLP应用（2）：不良反应抽取</h2>
+    <ul class="list mt-m"><li>从文献、病例、说明书、药物警戒文本中识别安全性信号</li><li>扩展字段：严重程度、时间、剂量、人群</li><li>应用价值：药物警戒、说明书信息整理、候选分子对比筛选</li><li>案例：「XX药物 导致 肝功能异常（中度，服药2周后）」</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估度量：如何衡量抽取质量？">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">评估度量：如何衡量抽取质量？</h2>
+    <ul class="list mt-m"><li>为什么需要：衡量质量、比较方法、指导迭代</li><li>NER评估：边界是否正确、类型是否正确（Precision/Recall/F1）</li><li>RE评估：关系是否正确、方向是否正确、是否漏检</li><li>严格匹配 vs 宽松匹配：边界完全一致 vs 部分重叠即可</li><li>关键：可追溯证据句与来源</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="抽取误差来源（常见且可复现）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">抽取误差来源（常见且可复现）</h2>
+    <ul class="list mt-m"><li>实体边界：过长/过短（如「阿司匹林片」误识别为「阿司匹林片剂量」）</li><li>实体类型：药物/代谢物/商品名混淆，疾病与症状混淆</li><li>同义词/缩写：acetylsalicylic acid vs aspirin</li><li>关系误判：共现不等于关系（同一句出现但无因果）</li><li>否定/假设/对照句容易误判方向或存在性</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="9" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂实操：完整流程（45分钟验收）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂实操：完整流程（45分钟验收）</h2>
+    <ul class="list mt-m"><li>步骤1：运行NER，抽取≥5个实体（含类型标注）</li><li>步骤2：完成RE，抽取≥2条关系（含方向、证据句）</li><li>步骤3：填写结构化表格（实体表 + 关系表）</li><li>步骤4：快速人工复核，识别明显错误</li><li>步骤5：给出1条可执行的改进建议</li><li>交叉复核：组间互换结果，指出对方1处可能误判</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="10" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="质检与改进意识">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">质检与改进意识</h2>
+    <ul class="list mt-m"><li>抽取结果是「候选证据」，不是「确凿事实」</li><li>改进方向：调整实体类型集合、加入否定词过滤规则</li><li>改进方向：提高阈值、替换模型、增加同义词归一后处理</li><li>任务对齐：先定义（实体类型集合、关系集合、输出格式）再抽取</li><li>强调可追溯：每条关系必须附证据句与来源文献ID</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="11" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="小结：从文本到知识的桥梁">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">小结：从文本到知识的桥梁</h2>
+    <ul class="list mt-m"><li>NER输出实体表，RE输出关系/三元组</li><li>评估度量指导质量改进与方法对比</li><li>医学NLP应用：关系抽取为知识图谱提供输入，不良反应抽取辅助药物警戒</li><li>质量意识：共现≠因果，否定/对照需要规则处理</li><li>下节预告：如何将抽取结果组织为知识图谱</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="12" data-total="12"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

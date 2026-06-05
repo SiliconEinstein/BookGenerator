@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 异步编程入门</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/tokyo-night.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="tokyo-night" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="什么是异步编程">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">什么是异步编程</h2>
+    <ul class="list mt-m"><li>传统同步：代码逐行执行，等待 I/O 时阻塞</li><li>异步模式：I/O 等待期间可执行其他任务</li><li>适用场景：网络请求、文件读写、数据库查询</li><li>核心优势：高并发下提升资源利用率</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="6"></span></div>
+  </section>
+
+  <section class="slide" data-title="协程基础：async/await">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">协程基础：async/await</h2>
+    <ul class="list mt-m"><li>async def 定义协程函数</li><li>await 关键字挂起当前协程，等待异步操作完成</li><li>协程不会自动运行，需要事件循环调度</li><li>示例：async def fetch(): data = await get_data()</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="6"></span></div>
+  </section>
+
+  <section class="slide" data-title="事件循环：asyncio.run()">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">事件循环：asyncio.run()</h2>
+    <ul class="list mt-m"><li>事件循环是异步程序的核心调度器</li><li>asyncio.run(main()) 启动循环并执行协程</li><li>循环管理所有协程的挂起与恢复</li><li>Python 3.7+ 推荐使用 asyncio.run()</li><li>自动处理循环的创建、运行和关闭</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="6"></span></div>
+  </section>
+
+  <section class="slide" data-title="并发任务：gather 与 create_task">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">并发任务：gather 与 create_task</h2>
+    <ul class="list mt-m"><li>asyncio.gather(*tasks) 并发执行多个协程，等待全部完成</li><li>asyncio.create_task(coro) 将协程封装为 Task 立即调度</li><li>gather 返回结果列表，保持顺序</li><li>create_task 适合后台任务，不阻塞主流程</li><li>示例：results = await asyncio.gather(fetch1(), fetch2())</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="6"></span></div>
+  </section>
+
+  <section class="slide" data-title="异步 I/O：文件与网络">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">异步 I/O：文件与网络</h2>
+    <ul class="list mt-m"><li>标准库：asyncio.open() 异步读写文件</li><li>网络请求：aiohttp 库实现异步 HTTP 客户端</li><li>数据库：asyncpg、aiomysql 等异步驱动</li><li>注意：requests 库是同步的，需替换为 aiohttp</li><li>异步 I/O 能显著提升高并发场景性能</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="6"></span></div>
+  </section>
+
+  <section class="slide" data-title="实践建议">
+    <p class="kicker">Python 异步编程入门</p>
+    <h2 class="h2">实践建议</h2>
+    <ul class="list mt-m"><li>优先使用高层 API：asyncio.run()、gather、create_task</li><li>避免在协程中调用阻塞函数（如 time.sleep，改用 asyncio.sleep）</li><li>混合同步代码时使用 runinexecutor 包装</li><li>调试工具：asyncio.run(debug=True) 开启详细日志</li><li>小步迁移：从单个模块开始异步化，逐步扩展</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="6"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

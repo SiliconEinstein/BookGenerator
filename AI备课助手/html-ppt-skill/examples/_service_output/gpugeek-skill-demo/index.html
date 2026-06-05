@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="engineering-whiteprint">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/engineering-whiteprint.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="engineering-whiteprint" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="本节目标与45分钟验收">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">本节目标与45分钟验收</h2>
+    <ul class="list mt-m"><li>理解：用自己的话区分 NER 与 RE（含例子）</li><li>产出：关系抽取得到“药物—靶点/疾病/不良反应”等关系</li><li>产出：不良反应抽取得到“药物—不良反应事件（含人群/剂量/时间）”</li><li>会用度量：Precision/Recall/F1 评估什么、为何评估、指导改进</li><li>当堂提交：≥5实体（含类型）+ ≥2关系（含证据句）+ 1条改进建议</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="核心概念：从文本到结构化信息">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">核心概念：从文本到结构化信息</h2>
+    <ul class="list mt-m"><li>目标：把非结构化生物医学文本 → 可计算的结构化结果</li><li>NER：识别实体边界 + 实体类型（药物/疾病/基因/不良反应等）</li><li>RE：判断实体对是否有关联 + 关系类型 + 方向</li><li>典型输出：实体表、关系表、三元组（E1-Rel-E2）</li><li>关键原则：先定义实体/关系集合与用途，再开始抽取</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="NER：怎么做、输出是什么">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">NER：怎么做、输出是什么</h2>
+    <ul class="list mt-m"><li>输入：句子/段落（文献摘要、说明书、药物警戒文本等）</li><li>方法：spaCy 领域模型 或 BERT 预训练/微调模型</li><li>输出字段：实体文本、起止位置、类型、置信度/分数</li><li>课堂要求：至少覆盖两类实体，总数≥5</li><li>常见坑：边界过长/过短、类型混淆、缩写被误当独立实体</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="RE：怎么做、如何形成关系/三元组">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">RE：怎么做、如何形成关系/三元组</h2>
+    <ul class="list mt-m"><li>前提：给定实体（来自 NER 或人工标注）</li><li>规则入门：共现 + 触发词/模式（causes/induces/inhibits/associated with）</li><li>方向判定：A inhibits B 等动词触发 + 句法/位置规则</li><li>输出建议：实体1|类型1|关系|实体2|类型2|证据句</li><li>质量底线：每条关系必须可追溯到证据句</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学NLP应用：关系抽取 vs 不良反应抽取">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学NLP应用：关系抽取 vs 不良反应抽取</h2>
+    <ul class="list mt-m"><li>关系抽取：药物—靶点/疾病/通路/不良反应 → 支撑证据链与知识图谱</li><li>不良反应抽取：药物—不良反应事件 → 汇总安全性信号</li><li>不良反应常扩展字段：严重程度、时间、剂量、人群</li><li>业务价值：检索与重定位、候选线索筛选、说明书信息整理</li><li>对比要点：RE更泛化；不良反应抽取更强调事件要素与语义约束</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估度量：评什么、为什么、用来改什么">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">评估度量：评什么、为什么、用来改什么</h2>
+    <ul class="list mt-m"><li>NER评估：边界对不对、类型对不对 → Precision/Recall/F1</li><li>RE评估：关系对不对、方向对不对、是否漏检 → Precision/Recall/F1</li><li>严格/宽松匹配：边界或事件要素是否必须完全一致</li><li>为什么评估：比较方法、定位错误来源、指导迭代</li><li>改进指向：降低误检（提精度）或减少漏检（提召回）</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="误差来源与质检清单（必须会找）">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">误差来源与质检清单（必须会找）</h2>
+    <ul class="list mt-m"><li>边界错误：实体截断/粘连（过短或过长）</li><li>类型错误：药物/代谢物/商品名混淆；疾病 vs 症状</li><li>同义词/缩写：aspirin vs acetylsalicylic acid 等需归一</li><li>关系误判：共现≠关系；跨句误连</li><li>否定/假设/对照：not/no/without 或对照组导致方向/存在性误判</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="8"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂实操流程：跑通→提交→改进（17分钟核心）">
+    <p class="kicker">第5章 自然语言处理、知识图谱和可解释人工智能：自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂实操流程：跑通→提交→改进（17分钟核心）</h2>
+    <ul class="list mt-m"><li>统一输入：发放含缩写与否定/对照的短文本</li><li>步骤1：NER → 导出实体表（实体|类型|证据片段）</li><li>步骤2：RE → 抽取≥2关系（含方向、证据句）并表格化</li><li>步骤3：快速质检：任选1条关系判定共现/否定/假设/对照风险</li><li>提交格式：实体清单 + 关系清单/三元组 + 证据句 + 1条可执行改进建议</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="8"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

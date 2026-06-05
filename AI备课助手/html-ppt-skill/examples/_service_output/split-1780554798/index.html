@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="欢迎来到 NLP 与医学文本挖掘">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">欢迎来到 NLP 与医学文本挖掘</h2>
+    <ul class="list mt-m"><li>第5章：自然语言处理、知识图谱和可解释人工智能</li><li>本节：自然语言处理与文本挖掘</li><li>从非结构化文本到结构化知识</li><li>让计算机读懂生物医学文献</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="今天的学习目标">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">今天的学习目标</h2>
+    <ul class="list mt-m"><li>理解 NER 和 RE 在医学场景中的区别</li><li>掌握关系抽取与不良反应抽取的实际产出</li><li>学会评估抽取结果的质量</li><li>完成从文本到结构化信息的完整流程</li><li>识别常见错误并提出改进建议</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="为什么需要 NLP？">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">为什么需要 NLP？</h2>
+    <ul class="list mt-m"><li>海量医学文献：每天数千篇论文发表</li><li>药品说明书、病例报告、临床试验数据</li><li>人工阅读效率低、遗漏风险高</li><li>需要将非结构化文本转为可计算的结构化信息</li><li>支持药物研发、安全监测、知识发现</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="核心任务一：命名实体识别（NER）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">核心任务一：命名实体识别（NER）</h2>
+    <ul class="list mt-m"><li>目标：识别文本中的实体边界与类型</li><li>医学实体类型：药物、疾病、基因/蛋白、不良反应</li><li>输出：实体文本 + 类型 + 位置 + 置信度</li><li>例：&quot;阿司匹林（药物）可能导致胃出血（不良反应）&quot;</li><li>工具：spaCy、BERT 预训练模型</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="核心任务二：关系抽取（RE）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">核心任务二：关系抽取（RE）</h2>
+    <ul class="list mt-m"><li>目标：判断实体对之间是否存在特定关系</li><li>输出：三元组（实体1 - 关系 - 实体2）+ 证据句</li><li>关系类型：药物-靶点、药物-疾病、药物-不良反应</li><li>方法：规则（触发词）+ 模型（Transformer）</li><li>挑战：共现≠因果、方向判断、否定句处理</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学 NLP 应用场景">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学 NLP 应用场景</h2>
+    <ul class="list mt-m"><li>关系抽取：构建药物-靶点/疾病知识图谱</li><li>不良反应抽取：药物警戒与安全性信号监测</li><li>证据链整理：支持药物重定位与候选筛选</li><li>临床决策支持：从病例中提取诊疗模式</li><li>文献检索增强：结构化索引加速信息获取</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估度量：如何衡量抽取质量？">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">评估度量：如何衡量抽取质量？</h2>
+    <ul class="list mt-m"><li>为什么评估：比较方法、指导迭代、控制质量</li><li>Precision（精确率）：抽出来的有多少是对的？</li><li>Recall（召回率）：该抽的抽出来了多少？</li><li>F1 值：综合平衡精确率和召回率</li><li>严格匹配 vs 宽松匹配：边界、类型、方向</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="常见抽取误差来源">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">常见抽取误差来源</h2>
+    <ul class="list mt-m"><li>实体边界：过长/过短截断</li><li>类型混淆：药物/代谢物、疾病/症状</li><li>同义词/缩写：acetylsalicylic acid = aspirin</li><li>共现误判：同一句出现≠存在关系</li><li>否定/假设：&quot;未发现...&quot;&quot;可能导致...&quot;</li><li>方向错误：inhibit vs activate</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂实操流程">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂实操流程</h2>
+    <ul class="list mt-m"><li>Step 1：运行 NER，标出 ≥5 个实体（含类型）</li><li>Step 2：执行 RE，抽取 ≥2 条关系（含证据句）</li><li>Step 3：人工复核，识别明显错误</li><li>Step 4：提出 1 条可执行的改进建议</li><li>Step 5：交叉复核，组间互相&quot;找茬&quot;</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="9" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="改进建议示例">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">改进建议示例</h2>
+    <ul class="list mt-m"><li>加入否定词过滤规则（no/not/without）</li><li>使用触发词表（causes/induces/inhibits）</li><li>提高置信度阈值减少误报</li><li>增加同义词/缩写归一化后处理</li><li>调整实体类型集合更符合任务需求</li><li>切换更适配的领域预训练模型</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="10" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂验收标准">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂验收标准</h2>
+    <ul class="list mt-m"><li>提交实体表：≥5 个实体 + 类型 + 证据片段</li><li>提交关系表：≥2 条关系 + 方向 + 证据句</li><li>简述评估度量的作用（评估什么、为什么）</li><li>给出 1 条&quot;可落地&quot;的改进建议</li><li>45 分钟内完成并提交</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="11" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="从文本到知识：下一步">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">从文本到知识：下一步</h2>
+    <ul class="list mt-m"><li>今天：文本 → 实体 + 关系（结构化信息）</li><li>下节：结构化信息 → 知识图谱</li><li>最终目标：支持药物研发全流程的智能决策</li><li>记住：抽取是候选证据，需要质量控制</li><li>持续迭代：评估 → 发现问题 → 改进 → 再评估</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="12" data-total="12"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

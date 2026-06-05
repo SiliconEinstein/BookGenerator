@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="tokyo-night">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 装饰器深入解析</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/tokyo-night.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="tokyo-night" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="什么是装饰器？">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">什么是装饰器？</h2>
+    <ul class="list mt-m"><li>装饰器是一种设计模式，用于在不修改原函数代码的情况下增强其功能</li><li>本质：接受函数作为参数，返回新函数的高阶函数</li><li>核心思想：函数是一等公民，可以作为参数传递和返回</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="闭包：装饰器的基础">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">闭包：装饰器的基础</h2>
+    <ul class="list mt-m"><li>闭包：内层函数引用外层函数的变量</li><li>特点：外层函数执行完毕后，内层函数仍可访问外层变量</li><li>装饰器利用闭包保存原函数引用和附加状态</li><li>示例：计数器、缓存等场景</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="@语法糖">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">@语法糖</h2>
+    <ul class="list mt-m"><li>@decorator 等价于 func = decorator(func)</li><li>语法糖让代码更简洁优雅</li><li>可以叠加多个装饰器：从下往上执行</li><li>Python 2.4+ 引入，已成为标准写法</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="带参数的装饰器">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">带参数的装饰器</h2>
+    <ul class="list mt-m"><li>三层嵌套结构：装饰器工厂 → 装饰器 → 包装函数</li><li>最外层接收装饰器参数，返回真正的装饰器</li><li>应用场景：权限验证、日志级别、重试次数</li><li>灵活性更高，可配置化</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="类装饰器">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">类装饰器</h2>
+    <ul class="list mt-m"><li>使用类实现装饰器：定义 _init 和 call_ 方法</li><li>优势：可维护状态、更清晰的结构</li><li>既可装饰函数，也可装饰类</li><li>适合复杂逻辑和需要保存多个状态的场景</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="functools.wraps 的作用">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">functools.wraps 的作用</h2>
+    <ul class="list mt-m"><li>问题：装饰后函数元信息丢失（_name、doc_ 等）</li><li>wraps 装饰器复制原函数的元数据到包装函数</li><li>保持被装饰函数的签名和文档字符串</li><li>最佳实践：编写装饰器时必须使用</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="7"></span></div>
+  </section>
+
+  <section class="slide" data-title="装饰器实战与最佳实践">
+    <p class="kicker">Python 装饰器深入解析</p>
+    <h2 class="h2">装饰器实战与最佳实践</h2>
+    <ul class="list mt-m"><li>常见应用：性能计时、日志记录、权限校验、缓存</li><li>注意保留函数签名：使用 functools.wraps</li><li>装饰器顺序很重要：理解执行流程</li><li>避免过度使用：保持代码可读性</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="7"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

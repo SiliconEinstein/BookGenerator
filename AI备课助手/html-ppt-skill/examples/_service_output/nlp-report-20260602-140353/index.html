@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="封面">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">封面</h2>
+    <p class="lede mt-m">第5章 自然语言处理、知识图谱和可解释人工智能 · 自然语言处理与文本挖掘</p>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="知识理解（可评估）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">知识理解（可评估）</h2>
+    <ul class="list mt-m"><li>能用自己的话说明NLP 基础任务在生物医学语境中的目标与差异：至少能口头区分并举例解释命名实体识别（NER）与关系抽取（RE）分别解决什么问题、输出什么结果。</li><li>能说明本节两类医学NLP应用的典型任务产出：</li><li>关系抽取：形成“药物—靶点/疾病/不良反应”等关系；</li><li>不良反应抽取：形成“药物—不良反应事件（可能含人群/剂量/时间）”的结构化信号。</li><li>能列举并解释本节涉及的评估度量在任务中的作用与使用场景：至少能回答“评估什么、为什么评估、用来指导什么改进”。</li><li>能在课堂上完成一次从文本到结构化信息的完整流程：使用 spaCy 或 BERT对一段生物医学文献/说明书片段进行NER，并进一步完成RE，输出三元组或关系表（含证据句）。</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="概念">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">概念</h2>
+    <ul class="list mt-m"><li>NLP 基础任务（面向信息抽取）</li><li>核心目标：把非结构化生物医学文本转成结构化信息，便于检索、证据汇总与知识组织。</li><li>本节聚焦两项关键子任务：</li><li>命名实体识别（NER）：识别文本中的实体边界与类型。</li><li>关系抽取（RE）：判断实体对之间是否存在特定关系，并给出关系类型与方向。</li><li>医学NLP应用（与药物研发相关）</li><li>关系抽取：抽取“药物—靶点/疾病/通路/不良反应”等关系，为证据链整理、知识图谱构建、检索与重定位提供输入。</li><li>不良反应抽取：从文献、病例、说明书、药物警戒文本中识别不良反应信号（常见扩展字段：严重程度、时间、剂量、人群）。</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="45分钟课堂流程与时间分配（强化互动版）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">45分钟课堂流程与时间分配（强化互动版）</h2>
+    <ul class="list mt-m"><li>发放文本（统一输入）：提供1段生物医学摘要或说明书片段（建议包含：缩写、否定/对照、至少2个实体类型）。</li><li>NER（先跑通再改进）：</li><li>运行 spaCy/BERT 得到实体列表；</li><li>要求学生把实体按类型整理成表（实体、类型、证据片段）。</li><li>RE（从“能输出”到“更可信”）：</li><li>基础版：基于句内实体共现 + 触发词规则（如 causes/induces/inhibits/associated with）输出候选关系；</li><li>提升版（可选）：加入否定词过滤（no/not/without）与方向规则（A inhibits B）。</li><li>结构化提交模板（统一格式便于评分）：</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="案例讨论（补充可直接用于课堂的文本与问题）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">案例讨论（补充可直接用于课堂的文本与问题）</h2>
+    <ul class="list mt-m"><li>讨论目标：让学生体验“共现≠因果”“否定/对照导致误判”。</li><li>讨论问题（全班快问）：</li><li>讨论目标：让学生体验“缩写/同义词归一”的必要性。</li><li>讨论问题：</li><li>练习1（必做，10分钟）：NER 基础</li><li>任务：至少标出两类实体（药物、疾病/靶点、不良反应三类任选其二），总数≥5。</li><li>互评点：边界是否一致？缩写是否被当成独立实体？</li><li>练习2（必做，7分钟）：RE 基础</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="5"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

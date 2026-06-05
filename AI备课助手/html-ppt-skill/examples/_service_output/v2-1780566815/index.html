@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Python 函数式编程</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="Python 函数式编程">
+    
+    <h1 class="h1 anim-fade-up">Python 函数式编程</h1>
+    <p class="lede">lambda · map/filter/reduce · 列表推导式</p>
+    
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="Lambda 表达式">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">Lambda 表达式</h2>
+    <ul class="list mt-m"><li>匿名函数：无需 def 定义，一行搞定简单逻辑</li><li>语法：lambda 参数: 表达式</li><li>适用场景：排序 key、回调函数、临时计算</li><li>示例：square = lambda x: x ** 2</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="map / filter / reduce">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">map / filter / reduce</h2>
+    <div class="grid g3 mt-m">
+      <div class="card"><ul class="list"><li>map(func, iterable)</li><li>对每个元素应用函数</li><li>返回惰性迭代器</li><li>示例：map(str.upper, words)</li></ul></div>
+      <div class="card"><ul class="list"><li>filter(func, iterable)</li><li>保留满足条件的元素</li><li>func 返回 True 则保留</li><li>示例：filter(lambda x: x&gt;0, nums)</li></ul></div>
+      <div class="card"><ul class="list"><li>reduce(func, iterable)</li><li>累积计算为单一结果</li><li>需从 functools 导入</li><li>示例：reduce(lambda a,b: a*b, [1,2,3])</li></ul></div>
+    </div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="列表推导式">
+    
+    <p class="kicker">Python 函数式编程</p>
+    <h2 class="h2">列表推导式</h2>
+    <ul class="list mt-m"><li>语法：[表达式 for 变量 in 可迭代对象 if 条件]</li><li>比 map/filter 更 Pythonic、更易读</li><li>支持嵌套循环与多重条件过滤</li><li>可扩展为字典推导式 {k:v for ...} 和集合推导式 {x for ...}</li><li>性能优于等价的 for 循环写法</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="5"></span></div>
+  </section>
+
+  <section class="slide" data-title="感谢聆听">
+    
+    <div class="center tc">
+      <h1 class="h1 gradient-text" style="font-size:160px">Thanks</h1>
+      <p class="lede">开始动手实践函数式编程吧！</p>
+    </div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="5"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="aurora">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘 · 课堂汇报</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/aurora.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="aurora,academic-paper,minimal-white,corporate-clean,engineering-whiteprint,cyberpunk-neon" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="封面">
+    <p class="kicker">第5章 · 自然语言处理、知识图谱和可解释人工智能</p>
+    <h1 class="h1 anim-fade-up" data-anim="fade-up">自然语言处理与文本挖掘<br>课堂汇报</h1>
+    <p class="lede mt-m">从非结构化生物医学文本到结构化知识：NER、RE 与不良反应抽取</p>
+    <div class="row mt-l" style="gap:12px">
+      <span class="pill">课程主题汇报</span>
+      <span class="pill">45 分钟课堂设计</span>
+      <span class="pill">可操作验收标准</span>
+    </div>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill · report deck</span><span class="slide-number" data-current="1" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="汇报目标">
+    <p class="kicker">REPORT OBJECTIVES</p>
+    <h2 class="h2">本次汇报聚焦三件事</h2>
+    <div class="grid g3 mt-l">
+      <div class="card">
+        <h4>教学目标可评估</h4>
+        <p class="dim">明确学生在知识理解、能力训练、课堂达成上的可验收产出。</p>
+      </div>
+      <div class="card">
+        <h4>方法路径可落地</h4>
+        <p class="dim">给出 NER 到 RE 的最小可运行流程，并强调质检与纠错。</p>
+      </div>
+      <div class="card">
+        <h4>评价机制可执行</h4>
+        <p class="dim">用实体数、关系数、证据句、改进建议实现当堂验收。</p>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">汇报概览</span><span class="slide-number" data-current="2" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="知识目标">
+    <p class="kicker">KNOWLEDGE GOALS</p>
+    <h2 class="h2">知识理解（可评估）</h2>
+    <ul class="list mt-m">
+      <li>能口头区分并举例解释 <b>命名实体识别（NER）</b> 与 <b>关系抽取（RE）</b> 的目标和输出。</li>
+      <li>能说明医学 NLP 两类应用产出：关系抽取（药物-靶点/疾病/不良反应）与不良反应抽取信号。</li>
+      <li>能解释评估度量的作用：评估什么、为何评估、用于指导哪些改进。</li>
+    </ul>
+    <div class="callout mt-l">
+      <b>课堂验收关键词：</b>区分任务、解释产出、说清评价意义。
+    </div>
+    <div class="deck-footer"><span class="dim2">教学目标</span><span class="slide-number" data-current="3" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="能力与验收">
+    <p class="kicker">SKILL TRAINING</p>
+    <h2 class="h2">能力训练与 45 分钟验收标准</h2>
+    <div class="grid g2 mt-l">
+      <div class="card">
+        <h4>能力训练（可操作）</h4>
+        <ul class="list mt-s">
+          <li>使用 spaCy 或 BERT 完成文本 NER 与 RE。</li>
+          <li>输出三元组/关系表，并附证据句。</li>
+          <li>识别边界、类型、方向、否定与共现误判等典型错误。</li>
+          <li>提出至少 1 条可执行改进建议。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>课堂达成（45 分钟）</h4>
+        <ul class="list mt-s">
+          <li>每组提交 ≥5 个实体（含类型）。</li>
+          <li>每组提交 ≥2 条关系（含方向与证据句）。</li>
+          <li>1 句评估度量说明（评估什么、为什么）。</li>
+          <li>1 条可落地改进建议（改哪里、怎么改）。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">训练与达成</span><span class="slide-number" data-current="4" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="核心概念">
+    <p class="kicker">CORE CONCEPTS</p>
+    <h2 class="h2">概念框架：从文本到结构化知识</h2>
+    <div class="grid g2 mt-l">
+      <div class="card">
+        <h4>NER（实体识别）</h4>
+        <p class="dim">识别实体边界与类型（药物、疾病、基因/蛋白、不良反应等），输出实体清单。</p>
+      </div>
+      <div class="card">
+        <h4>RE（关系抽取）</h4>
+        <p class="dim">判断实体对关系及方向，输出关系表或三元组并保留证据句。</p>
+      </div>
+      <div class="card">
+        <h4>关系抽取应用</h4>
+        <p class="dim">形成“药物-靶点/疾病/通路/不良反应”结构化结果，支撑知识组织与检索。</p>
+      </div>
+      <div class="card">
+        <h4>不良反应抽取应用</h4>
+        <p class="dim">识别药物安全性信号，可扩展严重程度、时间、剂量、人群等字段。</p>
+      </div>
+    </div>
+    <div class="card mt-l" style="padding:16px">
+      <h4 style="margin:0 0 8px">信息抽取流程示意图</h4>
+      <svg viewBox="0 0 980 170" style="width:100%;height:auto;border-radius:12px;background:linear-gradient(135deg,#eef2ff,#f0fdfa)">
+        <rect x="24" y="52" width="138" height="64" rx="12" fill="#4f46e5"></rect>
+        <text x="93" y="90" fill="#fff" font-size="20" text-anchor="middle">原始文本</text>
+        <rect x="226" y="52" width="138" height="64" rx="12" fill="#0ea5e9"></rect>
+        <text x="295" y="90" fill="#fff" font-size="20" text-anchor="middle">NER</text>
+        <rect x="428" y="52" width="138" height="64" rx="12" fill="#14b8a6"></rect>
+        <text x="497" y="90" fill="#fff" font-size="20" text-anchor="middle">RE</text>
+        <rect x="630" y="52" width="138" height="64" rx="12" fill="#f59e0b"></rect>
+        <text x="699" y="90" fill="#fff" font-size="20" text-anchor="middle">质检纠错</text>
+        <rect x="832" y="52" width="124" height="64" rx="12" fill="#ef4444"></rect>
+        <text x="894" y="90" fill="#fff" font-size="20" text-anchor="middle">结构化输出</text>
+        <path d="M162 84 L226 84 M364 84 L428 84 M566 84 L630 84 M768 84 L832 84" stroke="#334155" stroke-width="4" marker-end="url(#arrow)"></path>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+            <polygon points="0 0, 10 3, 0 6" fill="#334155"></polygon>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+    <div class="deck-footer"><span class="dim2">概念与应用</span><span class="slide-number" data-current="5" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="方法流程">
+    <p class="kicker">METHOD PIPELINE</p>
+    <h2 class="h2">课堂可执行流程（NER → RE → 质检）</h2>
+    <div class="grid g3 mt-l">
+      <div class="card">
+        <h4>步骤 1：统一文本输入</h4>
+        <p class="dim">发放包含缩写、否定/对照的生物医学文本，确保任务难点可复现。</p>
+      </div>
+      <div class="card">
+        <h4>步骤 2：NER 抽取</h4>
+        <p class="dim">运行模型并整理实体表：实体、类型、证据片段（可含位置与置信度）。</p>
+      </div>
+      <div class="card">
+        <h4>步骤 3：RE 抽取</h4>
+        <p class="dim">基于触发词/规则或模型接口抽取关系，强调关系方向与证据句。</p>
+      </div>
+      <div class="card">
+        <h4>步骤 4：快速质检</h4>
+        <p class="dim">定位共现误判、否定误判、类型混淆与方向错误。</p>
+      </div>
+      <div class="card">
+        <h4>步骤 5：提出改进</h4>
+        <p class="dim">至少 1 条可执行建议：规则过滤、阈值调整、后处理归一、模型替换。</p>
+      </div>
+      <div class="card">
+        <h4>步骤 6：结构化提交</h4>
+        <p class="dim">提交实体表、关系表、证据句与改进建议，便于课堂评分与留存。</p>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">流程落地</span><span class="slide-number" data-current="6" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估指标">
+    <p class="kicker">EVALUATION</p>
+    <h2 class="h2">评估度量：为什么、评什么、怎么用</h2>
+    <div class="grid g2 mt-l">
+      <div class="card">
+        <h4>NER 评估</h4>
+        <ul class="list mt-s">
+          <li>Precision：识别出的实体有多少是正确的。</li>
+          <li>Recall：真实实体有多少被识别出来。</li>
+          <li>F1：综合平衡精确率与召回率。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>RE/不良反应评估</h4>
+        <ul class="list mt-s">
+          <li>关系类型是否正确。</li>
+          <li>关系方向是否正确。</li>
+          <li>是否漏检关键关系或误判共现关系。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card mt-l" style="padding:18px">
+      <h4 style="margin:0 0 10px">示例：规则增强前后 F1 对比</h4>
+      <div style="display:flex;align-items:flex-end;gap:26px;height:170px;padding:8px 6px 0">
+        <div style="flex:1;text-align:center">
+          <div style="height:95px;background:#60a5fa;border-radius:10px 10px 0 0"></div>
+          <p class="dim" style="margin:8px 0 0">基础模型 0.62</p>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="height:122px;background:#34d399;border-radius:10px 10px 0 0"></div>
+          <p class="dim" style="margin:8px 0 0">+否定过滤 0.71</p>
+        </div>
+        <div style="flex:1;text-align:center">
+          <div style="height:144px;background:#f59e0b;border-radius:10px 10px 0 0"></div>
+          <p class="dim" style="margin:8px 0 0">+同义词归一 0.84</p>
+        </div>
+      </div>
+    </div>
+    <div class="callout mt-l">
+      <b>评估的意义：</b>不只“打分”，更用于定位错误来源并指导下一轮迭代。
+    </div>
+    <div class="deck-footer"><span class="dim2">度量与迭代</span><span class="slide-number" data-current="7" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂流程">
+    <p class="kicker">45-MIN CLASS PLAN</p>
+    <h2 class="h2">45 分钟课堂结构（强化互动）</h2>
+    <div class="grid g2 mt-l">
+      <div class="card">
+        <h4>前半程（23 分钟）</h4>
+        <ul class="list mt-s">
+          <li>3 分钟：破冰投票（识别难点）。</li>
+          <li>7 分钟：案例导入（共同标注候选实体/关系）。</li>
+          <li>8 分钟：讲授 NER vs RE（对齐输出）。</li>
+          <li>5 分钟：讲授评估指标（最小够用）。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>后半程（22 分钟）</h4>
+        <ul class="list mt-s">
+          <li>17 分钟：小组实操（NER+RE+表格提交）。</li>
+          <li>3 分钟：组间对拍（互提 1 个误判点）。</li>
+          <li>2 分钟：快问快答与收作业。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">时间分配</span><span class="slide-number" data-current="8" data-total="10"></span></div>
+  </section>
+
+  <section class="slide" data-title="风险与对策">
+    <p class="kicker">RISKS & MITIGATIONS</p>
+    <h2 class="h2">常见误差来源与课堂纠偏策略</h2>
+    <div class="grid g2 mt-l">
+      <div class="card">
+        <h4>高频误差</h4>
+        <ul class="list mt-s">
+          <li>实体边界过长/过短。</li>
+          <li>实体类型混淆（药物、代谢物、商品名）。</li>
+          <li>同义词/缩写未归一。</li>
+          <li>共现误判为关系。</li>
+          <li>否定/假设句导致关系方向错误。</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4>对应策略</h4>
+        <ul class="list mt-s">
+          <li>加入否定词过滤与方向规则。</li>
+          <li>统一实体类型集合与输出格式。</li>
+          <li>对关键关系进行证据句抽查。</li>
+          <li>增加同义词和缩写归一后处理。</li>
+          <li>明确“先定义再抽取”的任务边界。</li>
+        </ul>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">质量保障</span><span class="slide-number" data-current="9" data-total="10"></span></div>
+  </section>
+
+  <section class="slide center tc" data-title="总结">
+    <div>
+      <p class="kicker">SUMMARY</p>
+      <h1 class="h1 anim-rise-in" data-anim="rise-in">本节核心结论</h1>
+      <p class="lede mt-m">围绕 NER 与 RE 构建“可跑通、可评估、可改进”的文本挖掘课堂闭环。</p>
+      <div class="row mt-l" style="justify-content:center;gap:12px;flex-wrap:wrap">
+        <span class="pill">产出导向</span>
+        <span class="pill">证据可追溯</span>
+        <span class="pill">评价可量化</span>
+        <span class="pill">改进可执行</span>
+      </div>
+    </div>
+    <div class="deck-footer"><span class="dim2">自然语言处理与文本挖掘</span><span class="slide-number" data-current="10" data-total="10"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

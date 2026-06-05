@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="minimal-white">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>自然语言处理与文本挖掘</title>
+<link rel="stylesheet" href="../../../assets/fonts.css">
+<link rel="stylesheet" href="../../../assets/base.css">
+<link rel="stylesheet" id="theme-link" href="../../../assets/themes/minimal-white.css">
+<link rel="stylesheet" href="../../../assets/animations/animations.css">
+</head>
+<body data-themes="minimal-white" data-theme-base="../../../assets/themes/">
+<div class="deck">
+
+  <section class="slide" data-title="自然语言处理与文本挖掘">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">自然语言处理与文本挖掘</h2>
+    <ul class="list mt-m"><li>第5章 自然语言处理、知识图谱和可解释人工智能</li><li>从非结构化文本到结构化知识</li><li>药物研发中的信息抽取与应用</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="1" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="破冰思考：文本抽取的挑战">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">破冰思考：文本抽取的挑战</h2>
+    <ul class="list mt-m"><li>实体边界难以确定（过长/过短）</li><li>缩写与同义词的多样性</li><li>否定句与假设句的误判</li><li>关系方向与因果推断</li><li>共现不等于关联</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="2" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="NLP核心任务：从文本到结构">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">NLP核心任务：从文本到结构</h2>
+    <ul class="list mt-m"><li>目标：将非结构化医学文本转为结构化信息</li><li>命名实体识别（NER）：识别实体边界与类型</li><li>关系抽取（RE）：判断实体对之间的关系</li><li>输出形式：实体表、关系三元组、证据句</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="3" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="命名实体识别（NER）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">命名实体识别（NER）</h2>
+    <ul class="list mt-m"><li>任务：定位实体边界并赋予类型</li><li>实体类型：药物、疾病、基因/蛋白、不良反应等</li><li>工具：spaCy（领域模型）或 BERT（微调模型）</li><li>输出：实体文本、起止位置、类型、置信度</li><li>常见挑战：边界不准、类型混淆、同义词处理</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="4" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="关系抽取（RE）">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">关系抽取（RE）</h2>
+    <ul class="list mt-m"><li>任务：判断实体对之间是否存在特定关系</li><li>方法：规则/模式（触发词、句法依存）</li><li>方法：Transformer模型或提示式抽取</li><li>输出：三元组（实体1-关系-实体2）+ 证据句</li><li>关键：区分共现与真实关联，处理否定与方向</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="5" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="评估度量：如何衡量抽取质量">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">评估度量：如何衡量抽取质量</h2>
+    <ul class="list mt-m"><li>为什么需要：衡量质量、比较方法、指导迭代</li><li>NER评估：边界正确性、类型准确性</li><li>RE评估：关系正确性、方向准确性、漏检率</li><li>核心指标：Precision（精确率）、Recall（召回率）、F1</li><li>严格匹配 vs 宽松匹配</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="6" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学NLP应用：关系抽取">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学NLP应用：关系抽取</h2>
+    <ul class="list mt-m"><li>抽取关系：药物-靶点、药物-疾病、药物-通路</li><li>典型产出：实体-关系-实体的结构化结果</li><li>应用场景：证据汇总、候选靶点/适应症线索</li><li>支持后续：知识图谱构建、智能问答</li><li>价值：从海量文献中快速提取可计算知识</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="7" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="医学NLP应用：不良反应抽取">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">医学NLP应用：不良反应抽取</h2>
+    <ul class="list mt-m"><li>任务：从文献、病例、说明书中识别安全性信号</li><li>抽取内容：药物-不良反应事件关联</li><li>扩展字段：严重程度、时间、剂量、人群特征</li><li>应用：药物警戒、说明书整理、候选分子筛选</li><li>挑战：否定句、假设句、对照实验的误判</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="8" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="抽取误差的常见来源">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">抽取误差的常见来源</h2>
+    <ul class="list mt-m"><li>实体边界：过长（包含修饰语）或过短（缺失关键词）</li><li>实体类型混淆：药物/代谢物/商品名，疾病/症状</li><li>同义词/缩写：acetylsalicylic acid vs aspirin</li><li>共现≠关系：仅出现在同一句不代表有因果联系</li><li>否定/假设/对照句：容易误判关系存在性与方向</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="9" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂实操流程">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂实操流程</h2>
+    <ul class="list mt-m"><li>① 运行NER：识别并标注≥5个实体（≥2类）</li><li>② 执行RE：抽取≥2条关系，标注方向与证据句</li><li>③ 结构化输出：填写实体表与关系表</li><li>④ 质量复核：识别至少1个可能的误判</li><li>⑤ 改进建议：提出1条可执行的优化方案</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="10" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="质检与改进方向">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">质检与改进方向</h2>
+    <ul class="list mt-m"><li>调整实体类型集合（增加/合并/细分）</li><li>加入规则过滤否定句与假设句</li><li>提高置信度阈值减少误判</li><li>替换或微调预训练模型</li><li>增加后处理：同义词归一、实体链接</li><li>强调：抽取结果是候选证据，需人工抽查验证</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="11" data-total="12"></span></div>
+  </section>
+
+  <section class="slide" data-title="课堂验收要求">
+    <p class="kicker">自然语言处理与文本挖掘</p>
+    <h2 class="h2">课堂验收要求</h2>
+    <ul class="list mt-m"><li>提交≥5个实体（含类型标注）</li><li>提交≥2条关系（含关系类型、方向、证据句）</li><li>简述1个评估度量及其作用</li><li>提出1条可落地的改进建议</li><li>交叉复核：指出其他组1处可能误判</li></ul>
+    <div class="deck-footer"><span class="dim2">html-ppt-skill service</span><span class="slide-number" data-current="12" data-total="12"></span></div>
+  </section>
+
+</div>
+<script src="../../../assets/runtime.js"></script>
+</body>
+</html>

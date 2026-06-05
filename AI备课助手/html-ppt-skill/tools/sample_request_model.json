@@ -1,0 +1,19 @@
+{
+  "deckName": "nlp-model-demo",
+  "theme": "aurora",
+  "modelDriven": true,
+  "modelProvider": "gpugeek",
+  "injectSkillPrompt": true,
+  "modelName": "Vendor2/GPT-5.2",
+  "pageMin": 8,
+  "pageMax": 12,
+  "renderThumbnails": false,
+  "pptInput": {
+    "chapterName": "第5章 自然语言处理、知识图谱和可解释人工智能",
+    "sectionName": "自然语言处理与文本挖掘",
+    "teachingGoal": "## 知识理解\n- 解释 NER 与 RE 的区别\n- 说明关系抽取与不良反应抽取的产出",
+    "knowledgePoints": "## 概念\n- NER：实体识别\n- RE：关系抽取",
+    "suggestedStructure": "## 45分钟流程\n- 导入\n- 讲授\n- 小组实操\n- 总结",
+    "extraInfo": "## 案例\n- 案例A\n- 案例B"
+  }
+}

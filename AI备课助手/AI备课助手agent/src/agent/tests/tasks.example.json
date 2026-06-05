@@ -1,0 +1,63 @@
+[
+  {
+    "name": "outline",
+    "task": {
+      "externalTaskId": "task-outline-demo-1",
+      "taskType": 0,
+      "courseId": 101,
+      "callbackUrl": "",
+      "payload": {
+        "sourceType": "txt",
+        "sourceFileUrl": "/personal/AI备课助手/src/agent/tests/sample-outline.txt"
+      },
+      "config": {}
+    }
+  },
+  {
+    "name": "section",
+    "task": {
+      "externalTaskId": "task-section-demo-1",
+      "taskType": 1,
+      "courseId": 101,
+      "callbackUrl": "",
+      "payload": {
+        "chapterName": "第一章 Python语言概述",
+        "sectionName": "Python简介",
+        "sectionId": 3001,
+        "seqNo": 1
+      },
+      "config": {
+        "sectionDuration": 45,
+        "outputLanguage": 1
+      }
+    }
+  },
+  {
+    "name": "refine",
+    "task": {
+      "externalTaskId": "task-refine-demo-1",
+      "taskType": 2,
+      "courseId": 101,
+      "callbackUrl": "",
+      "payload": {
+        "sectionId": 3001,
+        "instruction": "请更突出应用场景",
+        "nextSeqNo": 2
+      },
+      "config": {}
+    }
+  },
+  {
+    "name": "ppt",
+    "task": {
+      "externalTaskId": "task-ppt-demo-1",
+      "taskType": 3,
+      "courseId": 101,
+      "callbackUrl": "",
+      "payload": {
+        "sectionId": 3001
+      },
+      "config": {}
+    }
+  }
+]

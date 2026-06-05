@@ -1,0 +1,35 @@
+{
+  "courseName": "Python程序设计课程大纲",
+  "chapters": [
+    {
+      "chapterName": "第一章 Python语言概述",
+      "sort": 1,
+      "sections": []
+    },
+    {
+      "chapterName": "第二章 1 Python简介",
+      "sort": 2,
+      "sections": []
+    },
+    {
+      "chapterName": "第三章 2 开发环境搭建",
+      "sort": 3,
+      "sections": []
+    },
+    {
+      "chapterName": "第四章 基础语法",
+      "sort": 4,
+      "sections": []
+    },
+    {
+      "chapterName": "第五章 1 变量与数据类型",
+      "sort": 5,
+      "sections": []
+    },
+    {
+      "chapterName": "第六章 2 条件与循环",
+      "sort": 6,
+      "sections": []
+    }
+  ]
+}
