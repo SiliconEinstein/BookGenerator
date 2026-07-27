@@ -1,30 +1,25 @@
 # Development environment configuration
 
 llm:
-  providers:
-    gemini:
-      model: "litellm_proxy/gemini-3-pro-preview"
-      base_url: "${LITELLM_PROXY_API_BASE}"
-      api_key: "${LITELLM_API_KEY}"
-    gpt5:
-      model: "Vendor2/GPT-5.2"
-      base_url: "${GPUGEEK_API_BASE}"
-      api_key: "${GPUGEEK_API_KEY}"
-    deepseek:
-      model: "DeepSeek/DeepSeek-V3-0324"
-      base_url: "${GPUGEEK_API_BASE}"
-      api_key: "${GPUGEEK_API_KEY}"
-    qwen:
-      model: "GpuGeek/Qwen3-VL-30B-A3B-Thinking"
-      base_url: "${GPUGEEK_API_BASE}"
-      api_key: "${GPUGEEK_API_KEY}"
-    doubao:
-      model: "Volcengine/Doubao-Seed-1.6"
-      base_url: "${GPUGEEK_API_BASE}"
-      api_key: "${GPUGEEK_API_KEY}"
-
-mcp:
-  url: "${MCP_URL}"
+  gateway:
+    base_url: "${LITELLM_PROXY_API_BASE}"
+    api_key: "${LITELLM_PROXY_API_KEY}"
+  # 按用途选模型；每项都可用 LLM_<ROLE>_MODEL 环境变量覆盖
+  models:
+    writer: "cds/GPT-5.4"                       # 正文、摘要、前言、纠错、notebook
+    reviewer: "claude-sonnet-4-6"               # 大纲 battle 的对手模型
+    utility: "gemini-3.1-pro-preview"           # 结构化输出、关键词扩展、插图选点
+    vision: "gemini-3.1-pro-preview"            # 插图质量评估（多模态）
+    image: "sn/gemini-3-pro-image-preview"      # 插图生成
+  # 大纲 battle 的评委，取多数票；应挑选相互独立的模型
+  evaluators:
+    - "cds/GPT-5.4"
+    - "claude-sonnet-4-6"
+    - "gemini-3.1-pro-preview"
+  # writer 调用失败时依次降级
+  writer_fallbacks:
+    - "azure/gpt-5"
+    - "aliyun/deepseek-v4-pro"
 
 wiki:
   search_api_base: "${WIKI_SEARCH_API_BASE}"

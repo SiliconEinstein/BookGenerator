@@ -60,16 +60,31 @@ pip install python-dotenv
 
 - YAML：`config/config.dev.yaml`
 - 环境变量：支持 `${ENV_VAR}` 插值
-- `.env`：`src/utils/config.py` 会尝试自动加载项目根目录 `.env`
+- `.env`：`src/__init__.py` 在导入任何子模块前加载项目根目录的 `.env`
 
-常用环境变量：
+所有 LLM 调用统一走同一个 LiteLLM 网关，只需两个凭据：
 
-- `LITELLM_PROXY_API_BASE`
-- `LITELLM_API_KEY`
-- `GPUGEEK_API_BASE`
-- `GPUGEEK_API_KEY`
-- `MCP_URL`
-- `WIKI_SEARCH_API_BASE`
+- `LITELLM_PROXY_API_BASE`（默认 `https://litellm.dp.tech`）
+- `LITELLM_PROXY_API_KEY`
+
+其余环境变量：`OPENSEARCH_HOST`、`OPENSEARCH_USERNAME`、`OPENSEARCH_PASSWORD`、`WIKI_SEARCH_API_BASE`。
+
+### 模型按用途配置
+
+模型名写在 `config/config.dev.yaml` 的 `llm.models` 下，可用 `LLM_<ROLE>_MODEL` 环境变量临时覆盖：
+
+| 角色 | 用途 | 默认模型 |
+| --- | --- | --- |
+| `writer` | 正文、摘要、前言、章节纠错、notebook | `cds/GPT-5.4` |
+| `reviewer` | 大纲 battle 的对手模型 | `claude-sonnet-4-6` |
+| `utility` | 结构化输出、QA 关键词扩展、插图选点 | `gemini-3.1-pro-preview` |
+| `vision` | 插图质量评估（多模态） | `gemini-3.1-pro-preview` |
+| `image` | 插图生成 | `sn/gemini-3-pro-image-preview` |
+
+另有两项列表配置：`llm.evaluators` 是大纲 battle 的评委（取多数票，应选相互独立的模型），
+`llm.writer_fallbacks` 是 writer 调用失败后的降级顺序。
+
+注意 `utility` 角色必须选支持 `response_format` JSON schema 的模型；Claude 系会忽略该参数并返回散文。
 
 语言与 prompt 目录映射：
 
@@ -245,17 +260,25 @@ python -m src.tools.draw_image.main markdown --markdown-path "你的md路径" --
 - **Q4：`.env` 不生效怎么办？**
   - 确认安装了 `python-dotenv`，并将 `.env` 放在 `book_generate_pipeline/` 根目录。
 
-- **Q5：MCP 相关模块报错怎么办？**
-  - `book_generator.py` 依赖 MCP 客户端（`dp.agent.client.MCPClient`）；请确保对应依赖可用，或替换为你们自己的实现。
+- **Q5：QA 检索命中 0 条怎么办？**
+  - OpenSearch 里的题库是英文的，中文关键词要靠 `utility` 模型扩展出英文变体才能命中。
+    先跑 `python scripts/healthcheck.py structured` 确认结构化输出正常。
 
 ---
 
 ## 9. 辅助工具
 
-查询 LiteLLM Proxy 可用模型：
+查询网关可用模型：
 
 ```bash
 python scripts/list_litellm_models.py
+```
+
+逐项体检（网关各角色模型、出图、多模态、百科检索、问答检索、PDF 渲染）：
+
+```bash
+python scripts/healthcheck.py             # 全部
+python scripts/healthcheck.py chat image  # 只跑指定项
 ```
 
 ---

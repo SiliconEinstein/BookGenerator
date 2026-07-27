@@ -7,7 +7,7 @@ import shutil
 import asyncio
 from typing import Dict, Any, Optional, List
 
-from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
+from src.models import writer_completion, reviewer_completion
 from src.core.chapter_generator import ChapterGenerator
 from src.core.book_generator import BookGenerator
 from src.core.material_pack_generator import MaterialPackGenerator
@@ -22,11 +22,8 @@ class TopicBookGenerator:
     """Main generator orchestrating the entire book generation pipeline."""
 
     def __init__(self, language: str = "cn"):
-        self.gemini = gemini_completion
-        self.gpt5 = gpt_completion
-        self.deepseek = deepseek_completion
-        self.qwen = qwen_completion
-        self.doubao = doubao_completion
+        self.writer = writer_completion
+        self.reviewer = reviewer_completion
 
         self.chapter_generator = ChapterGenerator(language)
         self.material_pack_generator = MaterialPackGenerator(language)
@@ -143,8 +140,8 @@ class TopicBookGenerator:
         await self.chapter_generator.build_book_info(book_info, docs_path)
         prompt_chapter = self.chapter_generator.generate_prompt()
         print("Generating chapter...")
-        res = await self.gemini(prompt_chapter)
-        res = await self.chapter_generator.battle_syllabus(self.gpt5, self.doubao, res, 0)
+        res = await self.writer(prompt_chapter)
+        res = await self.chapter_generator.battle_syllabus(self.writer, self.reviewer, res, 0)
         os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
         with open(output_path, 'a', encoding="utf-8") as f:
             f.write("\n\n### 最终版 ###\n\n")
@@ -246,6 +243,11 @@ class TopicBookGenerator:
                 continue
             chapter_dir = ctx.get_chapter_dir(key)
             md_path = os.path.join(md_files_dir, f"{chapter_dir}.md")
+            if not os.path.isfile(md_path):
+                print(
+                    f"  [Skip Phase 3] 章节 Markdown 不存在（Phase 1/2 可能失败）: {md_path}"
+                )
+                continue
             image_output_dir = os.path.join(images_base_dir, chapter_dir)
             new_md_path = os.path.join(new_md_files_dir, f"{chapter_dir}.md")
             image_tasks.append(
@@ -257,6 +259,8 @@ class TopicBookGenerator:
             )
         if image_tasks:
             await asyncio.gather(*image_tasks)
+        else:
+            print("  [Skip Phase 3] 无可用章节 Markdown，跳过插图。")
         print("[Phase 3 Done]")
         
         md_files_dir = new_md_files_dir if os.path.isdir(new_md_files_dir) else md_files_dir
@@ -418,7 +422,14 @@ class TopicBookGenerator:
         }
         audience = course_info.get("面向人群", "")
         teaching_methodology = course_info.get("教学方式", "")
-        style_tendency = prompt_config.get("style_tendency") or course_info.get("教材行文风格", "问题驱动型")
+        raw_style = prompt_config.get("style_tendency") or course_info.get("教材行文风格", "问题驱动型")
+        # book_info 常为自由描述；prompt_book.PromptConfig / build_style_guidance 仅接受三种枚举值
+        style_tendency = self._canonical_style_tendency(str(raw_style))
+        if str(raw_style).strip() and style_tendency != str(raw_style).strip():
+            print(
+                f"[Info] 教材行文风格已映射为提示词枚举值「{style_tendency}」"
+                f"（原字段为自由描述时可忽略此提示）"
+            )
         resolved_prompt_config = {
             "course_type": prompt_config.get("course_type")
             or self._infer_course_type(teaching_methodology, style_tendency),
@@ -431,6 +442,21 @@ class TopicBookGenerator:
             "style_tendency": style_tendency,
         }
         return resolved_preface_inputs, resolved_prompt_config
+
+    @staticmethod
+    def _canonical_style_tendency(style: str) -> str:
+        """将 book_info「教材行文风格」自由文本映射为 prompts/prompt_book.PromptConfig 允许的三选一。"""
+        allowed = ("严谨推演型", "叙事引导型", "问题驱动型")
+        s = (style or "").strip()
+        if s in allowed:
+            return s
+        if "严谨" in s or "推演" in s:
+            return "严谨推演型"
+        if "叙事" in s or "故事" in s:
+            return "叙事引导型"
+        if "问题驱动" in s or ("问题" in s and "驱动" in s):
+            return "问题驱动型"
+        return "问题驱动型"
 
     @staticmethod
     def _infer_course_type(teaching_methodology: str, style_tendency: str) -> str:

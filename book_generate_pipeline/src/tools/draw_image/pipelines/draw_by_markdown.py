@@ -4,11 +4,12 @@ import logging
 from typing import Dict, List, Optional, Any
 
 from ..insert.position_selector import InsertPositionSelector
-from ..insert.tag_inserter import insert_image_tags
+from ..insert.tag_inserter import build_image_marker, insert_image_tags
 from .draw_by_text import generate_image_from_context
 
 
 INSERT_META_MAX_ATTEMPTS = 3
+logger = logging.getLogger(__name__)
 
 
 async def generate_images_from_markdown(
@@ -32,7 +33,7 @@ async def generate_images_from_markdown(
         if inserted:
             break
         if attempt < INSERT_META_MAX_ATTEMPTS - 1:
-            logging.getLogger(__name__).warning(
+            logger.warning(
                 "未选出插入位置（inserted 为空），第 %d/%d 次重试…",
                 attempt + 2,
                 INSERT_META_MAX_ATTEMPTS,
@@ -55,13 +56,22 @@ async def generate_images_from_markdown(
             prompt_dir=prompt_dir,
             client=client,
         )
+        if not image_path:
+            # 出图失败时摘掉占位标签，否则成书里会留下指向空文件的图片链接
+            logger.warning("image_%s 生成失败，已从正文中移除该插图标签", item['index'])
+            tagged_markdown = _drop_marker(tagged_markdown, int(item['index']))
+            continue
         results.append({"index": str(item['index']), "context": context, "image_path": image_path, "reason": reason})
     if inserted:
-        final_markdown = tagged_markdown
         final_path = os.path.join(output_dir, "with_images.md")
         with open(final_path, "w", encoding="utf-8") as f:
-            f.write(final_markdown)
+            f.write(tagged_markdown)
     if save_manifest:
         with open(save_manifest, "w", encoding="utf-8") as f:
             json.dump(results, f, indent=4, ensure_ascii=False)
     return results
+
+
+def _drop_marker(markdown_text: str, index: int) -> str:
+    marker = build_image_marker(index)
+    return "\n".join(line for line in markdown_text.splitlines() if line.strip() != marker)

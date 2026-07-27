@@ -1,9 +1,6 @@
 import logging
 from typing import List, Dict
-import dotenv
 from .opensearch import OpenSearchClient
-
-dotenv.load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 

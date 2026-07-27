@@ -1,13 +1,11 @@
 from opensearch_dsl import Q, Search
 from typing import List
-import dotenv
 import os
 import asyncio
 import json
 from opensearchpy import OpenSearch
 from opensearchpy.connection import Urllib3HttpConnection
 
-dotenv.load_dotenv(override=True) 
 
 class OpenSearchClient:
     def __init__(self):

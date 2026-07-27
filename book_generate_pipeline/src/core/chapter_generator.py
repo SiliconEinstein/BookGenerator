@@ -7,7 +7,7 @@ import asyncio
 import pdfplumber
 from dataclasses import dataclass
 from typing import Dict, Any, Optional
-from src.models import gemini_completion, gpt_completion, deepseek_completion, qwen_completion, doubao_completion
+from src.models import evaluator_completions
 from src.tools import DatabaseManager
 from src.utils import get_config
 
@@ -30,11 +30,7 @@ class ChapterGenerator:
         self.config = get_config(language=language)
 
         self.prompt_chapter = self.config.get_prompt_name("chapter", "prompt_chapter")
-        self.gemini = gemini_completion
-        self.gpt5 = gpt_completion
-        self.deepseek = deepseek_completion
-        self.qwen = qwen_completion
-        self.doubao = doubao_completion
+        self.evaluators = evaluator_completions()
 
         self.db_manager = DatabaseManager(llm_config={})
         self.get_field_index = self.db_manager.init_get_field_index_content()
@@ -142,8 +138,7 @@ class ChapterGenerator:
             f.write(curr_chapter)
 
         prompt_eval = self.generate_eval_prompt(last_chapter, curr_chapter)
-        evaluators = [self.gemini, self.gpt5, self.deepseek, self.doubao]
-        winner = await self._evaluate_syllabi(prompt_eval, evaluators)
+        winner = await self._evaluate_syllabi(prompt_eval, self.evaluators)
 
         if winner == "B":
             return await self.battle_syllabus(modelB, modelA, curr_chapter, cnt + 1)

@@ -1,16 +1,18 @@
 # Model providers for LLM integration
 from .llm_providers import (
-    gemini_completion,
-    gpt_completion,
-    deepseek_completion,
-    qwen_completion,
-    doubao_completion,
-    gpugeek_image_generation,
+    complete,
+    evaluator_completions,
+    generate_images,
+    model_for,
+    reviewer_completion,
+    structured_completion,
+    utility_completion,
+    vision_completion,
+    writer_completion,
 )
-from .base import BaseLLMProvider
 
 __all__ = [
-    'BaseLLMProvider',
-    'gemini_completion', 'gpt_completion', 'deepseek_completion',
-    'qwen_completion', 'doubao_completion', 'gpugeek_image_generation'
+    'complete', 'writer_completion', 'reviewer_completion', 'utility_completion',
+    'structured_completion', 'vision_completion', 'generate_images',
+    'evaluator_completions', 'model_for',
 ]

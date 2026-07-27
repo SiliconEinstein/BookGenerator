@@ -6,8 +6,6 @@ import time
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 
-import dotenv
-
 from .prompt import (
     KEYWORD_VARIATIONS_PROMPT,
     PROBLEM_FILTER_PROMPT,
@@ -16,8 +14,6 @@ from .prompt import (
 )
 from .utils import call_llm, LLMUsageStats
 from .retriever import QARetriever
-
-dotenv.load_dotenv(override=True)
 
 logger = logging.getLogger(__name__)
 
