@@ -93,7 +93,121 @@ python scripts/healthcheck.py
 
 ---
 
-## 4. 目录结构（当前版本）
+## 4. 输入文件格式
+
+跑一门课程前，在 `output/<课程名>/book_info/` 下准备两个必需文件，另有两个可选文件。
+
+### 4.1 syllabus.md（必需）
+
+课程大纲。整份内容必须包在 `<syllabus>` 标签里，标签外的文字会被忽略：
+
+```markdown
+<syllabus>
+# 分子对接入门
+
+## 第1章：分子对接基础
+
+### 1.1 分子对接的基本原理（1课时）
+- 受体与配体的结合模式
+- 打分函数与结合自由能估计
+- 刚性对接与柔性对接的差异
+
+### 1.2 分子对接的实践流程（1课时）
+- 蛋白结构准备与质量检查
+- 对接盒子设置与构象搜索
+- 对接结果的可视化与评估
+
+## 第2章：对接结果的解读
+
+### 2.1 打分函数的局限（1课时）
+- 打分函数为何不等于亲和力
+</syllabus>
+```
+
+解析规则见 `TopicBookGenerator.parse_syllabus_to_dict`，不符合格式的行会被**静默跳过**而不是报错：
+
+| 行首 | 含义 | 硬性要求 |
+| --- | --- | --- |
+| `# ` | 课程名 | 建议与目录名、`book_info.json` 的 `教材名称` 保持一致 |
+| `## ` | 章 | 必须含 `第N章`，N 为阿拉伯数字 |
+| `### ` | 子节 | 形如 `<编号> <标题>`，两者之间必须有空格 |
+| `- ` | 知识点 | 挂到最近的 `### ` 下 |
+
+几个容易踩的点：
+
+- `## 第一章：...` 用中文数字**不会被识别**，该章连同其下所有子节会被整段丢弃，必须写成 `第1章`。
+- `### ` 行按第一个空格切分，`1.1` 是编号、其余是标题。写成 `### 1.1分子对接原理`（无空格）会导致这个子节丢失。
+- 子节编号建议用 `章号.序号`，`chapter_ids` / `subchapter_ids` 这类局部重跑参数依赖它。
+- `（1课时）` 这类后缀会作为标题的一部分保留，不影响解析。
+- 出现在任何 `### ` 之前的 `- ` 会被忽略。
+
+### 4.2 book_info.json（必需）
+
+课程元信息。七个字段全部必填，`main.py` 启动时会校验非空且不含 `{{...}}` 占位符：
+
+```json
+{
+  "教材名称": "分子对接入门",
+  "语言": "中文",
+  "面向人群": "药学、生物信息学专业本科高年级学生",
+  "教学方式": "课堂讲授与上机实践相结合，强调问题驱动的分析流程",
+  "教学目的": "理解分子对接的基本原理，掌握一次完整对接实验的操作流程与结果评估方法",
+  "教学要求": "具备基础的有机化学与蛋白质结构知识",
+  "教材行文风格": "问题驱动型"
+}
+```
+
+| 字段 | 用途 |
+| --- | --- |
+| `教材名称` | 课程名，用于目录与标题 |
+| `语言` | 只接受 `中文` 或 `英文`，决定 prompt 目录与输出语言 |
+| `面向人群` | 写进前言与正文 prompt，影响行文深度 |
+| `教学方式` | 影响正文中实践环节与理论叙述的配比 |
+| `教学目的` | 前言与章节目标的依据 |
+| `教学要求` | 预备知识，决定哪些概念需要展开 |
+| `教材行文风格` | 映射为 prompt 的 `style_tendency`，见下 |
+
+`教材行文风格` 最终会被归一化为 `严谨推演型`、`叙事引导型`、`问题驱动型` 三选一。
+建议直接填这三个值之一；填自由描述时会按关键词模糊匹配，匹配不上则默认 `问题驱动型`，并在日志里打印实际采用的值。
+
+文件不存在时，`main.py` 会先生成一份字段留空的模板并提示你填写，填完再跑。
+
+### 4.3 practical_case.json（可选）
+
+实战案例 notebook 的定义，是一个对象数组。不提供此文件时，notebook 环节会直接跳过：
+
+```json
+[
+  {
+    "chapter": "第1章 人工智能算法基础",
+    "section": "1.1 监督学习 分类算法实战",
+    "topic": "Iris数据集分类实战",
+    "description": "加载Iris数据集，使用scikit-learn实现逻辑回归、SVM、随机森林，绘制决策边界并对比准确率。",
+    "key_libraries": ["scikit-learn", "matplotlib", "pandas"]
+  }
+]
+```
+
+| 字段 | 说明 |
+| --- | --- |
+| `chapter` | 所属章，用于定位 notebook 落盘目录与按 `chapter_ids` 过滤 |
+| `section` | 所属子节 |
+| `topic` | 案例名，会被清洗成 notebook 文件名 |
+| `description` | 案例要做什么，是生成 notebook 的主要依据 |
+| `key_libraries` | 期望用到的库，写进 prompt 约束技术选型 |
+
+章节归属按 `chapter` 里的 `第N章` 或 `Chapter N` 识别，识别不到则回退到 `section` 的 `N.M` 前缀。
+两者都识别不出时，如果你传了 `chapter_ids`，该案例会被跳过并打印日志。
+
+### 4.4 docs/<课程名>_job.md（可选）
+
+岗位需求描述，普通 Markdown 即可，无固定结构。只在 `generate_chapter()` 生成或精修大纲时读取
+（路径为 `<docs_path>/<课程名>_job.md`，`scripts/generate_book.py` 默认 `docs_path="./docs"`），
+用于让大纲贴合真实岗位的能力要求。文件不存在时按空字符串处理，不影响运行。
+
+---
+
+## 5. 目录结构（当前版本）
 
 ```text
 book_generate_pipeline/
@@ -131,9 +245,10 @@ book_generate_pipeline/
 
 ```text
 output/<课程名>/
-├─ book_info/
+├─ book_info/                # 输入，格式见第 4 节
 │  ├─ syllabus.md
-│  └─ book_info.json
+│  ├─ book_info.json
+│  └─ practical_case.json    # 可选
 ├─ pack/
 │  ├─ book_info/
 │  ├─ prompts/
@@ -155,9 +270,9 @@ output/<课程名>/
 
 ---
 
-## 5. 运行方式
+## 6. 运行方式
 
-## 5.1 推荐：命令行脚本
+## 6.1 推荐：命令行脚本
 
 ```bash
 python scripts/generate_book.py --course-name "离散数学" --language ch --education-level 本科 --number-of-topics 50
@@ -174,7 +289,7 @@ python scripts/generate_book.py --course-name "离散数学" --language ch --sub
 - 大纲路径：`./output/<course_name>/book_info/syllabus.md`
 - 课程目录：`./output/<course_name>/`
 
-## 5.2 调试入口（`main.py`）
+## 6.2 调试入口（`main.py`）
 
 ```bash
 python main.py
@@ -185,7 +300,7 @@ python main.py
 - 仅跑素材包阶段（`generate_material_pack`，示例里有 `chapter_ids=[1]`）
 - 正文阶段代码默认注释，适合先验证 pack 逻辑
 
-## 5.3 编程调用（推荐双阶段显式调用）
+## 6.3 编程调用（推荐双阶段显式调用）
 
 ```python
 import asyncio
@@ -207,7 +322,7 @@ asyncio.run(run())
 
 ---
 
-## 6. 素材包（pack）重点说明
+## 7. 素材包（pack）重点说明
 
 `pack/` 是可复用中间层，推荐先人工审核后再跑全文生成。
 
@@ -234,7 +349,7 @@ asyncio.run(run())
 
 ---
 
-## 7. 插图流水线
+## 8. 插图流水线
 
 高层封装：
 - `src/tools/draw_images.py` -> `draw_images_for_markdown(...)`
@@ -263,7 +378,7 @@ asyncio.run(draw_images_for_markdown(
 
 ---
 
-## 8. 常见问题（FAQ）
+## 9. 常见问题（FAQ）
 
 - **Q1：为什么提示找不到素材包？**
   - `generate_book()` 依赖已存在的 `pack/`；请先执行 `generate_material_pack()`。
@@ -287,7 +402,7 @@ asyncio.run(draw_images_for_markdown(
 
 ---
 
-## 9. 辅助工具
+## 10. 辅助工具
 
 查询网关可用模型：
 
