@@ -3,8 +3,16 @@
 import os
 import re
 import yaml
-from typing import Dict, Any, Optional
+from typing import Dict, Any, List, Optional
 from pathlib import Path
+
+# 角色 -> 覆盖用的环境变量名
+_MODEL_ENV_OVERRIDES = {
+    "writer": "LLM_WRITER_MODEL",
+    "reviewer": "LLM_REVIEWER_MODEL",
+    "utility": "LLM_UTILITY_MODEL",
+    "image": "LLM_IMAGE_MODEL",
+}
 
 
 class Config:
@@ -29,17 +37,6 @@ class Config:
         """Set the language for prompts directory selection."""
         self.language = language
 
-    def _load_env(self):
-        """Load environment variables from .env if available."""
-        try:
-            import dotenv
-        except Exception:
-            return
-        project_root = Path(__file__).resolve().parents[2]
-        dotenv_path = project_root / '.env'
-        if dotenv_path.exists():
-            dotenv.load_dotenv(dotenv_path=dotenv_path, override=False)
-
     def _interpolate_env(self, data: Any) -> Any:
         """Replace ${VAR} tokens with environment values."""
         if isinstance(data, dict):
@@ -54,82 +51,58 @@ class Config:
 
     def _load_config(self):
         """Load configuration from YAML file."""
-        self._load_env()
-        config_dir = Path(__file__).parent.parent.parent / 'config'
-        config_file = config_dir / f'config.{self.env}.yaml'
+        config_file = Path(__file__).parent.parent.parent / 'config' / f'config.{self.env}.yaml'
+        if not config_file.exists():
+            raise FileNotFoundError(f"配置文件不存在: {config_file}")
+        with open(config_file, 'r', encoding='utf-8') as f:
+            raw_config = yaml.safe_load(f) or {}
+        self._config_cache = self._interpolate_env(raw_config)
 
-        if config_file.exists():
-            with open(config_file, 'r', encoding='utf-8') as f:
-                raw_config = yaml.safe_load(f) or {}
-                self._config_cache = self._interpolate_env(raw_config)
-        else:
-            self._config_cache = self._get_default_config()
-
-    def _get_default_config(self) -> Dict[str, Any]:
-        """Get default configuration."""
-        return {
-            'llm': {
-                'providers': {
-                    'gemini': {
-                        'model': 'litellm_proxy/gemini-3-pro-preview',
-                        'base_url': os.environ.get('LITELLM_PROXY_API_BASE', 'http://8.219.58.57:4000'),
-                        'api_key': os.environ.get('LITELLM_API_KEY', 'sk-WNrS8wC5RXbYvAx6KKdyEw'),
-                    },
-                    'gpt5': {
-                        'model': 'Vendor2/GPT-5.2',
-                        'base_url': os.environ.get('GPUGEEK_API_BASE', ''),
-                        'api_key': os.environ.get('GPUGEEK_API_KEY', ''),
-                    },
-                    'deepseek': {
-                        'model': 'DeepSeek/DeepSeek-V3-0324',
-                    },
-                    'qwen': {
-                        'model': 'GpuGeek/Qwen3-VL-30B-A3B-Thinking',
-                    },
-                    'doubao': {
-                        'model': 'Volcengine/Doubao-Seed-1.6',
-                    },
-                }
-            },
-            'mcp': {
-                'url': os.environ.get('MCP_URL', ''),
-            },
-            'wiki': {
-                'search_api_base': os.environ.get('WIKI_SEARCH_API_BASE', ''),
-            },
-            'output': {
-                'base_dir': 'output/books',
-                'temp_dir': 'output/temp',
-            },
-            'prompts': {
-                'base_dir_ch': 'prompts',  # Chinese prompts directory
-                'base_dir_en': 'prompts_en',  # English prompts directory
-                'names': {
-                    'abstract': 'prompt_abstract',
-                    'chapter': 'prompt_chapter',
-                    'battle': 'prompt_chapter_refine',
-                    'eval_chapter': 'prompt_chapter_eval',
-                    'book': 'prompt_book',
-                    'book_step2': 'prompt_book_step2',
-                    'book_step3': 'prompt_book_step3',
-                    'select_project_qa': 'prompt_select_project_qa',
-                },
-            },
-        }
+    # ---- LLM ----
 
     @property
-    def mcp_url(self) -> str:
-        """Get MCP server URL."""
-        return self._config_cache.get('mcp', {}).get('url', '')
+    def _llm(self) -> Dict[str, Any]:
+        return self._config_cache.get('llm', {})
+
+    @property
+    def gateway_base_url(self) -> str:
+        """LiteLLM 网关地址（不带尾部斜杠）。"""
+        return str(self._llm.get('gateway', {}).get('base_url', '')).rstrip('/')
+
+    @property
+    def gateway_api_key(self) -> str:
+        return str(self._llm.get('gateway', {}).get('api_key', ''))
+
+    def get_model(self, role: str) -> str:
+        """按角色取模型名，环境变量优先于 YAML。"""
+        env_key = _MODEL_ENV_OVERRIDES.get(role)
+        if env_key:
+            override = os.environ.get(env_key, "").strip()
+            if override:
+                return override
+        model = self._llm.get('models', {}).get(role)
+        if not model:
+            raise KeyError(f"未配置模型角色 '{role}'，请检查 config/config.{self.env}.yaml")
+        return str(model)
+
+    @property
+    def evaluator_models(self) -> List[str]:
+        """大纲 battle 的评委模型列表。"""
+        models = self._llm.get('evaluators') or []
+        return [str(m) for m in models if m]
+
+    @property
+    def writer_fallback_models(self) -> List[str]:
+        """writer 调用失败后的降级模型列表。"""
+        models = self._llm.get('writer_fallbacks') or []
+        return [str(m) for m in models if m]
+
+    # ---- 其他服务 ----
 
     @property
     def wiki_search_api_base(self) -> str:
         """Get wiki search API base URL."""
-        return self._config_cache.get('wiki', {}).get('search_api_base', '')
-
-    def get_provider_config(self, name: str) -> Dict[str, Any]:
-        """Get configuration for a specific LLM provider."""
-        return self._config_cache.get('llm', {}).get('providers', {}).get(name, {})
+        return str(self._config_cache.get('wiki', {}).get('search_api_base', '')).rstrip('/')
 
     @property
     def output_base_dir(self) -> Path:
@@ -141,12 +114,16 @@ class Config:
         """Get temp output directory."""
         return Path(self._config_cache.get('output', {}).get('temp_dir', 'output/temp'))
 
+    # ---- Prompts ----
+
     @property
     def prompts_base_dir(self) -> Path:
         """Get prompts base directory based on language setting."""
         prompts_config = self._config_cache.get('prompts', {})
-        # Use language-specific directory: prompts for 'cn', prompts_en for 'en'
-        base_dir = prompts_config.get('base_dir_en', 'prompts_en') if self.language == 'en' else prompts_config.get('base_dir_ch', 'prompts')
+        base_dir = (
+            prompts_config.get('base_dir_en', 'prompts_en') if self.language == 'en'
+            else prompts_config.get('base_dir_ch', 'prompts')
+        )
         return Path(base_dir)
 
     def get_prompt_path(self, prompt_name: str) -> Path:
@@ -167,7 +144,7 @@ class Config:
 _default_config: Optional[Config] = None
 
 
-def get_config(env: str = 'dev', language: str = 'cn') -> Config:
+def get_config(env: str = 'dev', language: str = 'ch') -> Config:
     """Get configuration instance with language support."""
     global _default_config
     if _default_config is None:

@@ -5,9 +5,9 @@ import re
 import json
 import asyncio
 import importlib.util
-from dp.agent.client import MCPClient
 from typing import Dict, Any, Optional, List
-from src.models import gemini_completion, gpt_completion
+from src.models import writer_completion
+from src.core.article_writer_local import write_article
 from src.utils import get_config, sanitize_filename
 from src.core.chapter_types import SubChapterInfo, ChapterInfo, BookGenerationContext
 from src.core.material_pack_generator import MaterialPackGenerator
@@ -19,7 +19,6 @@ class BookGenerator:
     def __init__(self, language: str = "ch"):
         self.language = language
         self.config = get_config(language=language)
-        self.mcp_url = self.config.mcp_url
         self._prompt_book_module = None
         self.material_pack_generator = MaterialPackGenerator(language=language)
 
@@ -105,6 +104,8 @@ class BookGenerator:
                     style_guide=prompt,
                     language=norm_language,
                     mode="advanced",
+                    outline=topics_str,
+                    wiki_data=wiki_content_str or None,
                 )
                 if article_content:
                     print(f"[Info] Attempt {i+1} succeeded for subchapter {sub_code}")
@@ -157,7 +158,7 @@ class BookGenerator:
             chapter_content=chapter_content,
             project_qas=project_qa_text
         )
-        new_chapter_content = await gemini_completion(prompt)
+        new_chapter_content = await writer_completion(prompt)
         # 第一步结果按节切分，再对每节分别纠错，避免整章合并纠错时内容过长
         first_line = ""
         if new_chapter_content and new_chapter_content.strip():
@@ -183,7 +184,7 @@ class BookGenerator:
                 chapter_content=section_content,
                 project_qas=project_qa_text
             )
-            check_result = await gpt_completion(prompt_check)
+            check_result = await writer_completion(prompt_check)
             log_match = re.search(r'<log>\s*(.*?)\s*</log>', check_result, re.DOTALL | re.IGNORECASE)
             content_match = re.search(r'<content>\s*(.*?)\s*</content>', check_result, re.DOTALL | re.IGNORECASE)
             log_parts.append(log_match.group(1).strip() if log_match else "")
@@ -336,7 +337,7 @@ class BookGenerator:
             candidates=candidates_str
         )
         try:
-            response = await gemini_completion(prompt)
+            response = await writer_completion(prompt)
         except Exception as e:
             print(f"  [Warning] QA selection failed: {e}")
             response = ""
@@ -459,33 +460,47 @@ class BookGenerator:
             contents.append(f"### {filename}\n{file_content}")
         return "\n\n".join(contents)
     
-    async def _generate_section_with_content(self, topic: str, style_guide: str = None,
-                                             language: str = "Chinese", mode: str = "advanced") -> Optional[str]:
-        """Call MCP tool to generate article."""
+    async def _generate_section_with_content(
+        self,
+        topic: str,
+        style_guide: str = None,
+        language: str = "Chinese",
+        mode: str = "advanced",
+        outline: Optional[str] = None,
+        wiki_data: Optional[str] = None,
+    ) -> Optional[str]:
+        """
+        使用与 content_writer-master/MCPs/ArticleWriter/pipeline.py 一致的 write_article 拼装与系统提示，
+        将 prompt_book 产出的长指令放在 extra_requirements；要点/百科在 outline/wiki_data 中补充
+        （与 prompt 内字段可能部分重复，便于与 MCP 用户提示结构对齐）。
+        """
+        guide = (style_guide or "").strip()
+        if not guide:
+            print(f"  [Error] 子节「{topic}」写作提示为空，跳过生成")
+            return None
+        extra = (
+            f"{guide}\n\n---\n【教材流水线补充】\n"
+            f"子节标题：{topic}\n"
+            f"模式：{mode}（advanced 表示更高信息密度与教学深度）\n"
+        )
         try:
-            async with MCPClient(self.mcp_url) as client:
-                result = await client.call_tool("generate_article", {
-                        "topic": topic,
-                        "language": language,
-                        "style_guide": style_guide,
-                        "mode": mode,
-                    },
-                    async_mode=True
-                )
-                try:
-                    content_data = json.loads(result.content[0].text)
-                    article_content = content_data.get("main_content", "")
-                    if article_content == "There are no suffient information in the knowledge base to write the article you required.":
-                        print("Generation failed, retrying...")
-                        return await self._generate_section_with_content(topic, style_guide, language, mode)
-                except (json.JSONDecodeError, AttributeError, IndexError):
-                    article_content = result.content[0].text if result.content else ""
-                if not article_content:
-                    print(f"  [Error] Empty content received for {topic}")
-                    return None
-                return article_content
+            result = await write_article(
+                topic=topic,
+                reference_material_path=None,
+                reference_material_content=None,
+                qa_data=None,
+                wiki_data=wiki_data or "",
+                outline=outline or "",
+                article_type="chapter",
+                writing_style=None,
+                target_audience=None,
+                output_language=language,
+                extra_requirements=extra,
+            )
+            text = (result.get("article") or "").strip()
+            return text or None
         except Exception as e:
-            print(f"  [Error] Failed generating section {topic}: {e}")
+            print(f"  [Error] article_writer_local.write_article 失败：{topic} — {e}")
             return None
 
     def _decompose_chapter_content(self, full_content: str) -> Dict[str, str]:

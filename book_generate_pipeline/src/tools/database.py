@@ -3,13 +3,11 @@ from decimal import Decimal
 from mysql.connector import pooling
 from mysql.connector import Error
 import logging
-import dotenv
 import os
 import asyncio
 from typing import Dict
 
 logger = logging.getLogger(__name__)
-dotenv.load_dotenv()
 
 ARTICLE_TABLE = 'articles'
 WIKI_INDEX_TABLE = 'wiki_index'

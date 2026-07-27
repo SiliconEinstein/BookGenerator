@@ -6,8 +6,8 @@ import os
 import argparse
 import json
 
-# Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+# 包根为 book_generate_pipeline/，其子目录 src/ 才是 Python 包 `src`
+sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..")))
 
 from src.core.topic_book_generator import TopicBookGenerator
 

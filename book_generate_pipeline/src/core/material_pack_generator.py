@@ -8,7 +8,7 @@ import asyncio
 from pathlib import Path
 from typing import Dict, Any, List, Optional, Tuple
 
-from src.models import gpt_completion
+from src.models import writer_completion
 from src.utils import get_config, sanitize_filename
 from src.tools import search_qa_pairs_for_subchapter, search_wiki_articles_for_subchapter
 from src.tools.draw_image.draw_image_agent import DrawImageAgent
@@ -236,7 +236,7 @@ class MaterialPackGenerator:
             teaching_methodology=preface_inputs.get("teaching_methodology", book_info.get("教学方式", "{{教学方式}}")),
             syllabus=outline_text,
         )
-        preface = await gpt_completion(prompt)
+        preface = await writer_completion(prompt)
         with open(preface_path, "w", encoding="utf-8") as f:
             f.write(preface.strip())
 
@@ -334,7 +334,7 @@ class MaterialPackGenerator:
             wiki_content=wiki_content_str,
             book_structure=book_structure,
         )
-        abstract = await gpt_completion(prompt)
+        abstract = await writer_completion(prompt)
         return {"abstract": abstract, "wiki_content": wiki_content_str}
 
     def _save_wiki_articles(
@@ -490,7 +490,7 @@ class MaterialPackGenerator:
             "只返回 JSON，格式：{\"translations\":[{\"source\":\"原文\",\"translated\":\"中文\"}]}\n"
             f"原文列表：{json.dumps(originals, ensure_ascii=False)}"
         )
-        response = await gpt_completion(prompt)
+        response = await writer_completion(prompt)
         mapping: Dict[str, str] = {}
         try:
             json_text = response.strip()
@@ -819,7 +819,7 @@ class MaterialPackGenerator:
             )
         prompt = prompt_template.replace("{{USER_INPUT_JSON}}", json.dumps(case, ensure_ascii=False, indent=2))
         prompt = prompt.replace("{{DATA_DIR}}", data_dir_for_notebook.replace("\\", "/"))
-        response = await gpt_completion(prompt)
+        response = await writer_completion(prompt)
         parsed = self._extract_json_object_from_text(response)
         if not isinstance(parsed, dict):
             return {"notebook": self._build_fallback_notebook(case), "data_requirements": []}
@@ -1107,7 +1107,7 @@ notebooks/
 - 正文插图由 `draw_images.py` 调用时，提示词优先级如下：
   1. `pack/prompts/draw_by_text`
   2. 默认目录 `src/tools/draw_image/prompt/draw_by_text`
-- 当 `prompt_dir` 指向 `pack/prompts` 但缺少其他绘图提示词（如 `get_insert_position`、`eval_image`）时，系统会自动回退到默认目录。
+- 当 `prompt_dir` 指向 `pack/prompts` 但缺少其他绘图提示词（如 `get_insert_position`）时，系统会自动回退到默认目录。
 
 ## 五、实战案例 notebook 规范
 

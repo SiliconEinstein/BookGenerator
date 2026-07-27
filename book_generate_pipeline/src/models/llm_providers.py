@@ -1,268 +1,213 @@
-"""LLM provider implementations using litellm and OpenAI clients."""
+"""统一的 LLM 调用层，所有请求都走同一个 LiteLLM 网关。
 
+按用途划分角色，具体模型名在 config/config.dev.yaml 里配置：
+
+- writer   正文、摘要、前言、章节纠错、notebook 生成
+- reviewer 大纲 battle 的对手模型
+- utility  结构化输出、关键词扩展、插图选点
+- image    插图生成
+"""
+
+import asyncio
+import base64
+import logging
 import os
 import time
-import asyncio
-import litellm
+from typing import Any, Callable, Dict, List, Optional, Tuple
+
 import httpx
-from openai import OpenAI, AsyncOpenAI
-from typing import Optional, Any, List
+import litellm
+from pydantic import BaseModel
+
 from src.utils import get_config
 
-# Configuration helpers
-def _get_config_value(config: dict, key: str, env_key: Optional[str] = None, default: str = "") -> str:
-    """Return value from config or environment fallback."""
-    if config:
-        value = config.get(key)
-        if value:
-            return value
-    if env_key:
-        return os.environ.get(env_key, default)
-    return default
+logger = logging.getLogger(__name__)
 
+litellm.suppress_debug_info = True
 
-def _get_provider_model(config: dict, default: str) -> str:
-    """Return provider model from config or default."""
-    if config:
-        value = config.get("model")
-        if value:
-            return value
-    return default
-
-
-# Initialize clients
 _config = get_config()
-_gemini_cfg = _config.get_provider_config("gemini")
-_gpt5_cfg = _config.get_provider_config("gpt5")
-_deepseek_cfg = _config.get_provider_config("deepseek")
-_qwen_cfg = _config.get_provider_config("qwen")
-_doubao_cfg = _config.get_provider_config("doubao")
+_BASE_URL = _config.gateway_base_url
+_API_KEY = _config.gateway_api_key
 
-_litellm_api_base = _get_config_value(_gemini_cfg, "base_url", "LITELLM_PROXY_API_BASE")
-_litellm_api_key = _get_config_value(_gemini_cfg, "api_key", "LITELLM_API_KEY")
-_gpugeek_api_base = _get_config_value(_gpt5_cfg, "base_url", "GPUGEEK_API_BASE")
-_gpugeek_api_key = _get_config_value(_gpt5_cfg, "api_key", "GPUGEEK_API_KEY")
-_gpugeek_image_base = os.environ.get("GPUGEEK_IMAGE_API_BASE", "https://api.gpugeek.com").rstrip("/")
-_gpugeek_image_model = os.environ.get("GPUGEEK_IMAGE_MODEL", "Vendor2/Gemini-3-Pro-Image")
-
-os.environ["LITELLM_PROXY_API_BASE"] = _litellm_api_base
-os.environ["LITELLM_PROXY_API_KEY"] = _litellm_api_key
-os.environ["LITELLM_API_KEY"] = _litellm_api_key
-
-# Create async OpenAI client for GPUgeek API
-_async_client = AsyncOpenAI(
-    api_key=_gpugeek_api_key,
-    base_url=_gpugeek_api_base,
-    http_client=httpx.AsyncClient(
-        limits=httpx.Limits(
-            max_connections=100,
-            max_keepalive_connections=50,
-        ),
-    ),
-)
-
-
-async def gemini_completion(prompt: str, **kwargs) -> str:
-    """Gemini 3 Pro completion using litellm proxy."""
-    messages = [{"role": "user", "content": prompt}]
-    try:
-        response = await litellm.acompletion(
-            model="litellm_proxy/gemini-3-pro-preview",
-            messages=messages,
-            **kwargs
-        )
-    except Exception as e:
-        raise RuntimeError(f"Evaluation failed: {e}")
-    return response['choices'][0]['message']['content']
-
-
-async def gpt_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
-    """GPT 5.2 completion using GPUgeek API."""
-    messages = [{"role": "user", "content": prompt}]
-    response = await _async_client.chat.completions.create(
-        model="Vendor2/GPT-5.2",
-        messages=messages,
-        temperature=temperature,
-        max_completion_tokens=65535,
-        **kwargs
+if not _BASE_URL or not _API_KEY:
+    raise RuntimeError(
+        "LiteLLM 网关未配置：请在 .env 中设置 LITELLM_PROXY_API_BASE 与 LITELLM_PROXY_API_KEY。"
     )
-    return response.choices[0].message.content
+
+# litellm 的 litellm_proxy provider 从这两个环境变量读取网关地址与密钥
+os.environ["LITELLM_PROXY_API_BASE"] = _BASE_URL
+os.environ["LITELLM_PROXY_API_KEY"] = _API_KEY
+
+# 正文类调用需要足够大的输出预算，否则整章会被截断
+WRITER_MAX_TOKENS = int(os.environ.get("LLM_WRITER_MAX_TOKENS", "32000"))
 
 
-async def deepseek_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
-    """DeepSeek V3 completion using GPUgeek API."""
-    messages = [{"role": "user", "content": prompt}]
-    response = await _async_client.chat.completions.create(
-        model="DeepSeek/DeepSeek-V3-0324",
-        messages=messages,
-        temperature=temperature,
-        **kwargs
-    )
-    return response.choices[0].message.content
+def _qualified(model: str) -> str:
+    return model if model.startswith("litellm_proxy/") else f"litellm_proxy/{model}"
 
 
-async def qwen_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
-    """Qwen VL completion using GPUgeek API."""
-    messages = [{"role": "user", "content": prompt}]
-    response = await _async_client.chat.completions.create(
-        model="GpuGeek/Qwen3-VL-30B-A3B-Thinking",
-        messages=messages,
-        temperature=temperature,
-        **kwargs
-    )
-    return response.choices[0].message.content
+def _api_url(path: str) -> str:
+    base = _BASE_URL[:-3].rstrip("/") if _BASE_URL.endswith("/v1") else _BASE_URL
+    return f"{base}/v1/{path.lstrip('/')}"
 
 
-async def doubao_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
-    """Doubao completion using GPUgeek API."""
-    messages = [{"role": "user", "content": prompt}]
-    response = await _async_client.chat.completions.create(
-        model="Volcengine/Doubao-Seed-1.6",
-        messages=messages,
-        temperature=temperature,
-        **kwargs
-    )
-    return response.choices[0].message.content
+def model_for(role: str) -> str:
+    """返回某个角色当前使用的模型名（不带 litellm_proxy/ 前缀）。"""
+    return _config.get_model(role)
 
 
-async def gpugeek_image_generation(
+async def complete(
     prompt: str,
-    aspect_ratio: str = "16:9",
-    image_size: str = "1K",
-    images: Optional[List[str]] = None,
-    poll_interval_seconds: float = 2.0,
-    timeout_seconds: float = 180.0,
-    submit_retry_times: int = 3,
-) -> List[Any]:
-    """
-    Generate image via GPUGeek predictions API (async submit + poll).
-
-    Returns:
-        prediction output payload list/object normalized to a list.
-    """
-    api_key = (_gpugeek_api_key or os.environ.get("GPUGEEK_API_KEY", "")).strip()
-    if not api_key:
-        raise RuntimeError("Missing GPUGEEK_API_KEY for image generation.")
-
-    prediction_url = f"{_gpugeek_image_base}/predictions"
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "Prefer": "respond-async",
+    model: str,
+    temperature: float = 0.7,
+    max_tokens: Optional[int] = None,
+    **kwargs,
+) -> str:
+    """向网关发一次单轮对话请求。"""
+    params: Dict[str, Any] = {
+        "model": _qualified(model),
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": temperature,
     }
-    payload = {
-        "model": _gpugeek_image_model,
-        "input": {
-            "aspectRatio": aspect_ratio,
-            "imageSize": image_size,
-            "images": images or [],
-            "prompt": prompt or "",
-        },
+    if max_tokens:
+        params["max_tokens"] = max_tokens
+    params.update(kwargs)
+    response = await litellm.acompletion(**params)
+    return response["choices"][0]["message"]["content"] or ""
+
+
+async def writer_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
+    """主力写作模型；失败时按配置依次降级。"""
+    models = [model_for("writer")] + _config.writer_fallback_models
+    kwargs.setdefault("max_tokens", WRITER_MAX_TOKENS)
+    last_error: Optional[Exception] = None
+    for model in models:
+        try:
+            return await complete(prompt, model=model, temperature=temperature, **kwargs)
+        except Exception as exc:
+            last_error = exc
+            logger.warning("writer 模型 %s 调用失败，尝试降级: %s", model, exc)
+    raise RuntimeError(f"所有 writer 模型均调用失败，最后一个错误: {last_error}")
+
+
+async def reviewer_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
+    kwargs.setdefault("max_tokens", WRITER_MAX_TOKENS)
+    return await complete(prompt, model=model_for("reviewer"), temperature=temperature, **kwargs)
+
+
+async def utility_completion(prompt: str, temperature: float = 0.7, **kwargs) -> str:
+    return await complete(prompt, model=model_for("utility"), temperature=temperature, **kwargs)
+
+
+def evaluator_completions() -> List[Callable[[str], Any]]:
+    """返回大纲 battle 的评委调用函数列表。"""
+
+    def _make(model: str) -> Callable[[str], Any]:
+        async def _call(prompt: str, temperature: float = 0.7, **kwargs) -> str:
+            kwargs.setdefault("max_tokens", WRITER_MAX_TOKENS)
+            return await complete(prompt, model=model, temperature=temperature, **kwargs)
+
+        _call.__name__ = f"evaluator_{model.replace('/', '_').replace('.', '_')}"
+        return _call
+
+    return [_make(m) for m in _config.evaluator_models]
+
+
+async def structured_completion(
+    system_prompt: str,
+    user_prompt: str,
+    response_format: Optional[type] = None,
+    temperature: float = 1.0,
+    max_tokens: int = 4096,
+    model: Optional[str] = None,
+) -> Tuple[str, Dict[str, Any]]:
+    """需要 JSON schema 约束输出的调用，返回 (文本, 用量信息)。
+
+    注意：Claude 系模型会忽略 response_format 并返回散文，请勿把它们配成 utility 角色。
+    """
+    target = model or model_for("utility")
+    start = time.time()
+    response = await litellm.acompletion(
+        model=_qualified(target),
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": [{"type": "text", "text": user_prompt}]},
+        ],
+        response_format=response_format,
+        temperature=temperature,
+        max_tokens=max_tokens,
+    )
+    content = response["choices"][0]["message"]["content"] or ""
+    usage = response.get("usage") or {}
+    if not isinstance(usage, dict):
+        usage = getattr(usage, "__dict__", {}) or {}
+    return content, {
+        "model": target,
+        "elapsed_time": time.time() - start,
+        "prompt_tokens": usage.get("prompt_tokens", 0),
+        "completion_tokens": usage.get("completion_tokens", 0),
+        "total_tokens": usage.get("total_tokens", 0),
     }
 
-    timeout = httpx.Timeout(connect=10.0, read=60.0, write=20.0, pool=10.0)
-    async with httpx.AsyncClient(timeout=timeout) as client:
-        submit_res = None
-        last_submit_error: Optional[Exception] = None
-        for attempt in range(1, max(1, submit_retry_times) + 1):
+
+async def generate_images(
+    prompt: str,
+    n: int = 1,
+    timeout_seconds: float = 300.0,
+    max_attempts: int = 3,
+) -> List[bytes]:
+    """调用网关的 images/generations 生成插图，返回图片字节列表。
+
+    出图接口偶发 429/5xx 与超时，这里做有限次退避重试；重试耗尽会抛异常，
+    由调用方决定是否降级，避免静默产出空图。
+    """
+    url = _api_url("images/generations")
+    headers = {"Authorization": f"Bearer {_API_KEY}", "Content-Type": "application/json"}
+    payload = {"model": model_for("image"), "prompt": prompt, "n": n}
+
+    last_error: Optional[str] = None
+    async with httpx.AsyncClient(timeout=timeout_seconds) as client:
+        for attempt in range(1, max_attempts + 1):
             try:
-                submit_res = await client.post(prediction_url, headers=headers, json=payload)
-                break
-            except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.ConnectError) as exc:
-                last_submit_error = exc
-                if attempt >= submit_retry_times:
-                    break
-                await asyncio.sleep(min(2.0 * attempt, 5.0))
+                resp = await client.post(url, headers=headers, json=payload)
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                last_error = f"{type(exc).__name__}: {exc}"
+            else:
+                if resp.status_code == 200:
+                    images = await _extract_images(resp.json(), client)
+                    if images:
+                        return images
+                    last_error = f"响应中没有图片数据: {str(resp.json())[:200]}"
+                else:
+                    last_error = f"HTTP {resp.status_code}: {resp.text[:200]}"
 
-        if submit_res is None:
-            raise RuntimeError(f"Image submit request failed after retries: {last_submit_error}")
-        if submit_res.status_code not in {200, 202}:
-            raise RuntimeError(
-                f"Image submit failed: status={submit_res.status_code}, body={submit_res.text}"
-            )
+            if attempt < max_attempts:
+                delay = min(2.0 * attempt, 8.0)
+                logger.warning("出图第 %d 次失败（%s），%.0fs 后重试", attempt, last_error, delay)
+                await asyncio.sleep(delay)
 
-        submit_payload = submit_res.json() if submit_res.content else {}
+    raise RuntimeError(f"出图失败，已重试 {max_attempts} 次。最后一个错误: {last_error}")
 
-        # 一些服务端会直接同步返回最终结果（200 + output），无需轮询。
-        if submit_res.status_code == 200:
-            direct_output = (submit_payload or {}).get("output")
-            if isinstance(direct_output, list):
-                return direct_output
-            if direct_output is None:
-                return []
-            return [direct_output]
 
-        prediction_id = (submit_payload or {}).get("id")
-        if not prediction_id:
-            raise RuntimeError(f"Image submit missing prediction id: {submit_res.text}")
-
-        query_url = f"{prediction_url}/{prediction_id}"
-        query_headers = {"Authorization": f"Bearer {api_key}"}
-        deadline = time.time() + timeout_seconds
-
-        while time.time() < deadline:
+async def _extract_images(payload: Dict[str, Any], client: httpx.AsyncClient) -> List[bytes]:
+    """兼容 b64_json 与 url 两种返回形态。"""
+    images: List[bytes] = []
+    for item in payload.get("data", []) or []:
+        if not isinstance(item, dict):
+            continue
+        b64 = item.get("b64_json")
+        if b64:
             try:
-                poll_res = await client.get(query_url, headers=query_headers)
-            except (httpx.ReadTimeout, httpx.ConnectTimeout, httpx.ConnectError):
-                # 接口偶发慢响应或网络抖动时，保留任务并继续轮询，避免直接失败。
-                await asyncio.sleep(poll_interval_seconds)
-                continue
-
-            poll_payload = poll_res.json() if poll_res.content else {}
-            status = (poll_payload or {}).get("status", "")
-            output = (poll_payload or {}).get("output")
-
-            if poll_res.status_code == 200 and status not in {"processing", "starting", ""}:
-                if status in {"failed", "canceled", "cancelled"}:
-                    raise RuntimeError(f"Image generation {status}: {poll_payload}")
-                if isinstance(output, list):
-                    return output
-                if output is None:
-                    return []
-                return [output]
-
-            await asyncio.sleep(poll_interval_seconds)
-
-    raise TimeoutError(f"Image generation timed out after {timeout_seconds}s.")
-
-
-# Sync wrapper for compatibility with eval.py
-def eval_sync(prompt: str, image_path: Optional[str] = None) -> str:
-    """Synchronous evaluation with optional image support."""
-    try:
-        if image_path is None:
-            messages = [{"role": "user", "content": prompt}]
-        else:
-            import base64
-            with open(image_path, "rb") as image_file:
-                encoded_image = base64.b64encode(image_file.read()).decode('utf-8')
-            messages = [
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}
-                        }
-                    ]
-                }
-            ]
-        response = litellm.completion(
-            model="litellm_proxy/gemini-3-pro-preview",
-            messages=messages,
-        )
-        return response['choices'][0]['message']['content']
-    except Exception as e:
-        raise RuntimeError(f"Evaluation failed: {e}")
-
-
-async def main():
-    """Test function for providers."""
-    res = await doubao_completion("介绍一下什么是人工智能")
-    print(res)
-
-
-if __name__ == '__main__':
-    import asyncio
-    asyncio.run(main())
+                images.append(base64.b64decode(b64))
+            except Exception:
+                logger.warning("b64_json 解码失败，跳过一张图")
+            continue
+        url = item.get("url")
+        if url:
+            try:
+                r = await client.get(url)
+                if r.status_code == 200:
+                    images.append(r.content)
+            except Exception as exc:
+                logger.warning("下载图片失败 %s: %s", url, exc)
+    return images

@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional, List, Union
 
 from src.tools.qa_retrieve.pipeline import retrieve_and_check_qa
 from src.utils import sanitize_filename
-from src.models import gpt_completion
+from src.models import writer_completion
 
 
 def extract_keywords_from_outline(
@@ -87,7 +87,7 @@ async def extract_keywords_from_online(
 
     以json列表形式返回: \n[keyword1, ...]
     """
-    response = await gpt_completion(prompt=prompt)
+    response = await writer_completion(prompt=prompt)
 
     def _normalize_keywords(raw: Any) -> List[str]:
         if isinstance(raw, dict):

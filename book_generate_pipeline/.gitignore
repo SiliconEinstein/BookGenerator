@@ -25,6 +25,7 @@ wheels/
 *.egg
 
 # Virtual environments
+.venv/
 venv/
 ENV/
 env/
@@ -37,10 +38,8 @@ env/
 *~
 
 # Output files
-output/books/*
-!output/books/.gitkeep
-output/temp/*
-!output/temp/.gitkeep
+# 成书产物体积大且每次运行都变，不纳入版本控制
+output/
 *.log
 
 # Input documents

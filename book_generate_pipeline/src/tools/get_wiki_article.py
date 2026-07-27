@@ -3,7 +3,9 @@ import re
 import aiohttp
 from typing import Dict, Any, Optional, List, Union
 
-WIKI_SEARCH_API_BASE = "https://literature-sage.test.bohrium.com"
+from src.utils import get_config
+
+WIKI_SEARCH_API_BASE = get_config().wiki_search_api_base or "https://literature-sage.test.bohrium.com"
 
 
 async def search_wiki_articles_for_subchapter(
