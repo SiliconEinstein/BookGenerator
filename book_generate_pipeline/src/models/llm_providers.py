@@ -5,7 +5,6 @@
 - writer   正文、摘要、前言、章节纠错、notebook 生成
 - reviewer 大纲 battle 的对手模型
 - utility  结构化输出、关键词扩展、插图选点
-- vision   插图质量评估（多模态）
 - image    插图生成
 """
 
@@ -149,26 +148,6 @@ async def structured_completion(
         "completion_tokens": usage.get("completion_tokens", 0),
         "total_tokens": usage.get("total_tokens", 0),
     }
-
-
-async def vision_completion(prompt: str, image_path: str, max_tokens: int = 4096) -> str:
-    """带图片输入的调用，用于插图质量评估。"""
-    with open(image_path, "rb") as f:
-        encoded = base64.b64encode(f.read()).decode("utf-8")
-    response = await litellm.acompletion(
-        model=_qualified(model_for("vision")),
-        messages=[
-            {
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {"type": "image_url", "image_url": {"url": f"data:image/png;base64,{encoded}"}},
-                ],
-            }
-        ],
-        max_tokens=max_tokens,
-    )
-    return response["choices"][0]["message"]["content"] or ""
 
 
 async def generate_images(

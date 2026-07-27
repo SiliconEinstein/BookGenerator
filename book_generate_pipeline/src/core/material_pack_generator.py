@@ -1107,7 +1107,7 @@ notebooks/
 - 正文插图由 `draw_images.py` 调用时，提示词优先级如下：
   1. `pack/prompts/draw_by_text`
   2. 默认目录 `src/tools/draw_image/prompt/draw_by_text`
-- 当 `prompt_dir` 指向 `pack/prompts` 但缺少其他绘图提示词（如 `get_insert_position`、`eval_image`）时，系统会自动回退到默认目录。
+- 当 `prompt_dir` 指向 `pack/prompts` 但缺少其他绘图提示词（如 `get_insert_position`）时，系统会自动回退到默认目录。
 
 ## 五、实战案例 notebook 规范
 

@@ -9,7 +9,6 @@ llm:
     writer: "cds/GPT-5.4"                       # 正文、摘要、前言、纠错、notebook
     reviewer: "claude-sonnet-4-6"               # 大纲 battle 的对手模型
     utility: "gemini-3.1-pro-preview"           # 结构化输出、关键词扩展、插图选点
-    vision: "gemini-3.1-pro-preview"            # 插图质量评估（多模态）
     image: "sn/gemini-3-pro-image-preview"      # 插图生成
   # 大纲 battle 的评委，取多数票；应挑选相互独立的模型
   evaluators:

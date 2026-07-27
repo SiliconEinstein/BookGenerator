@@ -41,15 +41,16 @@
 
 ```bash
 python -m venv .venv
-.venv\Scripts\activate
+source .venv/bin/activate      # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 playwright install chromium
 ```
 
-可选（建议）：
+装好后建议先跑一遍体检，确认外部依赖都通：
 
 ```bash
-pip install python-dotenv
+cp .env.example .env           # 填入网关密钥与 OpenSearch 凭据
+python scripts/healthcheck.py
 ```
 
 ---
@@ -78,7 +79,6 @@ pip install python-dotenv
 | `writer` | 正文、摘要、前言、章节纠错、notebook | `cds/GPT-5.4` |
 | `reviewer` | 大纲 battle 的对手模型 | `claude-sonnet-4-6` |
 | `utility` | 结构化输出、QA 关键词扩展、插图选点 | `gemini-3.1-pro-preview` |
-| `vision` | 插图质量评估（多模态） | `gemini-3.1-pro-preview` |
 | `image` | 插图生成 | `sn/gemini-3-pro-image-preview` |
 
 另有两项列表配置：`llm.evaluators` 是大纲 battle 的评委（取多数票，应选相互独立的模型），
@@ -97,25 +97,34 @@ pip install python-dotenv
 
 ```text
 book_generate_pipeline/
-├─ config/
-├─ prompts/
-├─ prompts_en/
+├─ config/config.dev.yaml     # 模型角色、并发、prompt 名映射
+├─ prompts/                   # 中文 prompt
+├─ prompts_en/                # 英文 prompt
 ├─ scripts/
-│  ├─ generate_book.py
-│  └─ list_litellm_models.py
+│  ├─ generate_book.py        # 主命令行入口
+│  ├─ healthcheck.py          # 外部依赖逐项体检
+│  ├─ run_e2e.py              # 最小课程端到端自检
+│  └─ list_litellm_models.py  # 列出网关可用模型
 ├─ src/
 │  ├─ core/
-│  │  ├─ topic_book_generator.py
-│  │  ├─ material_pack_generator.py
-│  │  ├─ chapter_generator.py
-│  │  └─ book_generator.py
-│  ├─ models/
+│  │  ├─ topic_book_generator.py   # 总调度
+│  │  ├─ chapter_generator.py      # 大纲生成与 battle
+│  │  ├─ material_pack_generator.py# 素材包
+│  │  ├─ book_generator.py         # 正文与导出
+│  │  ├─ article_writer_local.py   # 单篇写作
+│  │  └─ chapter_types.py
+│  ├─ models/llm_providers.py      # 唯一的 LLM 调用出口
 │  ├─ tools/
-│  │  ├─ draw_images.py
-│  │  ├─ md2html_wrapper.py
-│  │  └─ draw_image/
+│  │  ├─ draw_images.py            # 插图高层封装
+│  │  ├─ draw_image/               # 选点 + 出图
+│  │  ├─ get_wiki_article.py       # 百科检索
+│  │  ├─ get_qa_pair.py            # 问答对检索
+│  │  ├─ qa_retrieve/              # OpenSearch 检索实现
+│  │  ├─ md2html/ + md2html_wrapper.py  # HTML 渲染
+│  │  ├─ convert_format.py         # md -> html -> pdf
+│  │  └─ database.py               # wiki MySQL
 │  └─ utils/
-└─ output/
+└─ output/                    # 生成产物，已在 .gitignore 中
 ```
 
 单课程输出布局（`output/<课程名>/`）：
@@ -236,10 +245,20 @@ asyncio.run(run())
 - 生成 `with_images.md` 与 `images.json`
 - 输出 `book/md_with_images/*.md`，并修正为相对图片路径
 
-单独调试：
+出图接口偶发过载，`generate_images` 会退避重试三次；仍失败时该位点的图片标签会被摘掉，
+不会在成书里留下指向空文件的链接。
 
-```bash
-python -m src.tools.draw_image.main markdown --markdown-path "你的md路径" --output-dir "你的输出目录"
+单独调试某个 Markdown：
+
+```python
+import asyncio
+from src.tools import draw_images_for_markdown
+
+asyncio.run(draw_images_for_markdown(
+    md_path="你的md路径",
+    image_output_dir="输出目录",
+    new_md_path="输出目录/with_images.md",
+))
 ```
 
 ---
@@ -258,11 +277,13 @@ python -m src.tools.draw_image.main markdown --markdown-path "你的md路径" --
   - 你很可能传了 `subchapter_ids`，系统会提前结束后续阶段（这是预期行为）。
 
 - **Q4：`.env` 不生效怎么办？**
-  - 确认安装了 `python-dotenv`，并将 `.env` 放在 `book_generate_pipeline/` 根目录。
+  - `.env` 必须放在 `book_generate_pipeline/` 根目录，由 `src/__init__.py` 统一加载。
+    子包内不要再放 `.env`，否则会互相覆盖。
 
 - **Q5：QA 检索命中 0 条怎么办？**
   - OpenSearch 里的题库是英文的，中文关键词要靠 `utility` 模型扩展出英文变体才能命中。
-    先跑 `python scripts/healthcheck.py structured` 确认结构化输出正常。
+    先跑 `python scripts/healthcheck.py structured` 确认结构化输出正常。注意 `utility`
+    角色不能配 Claude 系模型，它们会忽略 `response_format` 导致关键词解析失败。
 
 ---
 
@@ -274,11 +295,18 @@ python -m src.tools.draw_image.main markdown --markdown-path "你的md路径" --
 python scripts/list_litellm_models.py
 ```
 
-逐项体检（网关各角色模型、出图、多模态、百科检索、问答检索、PDF 渲染）：
+逐项体检（网关各角色模型、结构化输出、出图、百科检索、问答检索、PDF 渲染）：
 
 ```bash
 python scripts/healthcheck.py             # 全部
 python scripts/healthcheck.py chat image  # 只跑指定项
+```
+
+改动核心链路后跑一遍最小课程端到端自检：
+
+```bash
+python scripts/run_e2e.py         # pack + book 全流程
+python scripts/run_e2e.py pack    # 只跑素材包
 ```
 
 ---

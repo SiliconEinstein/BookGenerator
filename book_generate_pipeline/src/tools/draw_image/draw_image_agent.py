@@ -3,16 +3,11 @@ import json
 import re
 import logging
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Dict, List, Optional
 
-from src.models import generate_images, utility_completion, vision_completion
+from src.models import generate_images, utility_completion
 
-from .services.article_fetcher import fetch_article_content
 from .pipelines.draw_by_text import generate_image_from_context
-from .pipelines.draw_by_pedia_content import (
-    build_pedia_markdown,
-    draw_by_pedia_content as generate_pedia_by_id,
-)
 from .pipelines.draw_by_markdown import (
     generate_images_from_markdown as generate_markdown_images,
 )
@@ -70,9 +65,6 @@ class DrawImageAgent:
     def __init__(self) -> None:
         self.model_kwargs: Dict[str, object] = {}
 
-    def get_article(self, article_id: int) -> Union[str, Tuple[str, str]]:
-        return fetch_article_content(article_id)
-
     def get_prompt(self, prompt_path: str, prompt_name: str, content: Dict[str, str]) -> str:
         file_path = Path(prompt_path) / prompt_name
         if not file_path.exists():
@@ -124,22 +116,6 @@ class DrawImageAgent:
                 first_path = file_path
         return first_path
 
-    async def eval_image(self, image_path: str, prompt: str) -> Dict[str, object]:
-        try:
-            response = await vision_completion(prompt, image_path)
-            response = json.loads(self.parse_result(response))
-            return {
-                "describe": response.get("describe", ""),
-                "reason": response.get("reason", ""),
-                "score": response.get("score", -1),
-            }
-        except Exception as exc:
-            logger.exception(f"Error occurred while calling LLM API: {str(exc)}")
-            return {"describe": "", "reason": "", "score": -1}
-
-    def build_pedia_markdown(self, main_content: str, applications: str) -> str:
-        return build_pedia_markdown(main_content, applications)
-
     async def draw_by_text(
         self,
         context: str,
@@ -153,19 +129,6 @@ class DrawImageAgent:
             output_dir=output_dir,
             image_name=image_name,
             reason=reason,
-            prompt_dir=prompt_dir,
-            client=self,
-        )
-
-    async def draw_by_pedia_content(
-        self,
-        article_id: int,
-        output_dir: str,
-        prompt_dir: str = "./prompt",
-    ) -> Dict[str, object]:
-        return await generate_pedia_by_id(
-            article_id=article_id,
-            output_dir=output_dir,
             prompt_dir=prompt_dir,
             client=self,
         )

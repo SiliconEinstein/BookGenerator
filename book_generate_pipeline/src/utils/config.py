@@ -11,7 +11,6 @@ _MODEL_ENV_OVERRIDES = {
     "writer": "LLM_WRITER_MODEL",
     "reviewer": "LLM_REVIEWER_MODEL",
     "utility": "LLM_UTILITY_MODEL",
-    "vision": "LLM_VISION_MODEL",
     "image": "LLM_IMAGE_MODEL",
 }
 

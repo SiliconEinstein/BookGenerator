@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""逐项体检：LiteLLM 网关各角色模型、出图、百科检索、问答检索、渲染链路。
+"""逐项体检：LiteLLM 网关各角色模型、出图、百科检索、问答检索、PDF 渲染。
 
 用法：
     python scripts/healthcheck.py            # 全部检查
@@ -27,7 +27,7 @@ async def check_env():
     config = get_config()
     record("网关地址", bool(config.gateway_base_url), config.gateway_base_url or "未配置")
     record("网关密钥", bool(config.gateway_api_key), "已设置" if config.gateway_api_key else "未配置")
-    for role in ("writer", "reviewer", "utility", "vision", "image"):
+    for role in ("writer", "reviewer", "utility", "image"):
         record(f"模型配置 [{role}]", True, config.get_model(role))
     for key in ("OPENSEARCH_HOST", "OPENSEARCH_USERNAME", "OPENSEARCH_PASSWORD"):
         record(f"环境变量 {key}", bool(os.environ.get(key)), "已设置" if os.environ.get(key) else "未设置")
@@ -86,31 +86,6 @@ async def check_image():
         record("出图", False, f"{type(e).__name__}: {str(e)[:150]}")
 
 
-async def check_vision():
-    """多模态读图，插图评估依赖它。"""
-    import base64
-    import tempfile
-
-    from src.models import model_for, vision_completion
-
-    # 1x1 红色 PNG
-    png = base64.b64decode(
-        "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
-    )
-    with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as f:
-        f.write(png)
-        path = f.name
-    try:
-        text = await asyncio.wait_for(
-            vision_completion("这张图是什么颜色？只回答颜色。", path, max_tokens=256), timeout=180
-        )
-        record(f"多模态读图 ({model_for('vision')})", bool(text.strip()), text.strip()[:60])
-    except Exception as e:
-        record("多模态读图", False, f"{type(e).__name__}: {str(e)[:150]}")
-    finally:
-        os.unlink(path)
-
-
 async def check_wiki():
     from src.tools.get_wiki_article import search_wiki_articles_for_subchapter
 
@@ -158,7 +133,6 @@ CHECKS = {
     "chat": check_chat,
     "structured": check_structured,
     "image": check_image,
-    "vision": check_vision,
     "wiki": check_wiki,
     "opensearch": check_opensearch,
     "render": check_render,
